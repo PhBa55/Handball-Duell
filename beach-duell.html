@@ -6292,7 +6292,7 @@ const G3 = { on:false };
     R3.env.time += dt;
     if (st.banT > 0){ st.banT -= dt; if (st.banT <= 0) document.getElementById('g3ban').hidden = true; }
     const s = G3.snapIn;
-    if (s){
+    if (s && s.P && s.b && s.ctl){
       st.phase = s.ph; st.score = s.sc; st.sets = s.sets; st.half = s.half; st.clock = s.clk; st.golden = !!s.golden; st.poss = s.poss; st.kind = s.kind;
       st.ctrls = [PL[s.ctl[0]] || null, PL[s.ctl[1]] || null];
       st.so = s.so ? { score:s.so.score, shots:s.so.shots, sd:!!s.so.sd, t:s.so.t, step:s.so.step, T:s.so.T } : null;
@@ -7833,7 +7833,7 @@ const H3 = { on:false };
     R3.env.time += dt;
     if (st.banT > 0){ st.banT -= dt; if (st.banT <= 0) document.getElementById('g3ban').hidden = true; }
     const s = H3.snapIn;
-    if (s){
+    if (s && s.P && s.b && s.ctl){
       st.phase = s.ph; st.score = s.sc; st.half = s.half; st.clock = s.clk; st.poss = s.poss; st.kind = s.kind;
       st.ctrls = [PL[s.ctl[0]] || null, PL[s.ctl[1]] || null];
       st.seven = s.sv ? { t:s.sv.t, T:s.sv.T, wait:s.sv.w, shot:!!s.sv.shot, sh:PL[s.sv.sh], k:PL[s.sv.k] } : null;
@@ -8099,21 +8099,22 @@ function netTransport(room){
     return T;
   }
   const base = url + '/rooms/' + room;
-  T.send = m => { fetch(base + '/m.json', { method:'POST', body:JSON.stringify(m) }).catch(() => netStatus('Verbindung gestört …')); };
+  const unpack = v => { if (typeof v === 'string'){ try { return JSON.parse(v); } catch (e) { return null; } } return v; };
+  T.send = m => { fetch(base + '/m.json', { method:'POST', body:JSON.stringify(JSON.stringify(m)) }).catch(() => netStatus('Verbindung gestört …')); };
   let busy = { 0:false, 1:false }, next = { 0:null, 1:null };
   T.state = (slot, d) => {
     // Zustand überschreiben; läuft noch eine Anfrage, wird nur der neueste Stand nachgeschickt
     if (busy[slot]){ next[slot] = d; return; }
     busy[slot] = true;
-    fetch(base + '/s' + slot + '.json', { method:'PUT', body:JSON.stringify(d) }).catch(() => {}).finally(() => { busy[slot] = false; if (next[slot]){ const n = next[slot]; next[slot] = null; T.state(slot, n); } });
+    fetch(base + '/s' + slot + '.json', { method:'PUT', body:JSON.stringify(JSON.stringify(d)) }).catch(() => {}).finally(() => { busy[slot] = false; if (next[slot]){ const n = next[slot]; next[slot] = null; T.state(slot, n); } });
   };
   let first = true;
-  const take = (k, m) => { if (T.seen.has(k)) return; T.seen.add(k); if (!first && T.onmsg) T.onmsg(m); };
+  const take = (k, m) => { if (T.seen.has(k)) return; T.seen.add(k); m = unpack(m); if (m && !first && T.onmsg) T.onmsg(m); };
   const handle = (path, data) => {
     if (path === '/'){
       if (data && data.m) for (const k of Object.keys(data.m)) take(k, data.m[k]);   // alte Nachrichten nur merken, nicht ausführen
       first = false; T.ready = true;
-      if (data){ for (const sl of [0, 1]) if (data['s' + sl]) T.onmsg && T.onmsg({ _s:sl, d:data['s' + sl] }); }
+      if (data){ for (const sl of [0, 1]) if (data['s' + sl]) T.onmsg && T.onmsg({ _s:sl, d:unpack(data['s' + sl]) }); }
       return;
     }
     const parts = path.split('/').filter(Boolean);
@@ -8121,7 +8122,7 @@ function netTransport(room){
       if (parts.length === 2) take(parts[1], data);
       else if (parts.length === 1 && data) for (const k of Object.keys(data)) take(k, data[k]);
     } else if ((parts[0] === 's0' || parts[0] === 's1') && parts.length === 1 && data){
-      T.onmsg && T.onmsg({ _s:Number(parts[0][1]), d:data });
+      const d = unpack(data); if (d) T.onmsg && T.onmsg({ _s:Number(parts[0][1]), d });
     }
   };
   const es = new EventSource(base + '.json');
@@ -8313,7 +8314,10 @@ function netGuestStart(d){
   showOverlay(null);
 }
 function netGuestTick(dt){
-  const s = NET.snap; if (!s) return;
+  try { netGuestTick0(dt); } catch (e) { console.error(e); }
+}
+function netGuestTick0(dt){
+  const s = NET.snap; if (!s || !s.att || !s.def || !s.k) return;
   if (Z.flashT > 0) Z.flashT -= dt;
   const kk = 1 - Math.exp(-dt*14);
   Z.phase = s.ph; Z.full = s.full; Z.two = s.two; Z.car = s.car; Z.passes = s.passes; Z.maxPass = s.maxPass;
@@ -8333,7 +8337,7 @@ function netGuestTick(dt){
   } else Z.fly = null;
   Z.run = s.run ? { f:mkFly(s.run.p.map(q => ({ x:q[0], y:q[1] })), 'run', 0) } : null;
   Z.spin = s.spin ? { t:s.spin } : null; Z.air = s.air ? { t:s.air[0], max:s.air[1] } : null;
-  Z.leavers = s.lv.map(l => ({ x:l[0], y:l[1], team:l[2] ? 'att' : 'def', gk:!!l[3] }));
+  Z.leavers = (s.lv || []).map(l => ({ x:l[0], y:l[1], team:l[2] ? 'att' : 'def', gk:!!l[3] }));
   Z.wz = s.wz; Z.wide = s.wide; Z.slide = s.slide; Z.soStep = s.soStep; Z.soT = s.soT; Z.result = s.result;
   Z.params = { dReach:s.P[0], kReach:s.P[1] };
   Z.fm = s.fm || null; Z.m = s.m || null;
