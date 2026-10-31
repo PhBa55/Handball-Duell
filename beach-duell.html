@@ -324,13 +324,13 @@ input.txt{user-select:text;-webkit-user-select:text}
       <span class="flabel">Spielen</span>
       <div class="seg sport" data-key="sport"><button data-v="beach">Beach</button><button data-v="hall">Halle</button></div>
       <div class="mgrid" id="mgHall">
-        <button class="mode mt m3d mhall wide" data-mode="h3d"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M3 27V12L16 5l13 7v15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="M3 27h26M10 27v-7a6 6 0 0 1 12 0v7" fill="none" stroke="currentColor" stroke-width="2.2"/></svg><b>Halle 3D</b><i>Neu · 6 + Torwart</i></button>
+        <button class="mode mt m3d mhall wide" data-mode="h3d"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M3 27V12L16 5l13 7v15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="M3 27h26M10 27v-7a6 6 0 0 1 12 0v7" fill="none" stroke="currentColor" stroke-width="2.2"/></svg><b>Halle 3D</b><i>6 + Torwart · auch online</i></button>
         <button class="mode mt" data-mode="hfull"><svg viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="7" width="26" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M16 7v18M3 11a5 5 0 0 1 0 10M29 11a5 5 0 0 0 0 10" fill="none" stroke="currentColor" stroke-width="2.2"/></svg><b>Ganzes Spiel</b><i>Allein oder zu zweit</i></button>
         <button class="mode mt" data-mode="hlevels"><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="7" cy="24" r="3" fill="currentColor"/><path d="M9.5 21.5C14 16 18 20 22 11" fill="none" stroke="currentColor" stroke-width="2.2" stroke-dasharray="3 3"/><path d="m19 11 3.5-3 1.2 4.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/></svg><b>Spielzüge</b><i>Allein · 16 Level</i><small id="hmodeStars"></small></button>
-        <button class="mode mt wide" data-mode="h7m"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 24V9h22v15" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/><path d="M9 13h14M9 17h14M13 9v15M19 9v15" stroke="currentColor" stroke-width="1" opacity=".5"/><text x="16" y="31" font-size="8" font-weight="900" text-anchor="middle" fill="currentColor">7m</text></svg><b>7-Meter-Werfen</b><i>Werfer gegen Torwart</i></button>
+        <button class="mode mt wide" data-mode="h7m"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 24V9h22v15" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/><path d="M9 13h14M9 17h14M13 9v15M19 9v15" stroke="currentColor" stroke-width="1" opacity=".5"/><text x="16" y="31" font-size="8" font-weight="900" text-anchor="middle" fill="currentColor">7m</text></svg><b>7-Meter-Werfen</b><i>Werfer gegen Torwart · auch online</i></button>
       </div>
       <div class="mgrid" id="mgBeach">
-        <button class="mode mt m3d wide" data-mode="g3d"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3 28 9.5v13L16 29 4 22.5v-13Z M4 9.5 16 16l12-6.5M16 16v13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/></svg><b>3D-Arena</b><i>Neu · gegen den Computer</i></button>
+        <button class="mode mt m3d wide" data-mode="g3d"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3 28 9.5v13L16 29 4 22.5v-13Z M4 9.5 16 16l12-6.5M16 16v13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/></svg><b>3D-Arena</b><i>Computer oder online</i></button>
         <button class="mode mt" data-mode="full"><svg viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="7" width="26" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M16 7v18M3 12h4v8H3M29 12h-4v8h4" fill="none" stroke="currentColor" stroke-width="2.2"/></svg><b>Ganzes Spiel</b><i>Allein oder zu zweit</i></button>
         <button class="mode mt" data-mode="so"><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="12" fill="none" stroke="currentColor" stroke-width="2.2"/><circle cx="16" cy="16" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><circle cx="16" cy="16" r="2" fill="currentColor"/></svg><b>Shoot-out</b><i>Allein oder zu zweit</i></button>
         <button class="mode mt" data-mode="duell"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 26V8h22v18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/><path d="M9 12h14M9 16h14M9 20h14M12 8v18M16 8v18M20 8v18" stroke="currentColor" stroke-width="1" opacity=".5"/><circle cx="22" cy="23" r="3.2" fill="currentColor"/></svg><b>Wurfduell</b><i>Allein</i></button>
@@ -1794,16 +1794,16 @@ const MODES = {
                    online:'Zwei Handys über das Internet: Einer erstellt einen Raum, der andere tritt mit dem Code bei. Wer angreift, zeichnet auf seinem Handy, wer verteidigt, stellt die Abwehr.' ,
                    two:'Einer stellt Abwehr und Torwart, der andere spielt den Angriff. Dann wird getauscht. 4 Angriffe pro Spieler.' },
             fields:['oppField','cdiffField'] },
-  g3d:    { game:'zug', zp:'1', eyebrow:'Allein · gegen den Computer', title:'3D-Arena', start:'Anpfiff',
+  g3d:    { game:'zug', zp:'1', eyebrow:'Gegen den Computer oder online', title:'3D-Arena', start:'Anpfiff',
             text:{ cpu:'Beachhandball in 3D aus der Sicht hinter dem Angreifer. Links steuerst du mit dem Joystick, rechts passt, wirfst und springst du.',
                    online:'Beachhandball in 3D auf zwei Handys: Jeder steuert sein Team, das Handy des Raum-Erstellers rechnet das Spiel. Einer erstellt den Raum, der andere gibt den Code ein.', two:'' },
             fields:['g3Field','oppField','cdiffField','fhalfField'] },
-  h3d:    { game:'zug', zp:'1', eyebrow:'Halle · gegen den Computer', title:'Halle 3D', start:'Anpfiff',
+  h3d:    { game:'zug', zp:'1', eyebrow:'Halle · Computer oder online', title:'Halle 3D', start:'Anpfiff',
             text:{ cpu:'Hallenhandball in 3D: 6 Feldspieler und Torwart pro Team, Sprungwurf und Schlagwurf, Prellen, 7-Meter und 2 Minuten. Bei Unentschieden 7-Meter-Werfen.',
                    online:'Hallenhandball in 3D auf zwei Handys: Jeder steuert sein Team, das Handy des Raum-Erstellers rechnet das Spiel. Einer erstellt den Raum, der andere gibt den Code ein.',
                    two:'' },
             fields:['oppField','cdiffField','hhalfField'] },
-  h7m:    { game:'zug', zp:'1', eyebrow:'Halle · gegen den Computer', title:'7-Meter-Werfen', start:'Los geht’s',
+  h7m:    { game:'zug', zp:'1', eyebrow:'Halle · Computer oder online', title:'7-Meter-Werfen', start:'Los geht’s',
             text:{ cpu:'Abwechselnd je 5 Würfe von der 7-m-Linie. Du wirfst mit Wurf, Heber oder Aufsetzer. Wirft der Computer, steuerst du deinen Torwart.',
                    online:'7-Meter-Duell auf zwei Handys: abwechselnd werfen und halten. Einer erstellt den Raum, der andere gibt den Code ein.', two:'' },
             fields:['oppField','cdiffField'] },
@@ -6296,12 +6296,18 @@ const G3 = { on:false };
       st.phase = s.ph; st.score = s.sc; st.sets = s.sets; st.half = s.half; st.clock = s.clk; st.golden = !!s.golden; st.poss = s.poss; st.kind = s.kind;
       st.ctrls = [PL[s.ctl[0]] || null, PL[s.ctl[1]] || null];
       st.so = s.so ? { score:s.so.score, shots:s.so.shots, sd:!!s.so.sd, t:s.so.t, step:s.so.step, T:s.so.T } : null;
-      const kk = 1 - Math.exp(-dt*16);
+      const want = p => {
+        if (st.phase !== 'play' || st.so || p.gk || p.air || p.out || p.st === 'windup' || p.st === 'pir' || p.st === 'pirH') return null;
+        if (!ball.owner && ball.fl && ball.fl.team === p.team) return null;
+        const j = joyVec(1); if (p.faceBall && j.m < .15) return null;
+        const c = ball.owner, w = toWorld(j.x, j.y), v = (c === p ? 5.4 : (p.faceBall ? 5.2 : 6.0))*j.m;
+        return { x:w.x*v, z:w.z*v };
+      };
+      ball.owner = s.b[6] >= 0 ? PL[s.b[6]] : null;
+      const b = s.b;
+      net3Apply(PL, s, ball, dt, st.ctrls[1], want, lerpAng);
       s.P.forEach((a, i) => {
         const p = PL[i]; if (!p) return;
-        const far = Math.hypot(p.x - a[0], p.z - a[1]) > 3;
-        p.x = far ? a[0] : p.x + (a[0] - p.x)*kk; p.z = far ? a[1] : p.z + (a[1] - p.z)*kk; p.y += (a[2] - p.y)*kk;
-        p.yaw = lerpAng(p.yaw, a[3], kk); p.vx = a[4]; p.vz = a[5];
         const stc = ST_CODES[a[6]] || ''; if (stc !== p.st){ p.st = stc; p.stT = a[7]; }
         p.dive = a[8]; p.diveDir = a[9]; p.diveH = a[10]; p.air = !!a[11]; p.spin = a[12]; p.out = !!a[13]; p.faceBall = !!a[14];
         p.hold = a[15]; p.stepDist = a[16]; p.wu = a[17] >= 0 ? { t:a[17], T:1 } : null;
@@ -6309,9 +6315,6 @@ const G3 = { on:false };
         if (!!a[20] !== p.gk) setRole(p, a[20] ? 'gk' : a[21] ? 'spez' : 'field');
         p.leave = null; p.enter = false; p.waitFor = null;
       });
-      const b = s.b, far = Math.hypot(ball.x - b[0], ball.z - b[2]) > 2.5;
-      ball.x = far ? b[0] : ball.x + (b[0] - ball.x)*kk; ball.y += (b[1] - ball.y)*kk; ball.z = far ? b[2] : ball.z + (b[2] - ball.z)*kk;
-      ball.vx = b[3]; ball.vy = b[4]; ball.vz = b[5];
       ball.owner = b[6] >= 0 ? PL[b[6]] : null;
       ball.fl = b[7] >= 0 ? { team:b[7], kind:b[8] === 1 ? 'shot' : b[8] === 2 ? 'lob' : 'pass', t:0, T:1 } : null;
       if (ball.fl && s.kr){ const to = PL[s.kr.to]; ball.fl.to = to; ball.fl.t = s.kr.t; ball.fl.T = s.kr.T; if (to) to.recv = { human:true, ideal:s.kr.ideal, win:s.kr.win }; }
@@ -7838,19 +7841,22 @@ const H3 = { on:false };
       st.ctrls = [PL[s.ctl[0]] || null, PL[s.ctl[1]] || null];
       st.seven = s.sv ? { t:s.sv.t, T:s.sv.T, wait:s.sv.w, shot:!!s.sv.shot, sh:PL[s.sv.sh], k:PL[s.sv.k] } : null;
       st.pen = s.pen ? { score:s.pen.s, shots:s.pen.n, sd:!!s.pen.sd } : null;
-      const kk = 1 - Math.exp(-dt*16);
+      const want = p => {
+        if (st.phase !== 'play' || st.seven || p.gk || p.air || p.out || p.st === 'windup' || p.st === 'pir' || p.st === 'pirH') return null;
+        if (!ball.owner && ball.fl && ball.fl.team === p.team) return null;
+        const j = joyVec(1); if (p.faceBall && j.m < .15) return null;
+        const c = ball.owner, w = toWorld(j.x, j.y), v = (c === p ? (p.drib ? 5.6 : 5.2) : (p.faceBall ? 5.2 : 6.2))*j.m;
+        return { x:w.x*v, z:w.z*v };
+      };
+      ball.owner = s.b[6] >= 0 ? PL[s.b[6]] : null;
+      const b = s.b;
+      net3Apply(PL, s, ball, dt, st.ctrls[1], want, lerpAng);
       s.P.forEach((a, i) => {
         const p = PL[i]; if (!p) return;
-        const far = Math.hypot(p.x - a[0], p.z - a[1]) > 3;
-        p.x = far ? a[0] : p.x + (a[0] - p.x)*kk; p.z = far ? a[1] : p.z + (a[1] - p.z)*kk; p.y += (a[2] - p.y)*kk;
-        p.yaw = lerpAng(p.yaw, a[3], kk); p.vx = a[4]; p.vz = a[5];
         const stc = ST_CODES[a[6]] || ''; if (stc !== p.st){ p.st = stc; p.stT = a[7]; }
         p.dive = a[8]; p.diveDir = a[9]; p.diveH = a[10]; p.air = !!a[11]; p.drib = !!a[12]; p.dribPh = a[13]; p.out = !!a[14]; p.faceBall = !!a[15];
         p.susp = a[16]; p.hold = a[17]; p.stepDist = a[18]; p.wu = a[19] >= 0 ? { t:a[19], T:1 } : null; p.dribbled = !!a[20];
       });
-      const b = s.b, far = Math.hypot(ball.x - b[0], ball.z - b[2]) > 2.5;
-      ball.x = far ? b[0] : ball.x + (b[0] - ball.x)*kk; ball.y += (b[1] - ball.y)*kk; ball.z = far ? b[2] : ball.z + (b[2] - ball.z)*kk;
-      ball.vx = b[3]; ball.vy = b[4]; ball.vz = b[5];
       ball.owner = b[6] >= 0 ? PL[b[6]] : null; ball.fl = b[7] >= 0 ? { team:b[7], kind:b[8] ? 'shot' : 'pass', t:0, T:1 } : null;
     }
     for (const p of PL){ if (!p.out) animate(p, dt); }
@@ -8100,13 +8106,51 @@ function netTransport(room){
   }
   const base = url + '/rooms/' + room;
   const unpack = v => { if (typeof v === 'string'){ try { return JSON.parse(v); } catch (e) { return null; } } return v; };
-  T.send = m => { fetch(base + '/m.json', { method:'POST', body:JSON.stringify(JSON.stringify(m)) }).catch(() => netStatus('Verbindung gestört …')); };
-  let busy = { 0:false, 1:false }, next = { 0:null, 1:null };
+  T.sendFb = m => { fetch(base + '/m.json', { method:'POST', body:JSON.stringify(JSON.stringify(m)) }).catch(() => netStatus('Verbindung gestört …')); };
+  // Direktverbindung (WebRTC) bevorzugt, sonst über die Datenbank
+  T.send = m => { if (T.dc && T.dc.readyState === 'open'){ try { T.dc.send(JSON.stringify(m)); return; } catch (e) {} } T.sendFb(m); };
+  let busy = { 0:0, 1:0 }, next = { 0:null, 1:null }, seq = 0;
+  const lastQ = { 0:0, 1:0 };
   T.state = (slot, d) => {
-    // Zustand überschreiben; läuft noch eine Anfrage, wird nur der neueste Stand nachgeschickt
-    if (busy[slot]){ next[slot] = d; return; }
-    busy[slot] = true;
-    fetch(base + '/s' + slot + '.json', { method:'PUT', body:JSON.stringify(JSON.stringify(d)) }).catch(() => {}).finally(() => { busy[slot] = false; if (next[slot]){ const n = next[slot]; next[slot] = null; T.state(slot, n); } });
+    d._q = ++seq;
+    if (T.ds && T.ds.readyState === 'open'){ try { T.ds.send(JSON.stringify({ _s:slot, d })); return; } catch (e) {} }
+    // Zustand überschreiben; höchstens zwei Anfragen gleichzeitig, sonst nur den neuesten Stand nachschicken
+    if (busy[slot] >= 2){ next[slot] = d; return; }
+    busy[slot]++;
+    fetch(base + '/s' + slot + '.json', { method:'PUT', body:JSON.stringify(JSON.stringify(d)) }).catch(() => {}).finally(() => { busy[slot]--; if (next[slot]){ const n = next[slot]; next[slot] = null; T.state(slot, n); } });
+  };
+  // ältere Stände (überholt oder doppelt über beide Wege) verwerfen
+  const fresh = (slot, d) => { if (!d) return false; const q = d._q || 0; if (q && q <= lastQ[slot] && lastQ[slot] - q < 1e6) return false; lastQ[slot] = q; return true; };
+  T.fresh = fresh;
+  T.rtc = null; T.dc = null; T.ds = null; T.direct = false;
+  const ICE = [{ urls:['stun:stun.l.google.com:19302', 'stun:stun1.l.google.com:19302'] }];
+  const gathered = pc => new Promise(res => { if (pc.iceGatheringState === 'complete') return res(); const t = setTimeout(res, 2500); pc.addEventListener('icegatheringstatechange', () => { if (pc.iceGatheringState === 'complete'){ clearTimeout(t); res(); } }); });
+  const mkPc = () => {
+    if (typeof RTCPeerConnection === 'undefined') return null;
+    try { if (T.rtc) T.rtc.close(); } catch (e) {}
+    const pc = new RTCPeerConnection({ iceServers:ICE });
+    T.rtc = pc;
+    T.dc = pc.createDataChannel('r', { negotiated:true, id:0 });
+    T.ds = pc.createDataChannel('s', { negotiated:true, id:1, ordered:false, maxRetransmits:0 });
+    const onm = e => { let m; try { m = JSON.parse(e.data); } catch (_) { return; } if (!m) return; if (m._s != null && !fresh(m._s, m.d)) return; T.onmsg && T.onmsg(m); };
+    T.dc.onmessage = onm; T.ds.onmessage = onm;
+    T.dc.onopen = () => { T.direct = true; T.onlink && T.onlink(true); };
+    T.dc.onclose = () => { if (T.direct){ T.direct = false; T.onlink && T.onlink(false); } };
+    return pc;
+  };
+  T.rtcStart = async () => {
+    const pc = mkPc(); if (!pc) return;
+    try { await pc.setLocalDescription(await pc.createOffer()); await gathered(pc); if (T.rtc === pc) T.sendFb({ f:NET.me, k:'rtc', d:{ type:'offer', sdp:pc.localDescription.sdp } }); } catch (e) {}
+  };
+  T.rtcSignal = async d => {
+    try {
+      if (d.type === 'offer'){
+        const pc = mkPc(); if (!pc) return;
+        await pc.setRemoteDescription({ type:'offer', sdp:d.sdp });
+        await pc.setLocalDescription(await pc.createAnswer()); await gathered(pc);
+        if (T.rtc === pc) T.sendFb({ f:NET.me, k:'rtc', d:{ type:'answer', sdp:pc.localDescription.sdp } });
+      } else if (d.type === 'answer' && T.rtc && T.rtc.signalingState === 'have-local-offer') await T.rtc.setRemoteDescription({ type:'answer', sdp:d.sdp });
+    } catch (e) {}
   };
   let first = true;
   const take = (k, m) => { if (T.seen.has(k)) return; T.seen.add(k); m = unpack(m); if (m && !first && T.onmsg) T.onmsg(m); };
@@ -8114,7 +8158,7 @@ function netTransport(room){
     if (path === '/'){
       if (data && data.m) for (const k of Object.keys(data.m)) take(k, data.m[k]);   // alte Nachrichten nur merken, nicht ausführen
       first = false; T.ready = true;
-      if (data){ for (const sl of [0, 1]) if (data['s' + sl]) T.onmsg && T.onmsg({ _s:sl, d:unpack(data['s' + sl]) }); }
+      if (data){ for (const sl of [0, 1]) if (data['s' + sl]){ const d = unpack(data['s' + sl]); if (fresh(sl, d)) T.onmsg && T.onmsg({ _s:sl, d }); } }
       return;
     }
     const parts = path.split('/').filter(Boolean);
@@ -8122,14 +8166,14 @@ function netTransport(room){
       if (parts.length === 2) take(parts[1], data);
       else if (parts.length === 1 && data) for (const k of Object.keys(data)) take(k, data[k]);
     } else if ((parts[0] === 's0' || parts[0] === 's1') && parts.length === 1 && data){
-      const d = unpack(data); if (d) T.onmsg && T.onmsg({ _s:Number(parts[0][1]), d });
+      const sl = Number(parts[0][1]), d = unpack(data); if (fresh(sl, d)) T.onmsg && T.onmsg({ _s:sl, d });
     }
   };
   const es = new EventSource(base + '.json');
   es.addEventListener('put', e => { try { const j = JSON.parse(e.data); handle(j.path, j.data); } catch (_) {} });
   es.addEventListener('patch', e => { try { const j = JSON.parse(e.data); const p = j.path === '/' ? '' : j.path; for (const k of Object.keys(j.data || {})) handle(p + '/' + k, j.data[k]); } catch (_) {} });
   es.onerror = () => { if (NET.on) netStatus('Verbindung wird gesucht …'); };
-  T.close = () => { try { es.close(); } catch (_) {} };
+  T.close = () => { try { es.close(); } catch (_) {} try { if (T.rtc) T.rtc.close(); } catch (_) {} T.rtc = null; };
   return T;
 }
 const NET3 = () => NET.eng === 'g3' ? G3 : H3;
@@ -8148,7 +8192,7 @@ async function netCreate(){
     try { await fetch(url + '/rooms/' + code + '.json', { method:'PUT', body:JSON.stringify({ info:{ game:GAME, t:Date.now() } }) }); }
     catch (e) { netLeave(true); return netStatus('Keine Verbindung zur Datenbank. Internet an? Adresse richtig?'); }
   }
-  NET.T = netTransport(code); NET.T.onmsg = netOnMsg;
+  NET.T = netTransport(code); NET.T.onmsg = netOnMsg; NET.T.onlink = netLink;
   netStatus('Raum ' + code + ' · Code an den Mitspieler geben und warten …');
   netUi();
 }
@@ -8167,13 +8211,22 @@ async function netJoin(code){
   }
   Object.assign(NET, { on:true, host:false, guest:true, me:1, room:code, peer:false, started:false });
   NET.names = ['Spieler 1', myName()];
-  NET.T = netTransport(code); NET.T.onmsg = netOnMsg;
+  NET.T = netTransport(code); NET.T.onmsg = netOnMsg; NET.T.onlink = netLink;
+  NET.rtt = 0; clearInterval(NET.pingI); NET.pingI = setInterval(() => { if (NET.guest && NET.peer) netSend('pg', { t:performance.now() }); }, 2000);
   netStatus('Verbinde mit Raum ' + code + ' …');
   const hello = () => { if (!NET.peer && NET.guest){ netSend('hello', { name:myName() }); setTimeout(hello, 1500); } };
   setTimeout(hello, url === 'local' ? 50 : 600);
   netUi();
 }
+// Status der Direktverbindung anzeigen (nur in der Lobby sichtbar)
+function netLink(direct){
+  NET.direct = direct;
+  const el = document.getElementById('netStatus'); if (!el || !NET.peer) return;
+  const base = el.textContent.replace(/ · (Direktverbindung|über Server)$/, '');
+  el.textContent = base + (direct ? ' · Direktverbindung' : ' · über Server');
+}
 function netLeave(silent){
+  clearInterval(NET.pingI);
   if (NET.T){ if (!silent && NET.on) try { netSend('bye', {}); } catch (_) {} NET.T.close(); }
   const wasRoom = NET.room;
   Object.assign(NET, { on:false, host:false, guest:false, room:'', peer:false, T:null, snap:null, curMsg:null, curMsg3:null, started:false, mode3:false });
@@ -8192,7 +8245,7 @@ function netUi(){
 /* ---------- Nachrichten ---------- */
 function netOnMsg(m){
   if (m._s != null){
-    if (NET.guest && m._s === 0 && NET.mode3){ NET3().snapIn = m.d; return; }
+    if (NET.guest && m._s === 0 && NET.mode3){ m.d._t = performance.now(); NET3().snapIn = m.d; return; }
     if (NET.host && m._s === 1 && NET.mode3){ NET3().remoteIn(m.d); return; }
     if (NET.guest && m._s === 0){ NET.snap = m.d; if (NET.started && !Z.active && NET.waitSnap){ NET.waitSnap = false; Z.active = true; zbar.hidden = false; } }
     if (NET.host && m._s === 1) netGuestState(m.d);
@@ -8204,6 +8257,7 @@ function netOnMsg(m){
     case 'hello':
       if (!NET.host) return;
       NET.peer = true; NET.names[1] = String(d.name || 'Spieler 2').slice(0, 14);
+      if (NET.T.rtcStart && !NET.T.rtc) NET.T.rtcStart();
       netSend('welcome', { name:NET.names[0], mode:curMode });
       netStatus('Raum ' + NET.room + ' · ' + NET.names[1] + ' ist da. Tippe auf „' + ($('#startBtn').textContent || 'Anpfiff') + '“.');
       netUi(); break;
@@ -8221,6 +8275,9 @@ function netOnMsg(m){
       running = false; M = null; A = null; Z.active = false; trainOff(); zbar.hidden = true; showOverlay(null);
       if (!NET3().startRemote(d.kind)){ toast('3D wird auf diesem Gerät nicht unterstützt.'); netSend('end', {}); netLeave(true); toMenu(); }
       break;
+    case 'rtc': if (NET.T && NET.T.rtcSignal) NET.T.rtcSignal(d); break;
+    case 'pg': if (NET.host) netSend('po', { t:d.t }); break;
+    case 'po': if (NET.guest && d.t){ const r = performance.now() - d.t; if (r >= 0 && r < 5000) NET.rtt = NET.rtt ? NET.rtt*.7 + r*.3 : r; } break;
     case 'a3': if (NET.host) NET3().remoteAct(d); break;
     case 'b3': if (NET.host) NET3().remoteBtn(d); break;
     case 'm3': if (NET.guest) NET3().showRemoteMsg(d); break;
@@ -8286,7 +8343,7 @@ function netSnap(){
 function netHostTick(){
   if (!NET.host || !NET.started || !Z.active || !NET.T) return;
   const now = performance.now();
-  if (now - NET.snapT < 120) return;
+  if (now - NET.snapT < (NET.T.direct ? 60 : 110)) return;
   NET.snapT = now;
   NET.T.state(0, netSnap());
 }
@@ -8343,6 +8400,51 @@ function netGuestTick0(dt){
   Z.fm = s.fm || null; Z.m = s.m || null;
   // eigene Eingaben (Torwart-Balken, Aufstellung) zum Host
   if ((Z.full && zAttTeam() === 0) || Z.phase === 'setup') netGuestSend();
+}
+
+/* ---------- 3D-Gast: Positionen vorausberechnen statt nur nachziehen ----------
+   Alle Spieler und der Ball werden mit ihrer Geschwindigkeit um das Alter des Schnappschusses weitergeschoben.
+   Den eigenen Spieler bewegt der Joystick sofort; die Antwort des Hosts korrigiert ihn nur sanft. */
+function net3Apply(PL, s, ball, dt, me, want, lerpAng){
+  const now = performance.now();
+  const age = Math.min(.25, Math.max(0, (now - (s._t || now))/1000));
+  const lead = Math.min(.45, age + (NET.rtt || 0)/1000);
+  const kk = 1 - Math.exp(-dt*14);
+  s.P.forEach((a, i) => {
+    const p = PL[i]; if (!p) return;
+    let tx = a[0] + a[4]*age, tz = a[1] + a[5]*age;
+    const w = p === me ? want(p) : null;
+    if (w){
+      tx = a[0] + a[4]*lead; tz = a[1] + a[5]*lead;
+      if (p._pvx == null){ p._pvx = a[4]; p._pvz = a[5]; }
+      const acc = 22*dt;
+      p._pvx += Math.max(-acc, Math.min(acc, w.x - p._pvx)); p._pvz += Math.max(-acc, Math.min(acc, w.z - p._pvz));
+      p.x += p._pvx*dt; p.z += p._pvz*dt;
+      const ex = tx - p.x, ez = tz - p.z;
+      if (Math.hypot(ex, ez) > 2.2){ p.x = tx; p.z = tz; }
+      else { const g = 1 - Math.exp(-dt*3); p.x += ex*g; p.z += ez*g; }
+      p.vx = p._pvx; p.vz = p._pvz;
+      if (Math.hypot(p._pvx, p._pvz) > .6 && !p.faceBall) p.yaw = lerpAng(p.yaw, Math.atan2(p._pvx, p._pvz), Math.min(1, dt*12));
+      else p.yaw = lerpAng(p.yaw, a[3], kk);
+    } else {
+      p._pvx = null;
+      const far = Math.hypot(p.x - tx, p.z - tz) > 3;
+      p.x = far ? tx : p.x + (tx - p.x)*kk; p.z = far ? tz : p.z + (tz - p.z)*kk;
+      p.yaw = lerpAng(p.yaw, a[3], kk); p.vx = a[4]; p.vz = a[5];
+    }
+    p.y += (a[2] - p.y)*kk;
+    p._dx = p.x - a[0]; p._dz = p.z - a[1];
+  });
+  const b = s.b, own = b[6] >= 0 ? PL[b[6]] : null;
+  if (own){
+    // Ball in der Hand: bleibt an der angezeigten Position seines Spielers
+    ball.x = b[0] + (own._dx || 0); ball.z = b[2] + (own._dz || 0); ball.y += (b[1] - ball.y)*Math.min(1, kk*2);
+  } else {
+    const tx = b[0] + b[3]*age, tz = b[2] + b[5]*age, ty = Math.max(.11, b[1] + b[4]*age - 4.905*age*age);
+    const kb = 1 - Math.exp(-dt*30), far = Math.hypot(ball.x - tx, ball.z - tz) > 2.5;
+    ball.x = far ? tx : ball.x + (tx - ball.x)*kb; ball.z = far ? tz : ball.z + (tz - ball.z)*kb; ball.y = far ? ty : ball.y + (ty - ball.y)*kb;
+  }
+  ball.vx = b[3]; ball.vy = b[4]; ball.vz = b[5];
 }
 
 /* @@G3D-JS-END@@ */
