@@ -117,6 +117,8 @@ button:focus-visible,summary:focus-visible{outline:3px solid var(--sun);outline-
 .mode.mc[data-mode="train"] small{color:var(--ink)}
 .mode.mc.off{display:none}
 .tiles2{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.homelink{align-self:flex-start;font-size:14px;font-weight:700;color:var(--home);text-decoration:none;border:2px solid var(--home);border-radius:999px;padding:3px 12px;margin-bottom:-4px}
+.homelink[hidden]{display:none}
 .linkbtn{border:0;background:none;color:#4E6268;font:inherit;font-size:14px;font-weight:600;text-decoration:underline;padding:4px;align-self:center}
 #lbList{display:flex;flex-direction:column;gap:10px}
 .lbcat{border:2px solid var(--ink);border-radius:12px;padding:8px 12px;background:#fff}
@@ -346,8 +348,14 @@ input.txt{user-select:text;-webkit-user-select:text}
 
   <section id="menu" class="overlay" aria-label="Spielmenü">
     <div class="panel">
+      <a id="homeLink" class="homelink" href="index.html" hidden>‹ Beach oder Halle</a>
       <p class="eyebrow">Beachhandball</p>
       <h1>Beach-Duell</h1>
+      <div class="tiles2">
+        <button class="mode tile" data-mode="prof"><b>Profil</b><small id="profBadge"></small></button>
+        <button class="mode tile" data-mode="rec"><b>Rekorde</b><small id="recBadge"></small></button>
+        <button class="mode tile" data-mode="board"><b>Bestenliste</b><small>alle Spieler</small></button>
+      </div>
       <button id="resumeBtn" class="resume" hidden><span class="rl">Weiterspielen</span><b id="resumeName"></b><span class="ra" aria-hidden="true">›</span></button>
       <div class="seg sport" data-key="sport"><button data-v="beach">Beach</button><button data-v="hall">Halle</button></div>
       <span class="flabel">Mit wem?</span>
@@ -370,11 +378,6 @@ input.txt{user-select:text;-webkit-user-select:text}
         <button class="mode mc" data-mode="train"><b>Training</b><span id="trainSub">Steuerung, Würfe, Kleingruppen</span><small id="trainBadge"></small></button>
         <button class="mode mc" data-mode="hlevels" data-game="hall"><b>Spielzüge</b><span>16 Level mit Sternen</span><small id="hmodeStars"></small></button>
         <button class="mode mc" data-mode="levels" data-game="beach"><b>Spielzüge</b><span>22 Level mit Sternen</span><small id="modeStars"></small></button>
-      </div>
-      <div class="tiles2">
-        <button class="mode tile" data-mode="prof"><b>Profil</b><small id="profBadge"></small></button>
-        <button class="mode tile" data-mode="rec"><b>Rekorde</b><small id="recBadge"></small></button>
-        <button class="mode tile" data-mode="board"><b>Bestenliste</b><small>alle Spieler</small></button>
       </div>
       <button id="bugBtn" class="linkbtn" type="button">Fehler melden</button>
     </div>
@@ -8681,11 +8684,11 @@ async function openBoard(){
   const list = $('#lbList'), note = $('#lbNote');
   list.textContent = ''; note.textContent = 'Lade …';
   showOverlay('lbOv');
-  let all = null;
+  let all = null, lbErr = '';
   const db = lbDb();
   if (db){
     await lbPush();
-    try { const r = await fetch(db + '/lb/' + GAME + '.json'); if (r.ok) all = await r.json() || {}; } catch (e) { all = null; }
+    try { const r = await fetch(db + '/lb/' + GAME + '.json'); if (r.ok) all = await r.json() || {}; else lbErr = r.status; } catch (e) { all = null; lbErr = 'net'; }
   }
   const mine = lbId();
   let rows;
@@ -8696,7 +8699,9 @@ async function openBoard(){
   } else {
     const e = lbEntry(); e.id = mine; if (!e.name) e.name = 'Du';
     rows = [e];
-    note.textContent = 'Keine Verbindung zur Bestenliste. Hier stehen nur deine eigenen Werte.';
+    note.textContent = !db ? 'Die gemeinsame Bestenliste aller Spieler gibt es nur in der Version auf der Spiele-Seite (GitHub). Hier stehen nur deine eigenen Werte.'
+      : lbErr === 401 || lbErr === 403 ? 'Die gemeinsame Bestenliste ist in der Datenbank noch nicht freigeschaltet (Firebase-Regeln). Bis dahin stehen hier nur deine eigenen Werte.'
+      : 'Keine Internetverbindung zur Bestenliste. Hier stehen nur deine eigenen Werte.';
   }
   for (const c of LB_CATS[GAME]){
     const top = rows.filter(e => { const v = c.v(e); return v != null && (c.low || v > 0); })
@@ -8767,6 +8772,8 @@ function applyGame(){
   document.querySelector('#menu .sport').style.display = 'none';
   document.title = hall ? 'Hallen-Duell' : 'Beach-Duell';
   $('#menu h1').textContent = hall ? 'Hallen-Duell' : 'Beach-Duell';
+  // Zurück zur Startseite mit beiden Spielen (nur auf der eigenen Spiele-Seite, nicht im Chat)
+  $('#homeLink').hidden = !/^https?:$/.test(location.protocol) || /claude\.ai|claudeusercontent/.test(location.hostname) || !/-duell\.html$/.test(location.pathname);
 }
 applyGame();
 $('#netSlot').append($('#netField'));
