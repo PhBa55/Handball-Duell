@@ -117,6 +117,31 @@ button:focus-visible,summary:focus-visible{outline:3px solid var(--sun);outline-
 .mode.mc[data-mode="train"] small{color:var(--ink)}
 .mode.mc.off{display:none}
 .tiles2{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.cuplist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.cuplist li{display:grid;grid-template-columns:1fr auto;column-gap:8px;border:2px solid var(--ink);border-radius:12px;padding:8px 12px;background:#fff}
+.cuplist li b{font-family:var(--f-display);font-weight:400;font-size:16px}
+.cuplist li span{grid-column:1;font-size:13px;color:#4E6268}
+.cuplist li i{grid-column:2;grid-row:1 / span 2;align-self:center;font-style:normal;font-weight:700;font-size:13px}
+.cuplist .cup-won{background:#E3F4EF;border-color:var(--home)} .cuplist .cup-won i{color:var(--home)}
+.cuplist .cup-now{background:#FFF1C9;border-color:#B57E00} .cuplist .cup-now i{color:#8A5F00}
+.cuplist .cup-lost{background:#FBE3DA;border-color:var(--cta)} .cuplist .cup-lost i{color:var(--cta)}
+.cuplist .cup-open{opacity:.6}
+.tbox{border:2px solid var(--ink);border-radius:13px;padding:10px 12px;display:flex;flex-direction:column;gap:8px;margin-bottom:10px;background:#fff}
+.tbox > b{font-family:var(--f-display);font-weight:400;font-size:17px}
+.netrow2{display:grid;grid-template-columns:1fr auto;gap:6px}
+.netrow2 .txt{text-align:center;letter-spacing:.15em;font-weight:800}
+#tourIn{display:flex;flex-direction:column;gap:10px}
+#tourIn[hidden]{display:none}
+.ttab{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
+.ttab th,.ttab td{padding:4px 4px;border-bottom:1px solid #E5DAC4;text-align:right}
+.ttab th:nth-child(2),.ttab td:nth-child(2),.ttab td:only-child{text-align:left}
+.ttab th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#4E6268}
+.ttab tr.me td{color:var(--cta);font-weight:700}
+.tgames{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px;font-size:14px}
+.tgames li{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.ghost.mini{padding:3px 8px;font-size:12px}
+.warn{color:var(--cta);font-weight:700}
+#netWarn{position:fixed;left:50%;top:10px;transform:translateX(-50%);z-index:90;background:#D9481F;color:#fff;font-weight:700;font-size:14px;padding:8px 14px;border-radius:12px;box-shadow:0 4px 0 rgba(0,0,0,.25);pointer-events:none;max-width:calc(100% - 32px);text-align:center}
 .homelink{align-self:flex-start;font-size:14px;font-weight:700;color:var(--home);text-decoration:none;border:2px solid var(--home);border-radius:999px;padding:3px 12px;margin-bottom:-4px}
 .homelink[hidden]{display:none}
 .linkbtn{border:0;background:none;color:#4E6268;font:inherit;font-size:14px;font-weight:600;text-decoration:underline;padding:4px;align-self:center}
@@ -357,6 +382,7 @@ input.txt{user-select:text;-webkit-user-select:text}
         <button class="mode tile" data-mode="board"><b>Bestenliste</b><small>alle Spieler</small></button>
       </div>
       <button id="resumeBtn" class="resume" hidden><span class="rl">Weiterspielen</span><b id="resumeName"></b><span class="ra" aria-hidden="true">›</span></button>
+      <button id="tourResume" class="resume" hidden><span class="rl">Zurück ins Turnier</span><b id="tourResumeName"></b><span class="ra" aria-hidden="true">›</span></button>
       <div class="seg sport" data-key="sport"><button data-v="beach">Beach</button><button data-v="hall">Halle</button></div>
       <span class="flabel">Mit wem?</span>
       <div class="seg who" data-key="opp"><button data-v="cpu"><i>●</i>Allein</button><button data-v="two"><i>●●</i>Zu zweit<br>ein Handy</button><button data-v="online"><i>⇄</i>Online</button></div>
@@ -365,10 +391,14 @@ input.txt{user-select:text;-webkit-user-select:text}
       <div class="mlist" id="mgHall">
         <button class="mode mc m3d" data-mode="h3d" data-opp="cpu online"><b>Halle 3D</b><span data-cpu="Ganzes Spiel, 6 + Torwart, du steuerst mit dem Joystick" data-online="Jeder steuert sein Team mit dem Joystick"></span></button>
         <button class="mode mc" data-mode="hfull" data-opp="cpu two online"><b>Spiel von oben</b><span data-cpu="Spielzüge zeichnen, Tor gegen Tor" data-two="Das Handy liegt zwischen euch, jeder hat ein Tor" data-online="Angreifer zeichnet, Verteidiger hält"></span></button>
+        <button class="mode mc" data-mode="cup" data-opp="cpu"><b>Pokal</b><span data-cpu="4 Runden gegen immer stärkere Gegner, wer verliert, ist raus"></span><small id="cupBadgeH"></small></button>
+        <button class="mode mc" data-mode="tour" data-opp="online"><b>Turnier</b><span data-online="Bis zu 8 Spieler, jeder gegen jeden"></span></button>
         <button class="mode mc" data-mode="h7m" data-opp="cpu online"><b>7-Meter</b><span data-cpu="Abwechselnd werfen und halten" data-online="Abwechselnd werfen und halten"></span></button>
       </div>
       <div class="mlist" id="mgBeach">
         <button class="mode mc m3d" data-mode="g3d" data-opp="cpu online"><b>3D-Arena</b><span data-cpu="Beachhandball in 3D, du steuerst mit dem Joystick" data-online="Jeder steuert sein Team mit dem Joystick"></span></button>
+        <button class="mode mc" data-mode="cup" data-opp="cpu"><b>Pokal</b><span data-cpu="4 Runden gegen immer stärkere Gegner, wer verliert, ist raus"></span><small id="cupBadgeB"></small></button>
+        <button class="mode mc" data-mode="tour" data-opp="online"><b>Turnier</b><span data-online="Bis zu 8 Spieler, jeder gegen jeden"></span></button>
         <button class="mode mc" data-mode="full" data-opp="cpu two online"><b>Spiel von oben</b><span data-cpu="Spielzüge zeichnen, Tor gegen Tor" data-two="Das Handy liegt zwischen euch, jeder hat ein Tor" data-online="Angreifer zeichnet, Verteidiger hält"></span></button>
         <button class="mode mc" data-mode="werfen" data-opp="cpu two online"><b>Werfen</b><span data-cpu="Wurfduell oder Shoot-out gegen den Computer" data-two="Shoot-out, je 5 Würfe abwechselnd" data-online="Shoot-out, je 5 Würfe abwechselnd"></span></button>
         <button class="mode mc" data-mode="tactic" data-opp="cpu two online"><b>Taktik-Duell</b><span data-cpu="Abwehr aufstellen, Angriff zeichnen" data-two="Einer stellt die Abwehr, der andere greift an" data-online="Einer stellt die Abwehr, der andere greift an"></span></button>
@@ -492,6 +522,53 @@ input.txt{user-select:text;-webkit-user-select:text}
     </div>
   </section>
 
+  <section id="cupOv" class="overlay" hidden aria-label="Pokal">
+    <div class="panel">
+      <p class="eyebrow">Allein · gegen den Computer</p>
+      <h2 id="cupTitle">Pokal</h2>
+      <p class="msgtext" id="cupInfo"></p>
+      <ol class="cuplist" id="cupList"></ol>
+      <div class="field" id="cupKind"><span class="flabel">Spielart</span>
+        <div class="seg" data-key="cupk"><button data-v="full" class="k3d">3D-Spiel</button><button data-v="pen" class="kpen">7-Meter</button></div></div>
+      <button id="cupGo" class="cta">Pokal starten</button>
+      <button id="cupQuit" class="ghost" hidden>Pokal aufgeben</button>
+      <button id="cupBack" class="ghost">Zurück</button>
+    </div>
+  </section>
+  <section id="tourOv" class="overlay" hidden aria-label="Online-Turnier">
+    <div class="panel">
+      <p class="eyebrow">Online · bis zu 8 Spieler</p>
+      <h2>Turnier</h2>
+      <p class="fnote warn" id="tourErr" hidden></p>
+      <div class="field"><label class="flabel" for="tourName">Dein Name im Turnier</label><input id="tourName" class="txt" type="text" maxlength="14" placeholder="z. B. Jonas"></div>
+      <div id="tourStartBox">
+        <div class="tbox">
+          <b>Turnier erstellen</b>
+          <div class="field"><span class="flabel">Spielart</span>
+            <div class="seg" data-key="tourk"><button data-v="full" class="k3d">3D-Spiel</button><button data-v="pen" class="kpen">7-Meter</button></div></div>
+          <div class="field" id="thalfHField"><span class="flabel">Halbzeit</span>
+            <div class="seg" data-key="thalfH"><button data-v="120">2 min</button><button data-v="180">3 min</button><button data-v="300">5 min</button></div></div>
+          <div class="field" id="thalfBField"><span class="flabel">Halbzeit</span>
+            <div class="seg" data-key="thalfB"><button data-v="60">1 min</button><button data-v="120">2 min</button><button data-v="180">3 min</button></div></div>
+          <button id="tourCreate" class="cta">Turnier erstellen</button>
+        </div>
+        <div class="tbox">
+          <b>Turnier beitreten</b>
+          <div class="netrow2"><input id="tourCode" class="txt" inputmode="numeric" maxlength="5" placeholder="Code"><button id="tourJoin" class="ghost">Beitreten</button></div>
+        </div>
+      </div>
+      <div id="tourIn" hidden>
+        <p class="fnote" id="tourHead"></p>
+        <p class="msgtext" id="tourState"></p>
+        <button id="tourGo" class="cta">Turnier starten</button>
+        <table class="ttab"><thead id="tourTabHead"><tr><th>#</th><th>Name</th><th>Sp</th><th>S</th><th>N</th><th>Tore</th><th>Pkt</th></tr></thead><tbody id="tourTab"></tbody></table>
+        <span class="flabel" id="tourGamesHead">Spiele dieser Runde</span>
+        <ul class="tgames" id="tourGames"></ul>
+        <button id="tourLeave" class="ghost">Turnier verlassen</button>
+      </div>
+      <button id="tourBack" class="ghost">Zum Menü</button>
+    </div>
+  </section>
   <section id="lbOv" class="overlay" hidden aria-label="Bestenliste">
     <div class="panel">
       <p class="eyebrow">Alle Spieler</p>
@@ -580,6 +657,7 @@ input.txt{user-select:text;-webkit-user-select:text}
   </section>
 </div>
 
+<div id="netWarn" hidden></div>
 <!-- @@G3D-HTML@@ -->
 <div id="g3" hidden>
   <canvas id="g3c"></canvas>
@@ -614,6 +692,10 @@ if (!['duell','zug'].includes(S.game)) S.game = 'duell';
 if (!['1','2','3','4'].includes(String(S.zp))) S.zp = '1';
 if (!['cpu','two'].includes(S.opp)) S.opp = 'cpu';   // online startet nie automatisch
 if (!['duell','so'].includes(S.wk)) S.wk = 'duell';
+if (!['full','pen'].includes(S.cupk)) S.cupk = 'full';
+if (!['full','pen'].includes(S.tourk)) S.tourk = 'full';
+if (!['120','180','300'].includes(String(S.thalfH))) S.thalfH = '180';
+if (!['60','120','180'].includes(String(S.thalfB))) S.thalfB = '120';
 if (!['full','so'].includes(S.g3k)) S.g3k = 'full';
 if (!['beach','hall'].includes(S.sport)) S.sport = 'beach';
 if (!['180','300','480'].includes(String(S.hhalf))) S.hhalf = '300';
@@ -1840,7 +1922,7 @@ function banner(main, sub, tone, ms){
 
 function showOverlay(id){
   if (NET.host && NET.started && id == null) netSend('ov', { id:null });
-  for (const o of ['menu','setupOv','pauseOv','endOv','levelsOv','msgOv','trainOv','recOv','shareOv','profOv','lbOv','bugOv']) $('#' + o).hidden = o !== id;
+  for (const o of ['menu','setupOv','pauseOv','endOv','levelsOv','msgOv','trainOv','recOv','shareOv','profOv','lbOv','bugOv','cupOv','tourOv']) $('#' + o).hidden = o !== id;
 }
 
 /* ---------- Menü ----------
@@ -2050,11 +2132,25 @@ function syncMenu(){
   document.querySelectorAll('#mgPractice .mode[data-game]').forEach(b => b.classList.toggle('off', b.dataset.game !== (hall ? 'hall' : 'beach')));
   $('#lblPractice').hidden = $('#mgPractice').hidden = S.opp !== 'cpu';
   $('#netField').hidden = S.opp !== 'online';
+  document.querySelectorAll('.kpen').forEach(b => b.textContent = hall ? '7-Meter' : 'Shoot-out');
+  document.querySelectorAll('.k3d').forEach(b => b.textContent = hall ? 'Halle 3D' : '3D-Arena');
+  if ($('#thalfHField')){ $('#thalfHField').hidden = !hall || S.tourk === 'pen'; $('#thalfBField').hidden = hall || S.tourk === 'pen'; }
+  { const c = REC.cup && REC.cup[GAME], el = $(hall ? '#cupBadgeH' : '#cupBadgeB'); if (el) el.textContent = c && !c.out && !c.won ? CUP_ROUNDS[c.round] : (REC.cups ? REC.cups + '× gewonnen' : ''); }
+  if (typeof syncTourBtn === 'function') syncTourBtn();
   $('#menu .eyebrow').textContent = hall ? 'Hallenhandball' : 'Beachhandball';
   $('#trainBadge').textContent = td ? td + '/' + TRL().filter(L => L.kind !== 'info').length + ' ✓' : 'Hier starten';
 }
-document.querySelectorAll('.mode').forEach(b => b.addEventListener('click', () => b.dataset.mode === 'train' ? openTraining() : b.dataset.mode === 'rec' ? openRecords() : b.dataset.mode === 'prof' ? openProfile() : b.dataset.mode === 'board' ? openBoard() : openMode(b.dataset.mode)));
+document.querySelectorAll('.mode').forEach(b => b.addEventListener('click', () => b.dataset.mode === 'train' ? openTraining() : b.dataset.mode === 'rec' ? openRecords() : b.dataset.mode === 'prof' ? openProfile() : b.dataset.mode === 'board' ? openBoard() : b.dataset.mode === 'cup' ? openCup() : b.dataset.mode === 'tour' ? openTour() : openMode(b.dataset.mode)));
 $('#bugBtn').addEventListener('click', () => openBug());
+$('#cupGo').addEventListener('click', () => cupStart());
+$('#cupQuit').addEventListener('click', () => cupQuit());
+$('#cupBack').addEventListener('click', () => showOverlay('menu'));
+$('#tourCreate').addEventListener('click', () => tourCreate());
+$('#tourJoin').addEventListener('click', () => tourJoin());
+$('#tourGo').addEventListener('click', () => tourStart());
+$('#tourLeave').addEventListener('click', () => tourLeave());
+$('#tourBack').addEventListener('click', () => { syncMenu(); showOverlay('menu'); });
+$('#tourResume').addEventListener('click', () => openTour());
 $('#lbBack').addEventListener('click', () => showOverlay('menu'));
 $('#bugBack').addEventListener('click', () => showOverlay('menu'));
 $('#bugSend').addEventListener('click', () => sendBug());
@@ -2116,7 +2212,7 @@ $('#resumeBtn').addEventListener('click', () => {
 });
 $('#againBtn').addEventListener('click', newMatch);
 $('#restartBtn').addEventListener('click', () => { if (Z.active){ Z.paused = false; zRestart(); } else newMatch(); });
-function toMenu(){ if (NET.on && NET.started){ netSend('end', {}); netLeave(true); } setTable(false); trainOff(); clearTimeout(endTimer); running = false; paused = false; M = null; A = null; Z.active = false; Z.paused = false; Z.draw = null; zbar.hidden = true; releaseWake(); syncMenu(); showOverlay('menu'); }
+function toMenu(){ if (typeof cupPlaying !== 'undefined' && cupPlaying){ cupPlaying = false; if (cupKeep) S.cdiff = cupKeep; } if (NET.on && NET.started){ netSend('end', {}); netLeave(true); } setTable(false); trainOff(); clearTimeout(endTimer); running = false; paused = false; M = null; A = null; Z.active = false; Z.paused = false; Z.draw = null; zbar.hidden = true; releaseWake(); syncMenu(); showOverlay('menu'); }
 $('#menuBtn').addEventListener('click', toMenu);
 $('#rotOk').addEventListener('click', () => { portraitOk = true; $('#rotOv').hidden = true; last = performance.now(); });
 $('#endMenuBtn').addEventListener('click', toMenu);
@@ -4316,7 +4412,9 @@ const BADGES = [
   { id:'train',    lbl:'T',   name:'Musterschüler',   desc:'Alle Trainingsübungen geschafft' },
   { id:'twtor',    lbl:'TW',  name:'Torwart-Tor',     desc:'Ein Torwart-Tor im Ganzen Spiel' },
   { id:'team',     lbl:'2',   name:'Teamplayer',      desc:'Ein Ganzes Spiel zu zweit zu Ende gespielt' },
-  { id:'cpu',      lbl:'PC',  name:'Maschinenstürmer', desc:'Ganzes Spiel, Taktik-Duell oder Shoot-out gegen den Computer auf Schwer gewonnen' }
+  { id:'cpu',      lbl:'PC',  name:'Maschinenstürmer', desc:'Ganzes Spiel, Taktik-Duell oder Shoot-out gegen den Computer auf Schwer gewonnen' },
+  { id:'pokal',    lbl:'Cup',  name:'Pokalsieger',     desc:'Den Pokal gegen den Computer gewonnen' },
+  { id:'turnier',  lbl:'T1',  name:'Turniersieger',   desc:'Ein Online-Turnier gewonnen' }
 ];
 const toastQ = [];
 function earn(id){
@@ -5307,7 +5405,7 @@ const G3 = { on:false };
     cancelAnimationFrame(raf); raf = requestAnimationFrame(loop);
     return true;
   }
-  function setNames(){ const tn = document.querySelectorAll('#g3 .g3sb .tn'); if (tn.length === 2){ tn[0].textContent = st.online ? NET.names[0].slice(0, 10) : ((typeof curProf === 'function' && curProf().name.trim()) || 'DU').slice(0, 10); tn[1].textContent = st.online ? NET.names[1].slice(0, 10) : 'CPU'; } }
+  function setNames(){ const tn = document.querySelectorAll('#g3 .g3sb .tn'); if (tn.length === 2){ tn[0].textContent = st.online ? NET.names[0].slice(0, 10) : ((typeof curProf === 'function' && curProf().name.trim()) || 'DU').slice(0, 10); tn[1].textContent = st.online ? NET.names[1].slice(0, 10) : ((typeof cupOpp === 'function' && cupOpp()) || 'CPU').slice(0, 13); } }
   function stop(){
     G3.on = false; cancelAnimationFrame(raf);
     if (ui) ui.hidden = true;
@@ -5590,6 +5688,8 @@ const G3 = { on:false };
     } catch (e) {}
     if (!st.online) try { if (typeof Z !== 'undefined') Z.cdiff = S.cdiff; recCpu(st.kind === 'so' && !st.so.inGame ? 'so' : 'full', w === 0); } catch (e) {}
     const lines = st.hist.map(h => h[0] + '  ' + h[1]).join(' · ');
+    { const sc = st.so && !st.so.inGame ? st.so.score : [0, 1].map(t => st.score[0][t] + st.score[1][t]);
+      if (typeof matchEnd === 'function' && matchEnd(w, sc.slice(), !!st.online)) return; }
     msg('Abpfiff', st.online ? nm(w) + ' gewinnt' : w === 0 ? 'Gewonnen!' : 'Der Computer gewinnt', lines || '',
       [{ label:'Revanche', primary:true, fn:() => { hideMsg(); start(st.kind, null, { online:st.online }); } }, { label:'Zum Menü', fn:exit }]);
   }
@@ -6499,7 +6599,7 @@ const G3 = { on:false };
   // Für Tests: Logik ohne Zeichnen weiterrechnen
   function simStep(dt){ step(dt); if (ball) ballN.pos = [ball.x, ball.y, ball.z]; R3.update(root); }
   function renderNow(co){ if (co){ Object.assign(cam, co); world.sky.pos = cam.pos.slice(); cam.shadowCenter = cam.tgt; } else updateCam(.5); R3.render(root, cam, cvs.width, cvs.height); hud(); }
-  Object.assign(G3, { IN, start, stop, exit, input:inp, step, cam, simStep, renderNow, startRemote, remoteIn, remoteAct, showRemoteMsg, remoteBtn, remotePause,
+  Object.assign(G3, { IN, start, stop, exit, input:inp, step, cam, simStep, renderNow, startRemote, remoteIn, remoteAct, showRemoteMsg, remoteBtn, remotePause, localMsg:(e, t, x, b) => msg(e, t, x, b, true),
     banner:(a, b, ms) => banner(a, b, ms), flash:t => flash(t), hideMsg:() => { $3('g3msg').hidden = true; } });
   Object.defineProperties(G3, { st:{ get:() => st }, PL:{ get:() => PL }, ball:{ get:() => ball } });
 })();
@@ -6632,7 +6732,7 @@ const H3 = { on:false };
     cancelAnimationFrame(raf); raf = requestAnimationFrame(loop);
     return true;
   }
-  function setNames(){ const tn = document.querySelectorAll('#g3 .g3sb .tn'); if (tn.length === 2){ tn[0].textContent = st.online ? NET.names[0].slice(0, 10) : ((typeof curProf === 'function' && curProf().name.trim()) || 'DU').slice(0, 10); tn[1].textContent = st.online ? NET.names[1].slice(0, 10) : 'CPU'; } }
+  function setNames(){ const tn = document.querySelectorAll('#g3 .g3sb .tn'); if (tn.length === 2){ tn[0].textContent = st.online ? NET.names[0].slice(0, 10) : ((typeof curProf === 'function' && curProf().name.trim()) || 'DU').slice(0, 10); tn[1].textContent = st.online ? NET.names[1].slice(0, 10) : ((typeof cupOpp === 'function' && cupOpp()) || 'CPU').slice(0, 13); } }
   function stop(){
     H3.on = false; cancelAnimationFrame(raf);
     if (ui){ ui.hidden = true; ui.classList.remove('hall'); }
@@ -6930,6 +7030,9 @@ const H3 = { on:false };
     } catch (e) {}
     if (!st.online) try { if (typeof Z !== 'undefined') Z.cdiff = S.cdiff; recCpu(st.kind === '7m' ? 'h7m' : 'hall', w === 0); } catch (e) {}
     const lines = st.hist.map(h => h[0] + '  ' + h[1]).join(' · ');
+    // Turnier oder Pokal übernehmen das Spielende selbst
+    { const sc = st.kind === '7m' && st.pen ? st.pen.score : st.score;
+      if (typeof matchEnd === 'function' && matchEnd(w, sc.slice(), !!st.online)) return; }
     msg('Abpfiff', st.online ? nm(w) + ' gewinnt' : w === 0 ? 'Gewonnen!' : 'Der Computer gewinnt', (st.kind === '7m' ? '' : 'Endstand ' + st.score[0] + ':' + st.score[1] + ' · ') + lines,
       [{ label:'Revanche', primary:true, fn:() => { hideMsg(); start(st.kind, null, { online:st.online }); } }, { label:'Zum Menü', fn:exitH }]);
   }
@@ -8086,7 +8189,7 @@ const H3 = { on:false };
   // Für Tests: Logik ohne Zeichnen weiterrechnen
   function simStep(dt){ frameStep(dt); R3.update(root); }
   function renderNow(co){ if (co){ Object.assign(cam, co); world.sky.pos = cam.pos.slice(); cam.shadowCenter = cam.tgt; } else updateCam(.5); R3.render(root, cam, cvs.width, cvs.height); hud(); }
-  Object.assign(H3, { IN, start, stop, exit:exitH, input:inp, step, cam, simStep, renderNow, aDist, startRemote, remoteIn, remoteAct, showRemoteMsg, remoteBtn, remotePause,
+  Object.assign(H3, { IN, start, stop, exit:exitH, input:inp, step, cam, simStep, renderNow, aDist, startRemote, remoteIn, remoteAct, showRemoteMsg, remoteBtn, remotePause, localMsg:(e, t, x, b) => msg(e, t, x, b, true),
     banner:(a, b, ms) => banner(a, b, ms), flash:t => flash(t), hideMsg:() => { $3('g3msg').hidden = true; } });
   Object.defineProperties(H3, { st:{ get:() => st }, PL:{ get:() => PL }, ball:{ get:() => ball } });
 })();
@@ -8392,11 +8495,11 @@ const netSend = (k, d) => { if (NET.T) NET.T.send({ f:NET.me, k, d }); };
 const myName = () => (curProf().name.trim() || (NET.host ? 'Spieler 1' : 'Spieler 2')).slice(0, 14);
 
 /* ---------- Raum erstellen und beitreten ---------- */
-async function netCreate(){
+async function netCreate(fixed){
   const url = netUrl();
   if (!url) return netStatus('Für Online fehlt die Datenbank-Adresse (siehe Anleitung).');
   netLeave(true);
-  const code = String(Math.floor(1000 + Math.random()*9000));
+  const code = typeof fixed === 'string' ? fixed : String(Math.floor(1000 + Math.random()*9000));
   Object.assign(NET, { on:true, host:true, guest:false, me:0, room:code, peer:false, started:false });
   NET.names = [myName(), 'Spieler 2'];
   if (url !== 'local'){
@@ -8439,6 +8542,8 @@ function netLink(direct){
 // Mitspieler weg (verlassen oder nicht mehr erreichbar): Info zeigen und zurück ins Menü
 function netPeerGone(txt){
   if (!NET.on) return;
+  netWarn(0);
+  if (typeof TOUR !== 'undefined' && TOUR.match && tourPeerGone(txt)) return;
   if (!NET.started){
     if (NET.host){ NET.peer = false; NET.lastRx = 0; netStatus(txt + ' Raum ' + NET.room + ' bleibt offen, warte auf einen neuen Mitspieler.'); netUi(); }
     else { netLeave(true); netStatus(txt + ' Erstelle einen neuen Raum oder tritt mit einem Code bei.'); }
@@ -8450,18 +8555,28 @@ function netPeerGone(txt){
   netStatus(txt + ' Erstelle einen neuen Raum oder tritt mit einem Code bei.');
   toast(txt + ' Zurück im Menü.', 5000);
 }
-// Lebenszeichen alle 3 s; kommt 12 s lang nichts vom Mitspieler, gilt er als weg
+// Lebenszeichen alle 3 s; kommt 20 s lang nichts vom Mitspieler, gilt er als weg. Ab 5 s läuft sichtbar ein Countdown.
+const NET_WAIT = 20000;
+function netWarn(sec){
+  const el = document.getElementById('netWarn'); if (!el) return;
+  if (!sec){ el.hidden = true; return; }
+  el.hidden = false; el.textContent = 'Keine Verbindung zu ' + NET.names[NET.host ? 1 : 0] + ' · noch ' + sec + ' s';
+}
+let netHbT = 0;
 setInterval(() => {
-  if (!NET.on || !NET.peer || !NET.T) return;
+  if (!NET.on || !NET.peer || !NET.T){ netWarn(0); return; }
   if (document.hidden){ NET.lastRx = performance.now(); return; }
-  netSend('hb', {});
-  if (!NET.lastRx) NET.lastRx = performance.now();
-  else if (performance.now() - NET.lastRx > 12000) netPeerGone(NET.names[NET.host ? 1 : 0] + ' ist nicht mehr erreichbar.');
-}, 3000);
+  const now = performance.now();
+  if (now - netHbT > 2900){ netHbT = now; netSend('hb', {}); }
+  if (!NET.lastRx){ NET.lastRx = now; return; }
+  const gap = now - NET.lastRx;
+  if (gap > NET_WAIT) netPeerGone(NET.names[NET.host ? 1 : 0] + ' ist nicht mehr erreichbar.');
+  else netWarn(gap > 5000 ? Math.ceil((NET_WAIT - gap)/1000) : 0);
+}, 1000);
 document.addEventListener('visibilitychange', () => { if (!document.hidden && NET.on) NET.lastRx = performance.now(); });
 window.addEventListener('pagehide', () => { if (NET.on && NET.T) try { netSend('bye', {}); } catch (e) {} });
 function netLeave(silent){
-  clearInterval(NET.pingI);
+  clearInterval(NET.pingI); netWarn(0);
   if (NET.T){ if (!silent && NET.on) try { netSend('bye', {}); } catch (_) {} NET.T.close(); }
   const wasRoom = NET.room;
   Object.assign(NET, { lastRx:0, on:false, host:false, guest:false, room:'', peer:false, T:null, snap:null, curMsg:null, curMsg3:null, started:false, mode3:false });
@@ -8497,6 +8612,7 @@ function netOnMsg(m){
       if (NET.T.rtcStart && !NET.T.rtc) NET.T.rtcStart();
       netSend('welcome', { name:NET.names[0], mode:curMode });
       netStatus('Raum ' + NET.room + ' · ' + NET.names[1] + ' ist da. Tippe jetzt ein Spiel an.');
+      if (typeof TOUR !== 'undefined' && TOUR.match && !NET.started) setTimeout(tourStartMatch, 1500);
       netUi(); break;
     case 'welcome':
       if (!NET.guest) return;
@@ -8533,6 +8649,7 @@ function netOnMsg(m){
     case 'ban': if (NET.guest) banner(d.a, d.b, d.t, d.ms); break;
     case 'flash': if (NET.guest) zFlash(d.t); break;
     case 'hb': break;
+    case 'tdone': if (NET.guest && typeof tourGuestDone === 'function') tourGuestDone(d); break;
     case 'end': case 'bye':
       if (NET.on) netPeerGone(NET.names[NET.host ? 1 : 0] + ' hat das Spiel verlassen.');
       break;
@@ -8862,6 +8979,319 @@ function copyBug(){
   };
   ping(true);
   setInterval(() => ping(false), 30000);
+})();
+
+/* ======================= Pokal gegen den Computer und Online-Turnier =======================
+   Pokal: 4 Runden (Achtelfinale bis Finale) gegen immer stärkere Computer-Teams. Stand pro Profil in REC.cup.
+   Online-Turnier: bis 8 Spieler, jeder gegen jeden, 3D-Spiel oder 7-Meter (Beach: Shoot-out).
+   Daten in Firebase unter /tour/<code>: info, state (lobby|run|done), players, sched (Text), round, res.
+   Jedes Spiel ist ein normaler Online-Raum: Spieler a erstellt ihn, Spieler b tritt bei, a startet automatisch. */
+
+const CUP_ROUNDS = ['Achtelfinale', 'Viertelfinale', 'Halbfinale', 'Finale'];
+const CUP_DIFF = ['leicht', 'mittel', 'mittel', 'schwer'];
+const CUP_TEAMS = { hall:['HSG Talblick', 'TV Waldau', 'SG Bergfeld', 'HC Nordstern'], beach:['Sandpiraten', 'Dünenhaie', 'Beach Bombers', 'Wellenreiter'] };
+const kindName = k => k === 'pen' ? (GAME === 'hall' ? '7-Meter-Werfen' : 'Shoot-out') : (GAME === 'hall' ? 'Halle 3D' : '3D-Arena');
+let cupPlaying = false, cupKeep = null;
+const cupState = () => (REC.cup && REC.cup[GAME]) || null;
+function cupOpp(){ const c = cupState(); return cupPlaying && c ? CUP_TEAMS[GAME][c.round] : ''; }
+
+/* ---------- Gemeinsamer Abschluss eines 3D-Spiels (aus den Engines aufgerufen) ---------- */
+function matchEnd(w, sc, online){
+  if (online) return tourEnd(w, sc);
+  if (cupPlaying) return cupEnd(w, sc);
+  return false;
+}
+
+/* ---------- Pokal ---------- */
+function openCup(){
+  trainOff(); running = false; M = null; A = null; Z.active = false; zbar.hidden = true;
+  const c = cupState();
+  $('#cupTitle').textContent = 'Pokal';
+  const list = $('#cupList'); list.textContent = '';
+  CUP_ROUNDS.forEach((r, i) => {
+    const li = document.createElement('li');
+    const st = !c ? 'open' : (i < c.round || (c.won && i === c.round)) ? 'won' : i === c.round ? (c.out ? 'lost' : 'now') : 'open';
+    li.className = 'cup-' + st;
+    li.innerHTML = '<b></b><span></span><i></i>';
+    li.querySelector('b').textContent = r;
+    li.querySelector('span').textContent = CUP_TEAMS[GAME][i] + ' · Computer ' + { leicht:'Leicht', mittel:'Mittel', schwer:'Schwer' }[CUP_DIFF[i]] + (i === 2 ? '+' : '');
+    li.querySelector('i').textContent = st === 'won' ? ((c.res && c.res[i]) || 'gewonnen') : st === 'lost' ? 'ausgeschieden' : st === 'now' ? 'als Nächstes' : '';
+    list.append(li);
+  });
+  const fresh = !c || c.out || c.won;
+  $('#cupKind').hidden = !fresh;
+  $('#cupInfo').textContent = !c ? 'Gewinne vier Spiele hintereinander. Wer verliert, ist raus.'
+    : c.won ? 'Pokalsieger! ' + kindName(c.kind) + ' · Willst du es nochmal versuchen?'
+    : c.out ? 'Im ' + CUP_ROUNDS[c.round] + ' ausgeschieden. Neuer Versuch?'
+    : kindName(c.kind) + ' · Nächstes Spiel: ' + CUP_ROUNDS[c.round] + ' gegen ' + CUP_TEAMS[GAME][c.round];
+  $('#cupGo').textContent = fresh ? 'Pokal starten' : 'Anpfiff ' + CUP_ROUNDS[c.round];
+  $('#cupQuit').hidden = fresh;
+  syncMenu();
+  showOverlay('cupOv');
+}
+function cupStart(){
+  let c = cupState();
+  if (!c || c.out || c.won){
+    if (!REC.cup) REC.cup = {};
+    c = REC.cup[GAME] = { kind:S.cupk === 'pen' ? 'pen' : 'full', round:0, res:[], t:Date.now() };
+    saveRec();
+  }
+  const hall = GAME === 'hall', E = hall ? H3 : G3;
+  const kind = c.kind === 'pen' ? (hall ? '7m' : 'so') : 'full';
+  running = false; M = null; A = null; Z.active = false; zbar.hidden = true; showOverlay(null);
+  cupKeep = S.cdiff; S.cdiff = CUP_DIFF[c.round]; cupPlaying = true;
+  curMode = hall ? (kind === '7m' ? 'h7m' : 'h3d') : 'g3d';
+  if (!E.start(kind, null, {})){ cupPlaying = false; S.cdiff = cupKeep; openCup(); return; }
+  if (c.round === 2){ try { E.st.D = Object.assign({}, E.st.D, { think:(E.st.D.think || 1)*.85 }); } catch (e) {} }
+}
+function cupEnd(w, sc){
+  const c = cupState(); if (!c) return false;
+  cupPlaying = false; if (cupKeep) S.cdiff = cupKeep;
+  const E = GAME === 'hall' ? H3 : G3;
+  const r = c.round, opp = CUP_TEAMS[GAME][r];
+  let title, text;
+  if (w === 0){
+    c.res = c.res || []; c.res[r] = sc[0] + ':' + sc[1];
+    if (r === 3){ c.won = true; REC.cups = (REC.cups || 0) + 1; earn('pokal'); title = 'Pokalsieger!'; text = 'Finale gegen ' + opp + ' ' + sc[0] + ':' + sc[1] + ' gewonnen.'; }
+    else { c.round++; title = CUP_ROUNDS[r] + ' gewonnen'; text = sc[0] + ':' + sc[1] + ' gegen ' + opp + '. Weiter geht es im ' + CUP_ROUNDS[c.round] + ' gegen ' + CUP_TEAMS[GAME][c.round] + '.'; }
+  } else { c.out = true; title = 'Ausgeschieden'; text = sc[0] + ':' + sc[1] + ' gegen ' + opp + ' im ' + CUP_ROUNDS[r] + '.'; }
+  saveRec(); try { lbPush(); } catch (e) {}
+  E.localMsg('Pokal · ' + CUP_ROUNDS[r], title, text, [{ label:'Zum Pokal', primary:true, fn:() => { E.stop(); document.getElementById('g3msg').hidden = true; toMenu(); openCup(); } }]);
+  return true;
+}
+function cupQuit(){ const c = cupState(); if (c){ c.out = true; saveRec(); } openCup(); }
+
+/* ---------- Online-Turnier ---------- */
+const TOUR = { code:'', me:'', d:null, match:null, matchDone:false, busy:false, joined:false, pollI:0, err:'' };
+const tourUrl = p => netUrl() + '/tour/' + TOUR.code + (p ? '/' + p : '') + '.json';
+const tourPut = (p, v) => fetch(tourUrl(p), { method:'PUT', body:JSON.stringify(v) }).then(r => r.ok).catch(() => false);
+const tourMe = () => lbDev() + '_' + curProf().id;
+const tourSched = () => { try { return JSON.parse((TOUR.d && TOUR.d.sched) || '[]'); } catch (e) { return []; } };
+const tourName = id => { const p = TOUR.d && TOUR.d.players && TOUR.d.players[id]; return p ? p.name : '?'; };
+function tourSave(){ try { if (TOUR.code) localStorage.setItem('bd_tour', JSON.stringify({ code:TOUR.code, g:GAME })); else localStorage.removeItem('bd_tour'); } catch (e) {} }
+function tourNameInput(){ return ($('#tourName').value || '').trim().slice(0, 14) || curProf().name.trim().slice(0, 14); }
+
+function openTour(){
+  trainOff(); running = false; M = null; A = null; Z.active = false; zbar.hidden = true;
+  if (!$('#tourName').value) $('#tourName').value = curProf().name.trim();
+  tourRender(); showOverlay('tourOv');
+  if (TOUR.code) tourTick();
+}
+async function tourCreate(){
+  if (!/^https?:/.test(netUrl())){ TOUR.err = 'Online-Turniere gibt es nur auf der Spiele-Seite (GitHub).'; return tourRender(); }
+  const name = tourNameInput(); if (!name){ TOUR.err = 'Trag zuerst deinen Namen ein.'; return tourRender(); }
+  TOUR.code = String(Math.floor(10000 + Math.random()*90000)); TOUR.me = tourMe();
+  const doc = { info:{ game:GAME, kind:S.tourk === 'pen' ? 'pen' : 'full', half:Number(GAME === 'hall' ? S.thalfH : S.thalfB) || (GAME === 'hall' ? 180 : 120), leader:TOUR.me, t:Date.now() },
+                state:'lobby', round:0, players:{ [TOUR.me]:{ name, t:Date.now() } } };
+  const ok = await tourPut('', doc);
+  if (!ok){ TOUR.code = ''; TOUR.err = 'Turnier konnte nicht angelegt werden. Sind die Firebase-Regeln für „tour“ eingetragen?'; return tourRender(); }
+  TOUR.err = ''; TOUR.d = doc; tourSave(); tourPoll(); tourRender();
+}
+async function tourJoin(){
+  const code = ($('#tourCode').value || '').replace(/\D/g, '');
+  if (code.length !== 5){ TOUR.err = 'Der Turniercode hat 5 Ziffern.'; return tourRender(); }
+  const name = tourNameInput(); if (!name){ TOUR.err = 'Trag zuerst deinen Namen ein.'; return tourRender(); }
+  let d = null;
+  try { const r = await fetch(netUrl() + '/tour/' + code + '.json'); d = r.ok ? await r.json() : null; } catch (e) { d = null; }
+  if (!d || !d.info){ TOUR.err = 'Turnier ' + code + ' gibt es nicht.'; return tourRender(); }
+  if (d.info.game !== GAME){ TOUR.err = 'Dieses Turnier läuft im ' + (d.info.game === 'hall' ? 'Hallen-Duell' : 'Beach-Duell') + '.'; return tourRender(); }
+  const me = tourMe();
+  if (d.state !== 'lobby' && !(d.players && d.players[me])){ TOUR.err = 'Das Turnier hat schon begonnen.'; return tourRender(); }
+  if (d.state === 'lobby' && Object.keys(d.players || {}).length >= 8 && !(d.players || {})[me]){ TOUR.err = 'Das Turnier ist voll (8 Spieler).'; return tourRender(); }
+  TOUR.code = code; TOUR.me = me; TOUR.err = '';
+  if (d.state === 'lobby') await tourPut('players/' + me, { name, t:Date.now() });
+  tourSave(); tourPoll(); tourTick();
+}
+function tourLeave(){
+  if (TOUR.code && TOUR.d && TOUR.d.state === 'lobby' && TOUR.me !== TOUR.d.info.leader) fetch(tourUrl('players/' + TOUR.me), { method:'DELETE' }).catch(() => {});
+  clearInterval(TOUR.pollI); Object.assign(TOUR, { code:'', d:null, match:null, matchDone:false, err:'' });
+  if (NET.on) netLeave(false);
+  tourSave(); tourRender();
+}
+// Spielplan „jeder gegen jeden“ (Kreisverfahren), bei ungerader Zahl ein Freilos pro Runde
+function tourSchedule(ids){
+  const a = ids.slice(); for (let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random()*(i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  if (a.length % 2) a.push(null);
+  const n = a.length, rounds = [];
+  for (let r = 0; r < n - 1; r++){
+    const pairs = [];
+    for (let i = 0; i < n/2; i++){
+      let x = a[i], y = a[n - 1 - i]; if (r % 2 && i === 0) [x, y] = [y, x];
+      pairs.push({ a:x, b:y, room: x && y ? String(Math.floor(1000 + Math.random()*9000)) : '' });
+    }
+    rounds.push(pairs);
+    a.splice(1, 0, a.pop());
+  }
+  return rounds;
+}
+async function tourStart(){
+  const ids = Object.keys((TOUR.d && TOUR.d.players) || {});
+  if (ids.length < 2){ TOUR.err = 'Es braucht mindestens 2 Spieler.'; return tourRender(); }
+  const sched = JSON.stringify(tourSchedule(ids));
+  await fetch(tourUrl(''), { method:'PATCH', body:JSON.stringify({ sched, state:'run', round:0 }) }).catch(() => {});
+  tourTick();
+}
+function tourPoll(){ clearInterval(TOUR.pollI); TOUR.pollI = setInterval(tourTick, 2000); }
+async function tourTick(){
+  if (!TOUR.code || TOUR.busy) return;
+  TOUR.busy = true;
+  try {
+    const r = await fetch(tourUrl('')); const d = r.ok ? await r.json() : null;
+    if (!d){ if (!TOUR.d){ TOUR.err = 'Turnier nicht gefunden.'; tourLeave(); } return; }
+    TOUR.d = d;
+    const sched = tourSched(), res = d.res || {};
+    if (d.state === 'run'){
+      const rd = d.round || 0, pairs = sched[rd] || [];
+      // Runde fertig? Dann darf jeder Teilnehmer weiterschalten (gleicher Wert, kein Konflikt)
+      if (pairs.length && pairs.every((p, i) => !p.a || !p.b || res[rd + '_' + i])){
+        if (rd + 1 < sched.length) await tourPut('round', rd + 1); else await tourPut('state', 'done');
+      }
+      // eigenes Spiel dieser Runde
+      if (!TOUR.match && !NET.on){
+        const i = pairs.findIndex(p => p.a === TOUR.me || p.b === TOUR.me);
+        const p = pairs[i];
+        if (p && p.a && p.b && !res[rd + '_' + i]){
+          TOUR.match = { r:rd, i, a:p.a, b:p.b, room:p.room }; TOUR.matchDone = false;
+          if (p.a === TOUR.me) netCreate(p.room);
+        }
+      }
+      if (TOUR.match && !TOUR.matchDone && TOUR.match.b === TOUR.me && !NET.on) netJoin(TOUR.match.room);
+      if (TOUR.match && !TOUR.matchDone && res[TOUR.match.r + '_' + TOUR.match.i] && !NET.started){ if (NET.on) netLeave(true); TOUR.match = null; }
+    }
+    if (d.state === 'done' && !TOUR.wonShown){
+      const tab = tourTable(); if (tab[0] && tab[0].id === TOUR.me){ earn('turnier'); REC.tours = (REC.tours || 0) + 1; saveRec(); }
+      TOUR.wonShown = true;
+    }
+  } catch (e) {} finally { TOUR.busy = false; }
+  if (!$('#tourOv').hidden) tourRender();
+  syncTourBtn();
+}
+function tourTable(){
+  const d = TOUR.d || {}, sched = tourSched(), res = d.res || {};
+  const T = {}; for (const id of Object.keys(d.players || {})) T[id] = { id, name:tourName(id), sp:0, s:0, n:0, tp:0, tm:0, pk:0 };
+  sched.forEach((pairs, r) => pairs.forEach((p, i) => {
+    const x = res[r + '_' + i]; if (!x || !T[p.a] || !T[p.b]) return;
+    const A = T[p.a], B = T[p.b];
+    A.sp++; B.sp++; A.tp += x.ga || 0; A.tm += x.gb || 0; B.tp += x.gb || 0; B.tm += x.ga || 0;
+    if (x.w === 'a'){ A.s++; A.pk += 2; B.n++; } else { B.s++; B.pk += 2; A.n++; }
+  }));
+  return Object.values(T).sort((a, b) => b.pk - a.pk || (b.tp - b.tm) - (a.tp - a.tm) || b.tp - a.tp || a.name.localeCompare(b.name));
+}
+function tourRender(){
+  const d = TOUR.d, inT = !!TOUR.code && !!d;
+  $('#tourErr').textContent = TOUR.err || ''; $('#tourErr').hidden = !TOUR.err;
+  $('#tourStartBox').hidden = inT;
+  $('#tourIn').hidden = !inT;
+  if (!inT) return;
+  const lead = d.info.leader === TOUR.me, sched = tourSched(), res = d.res || {}, rd = d.round || 0;
+  $('#tourHead').textContent = 'Turnier ' + TOUR.code + ' · ' + kindName(d.info.kind) + (d.info.kind === 'full' ? ' · ' + Math.round(d.info.half/60) + ' min pro Halbzeit' : '');
+  const players = Object.keys(d.players || {});
+  const st = $('#tourState');
+  if (d.state === 'lobby'){
+    st.textContent = (lead ? 'Gib den Code ' + TOUR.code + ' an deine Mitspieler. Starte, wenn alle da sind.' : 'Warte, bis ' + tourName(d.info.leader) + ' das Turnier startet.') + ' ' + players.length + ' von 8 Spielern.';
+  } else if (d.state === 'run'){
+    const m = TOUR.match, pairs = sched[rd] || [];
+    const mine = pairs.find(p => p.a === TOUR.me || p.b === TOUR.me);
+    let t = 'Runde ' + (rd + 1) + ' von ' + sched.length + '. ';
+    if (mine && (!mine.a || !mine.b)) t += 'Du hast in dieser Runde frei.';
+    else if (m && !m.done){
+      const opp = tourName(m.a === TOUR.me ? m.b : m.a);
+      t += TOUR.matchDone ? 'Dein Spiel ist vorbei, warte auf die anderen.' : NET.started ? 'Dein Spiel gegen ' + opp + ' läuft.' : NET.peer ? 'Gleich geht es los gegen ' + opp + '.' : 'Dein Spiel: gegen ' + opp + '. Warte auf ' + opp + ' …';
+    } else t += 'Dein Spiel ist vorbei, warte auf die anderen.';
+    st.textContent = t;
+  } else {
+    const tab = tourTable(); st.textContent = 'Turnier beendet. Sieger: ' + (tab[0] ? tab[0].name : '–') + '!';
+  }
+  $('#tourGo').hidden = !(lead && d.state === 'lobby'); $('#tourGo').disabled = players.length < 2;
+  // Spieler bzw. Tabelle
+  const tb = $('#tourTab'); tb.textContent = '';
+  if (d.state === 'lobby'){
+    for (const id of players){ const tr = document.createElement('tr'); tr.innerHTML = '<td></td>'; tr.firstChild.textContent = tourName(id) + (id === d.info.leader ? ' (Leitung)' : ''); if (id === TOUR.me) tr.className = 'me'; tb.append(tr); }
+    $('#tourTabHead').hidden = true;
+  } else {
+    $('#tourTabHead').hidden = false;
+    tourTable().forEach((e, i) => {
+      const tr = document.createElement('tr'); if (e.id === TOUR.me) tr.className = 'me';
+      [String(i + 1), e.name, e.sp, e.s, e.n, e.tp + ':' + e.tm, e.pk].forEach(v => { const td = document.createElement('td'); td.textContent = String(v); tr.append(td); });
+      tb.append(tr);
+    });
+  }
+  // Spiele der aktuellen Runde (Leitung kann fehlende Ergebnisse kampflos werten)
+  const gl = $('#tourGames'); gl.textContent = '';
+  if (d.state === 'run'){
+    (sched[rd] || []).forEach((p, i) => {
+      const li = document.createElement('li');
+      if (!p.a || !p.b){ li.textContent = tourName(p.a || p.b) + ' hat frei'; gl.append(li); return; }
+      const x = res[rd + '_' + i];
+      li.textContent = tourName(p.a) + ' – ' + tourName(p.b) + (x ? '  ' + x.ga + ':' + x.gb + (x.ff ? ' (kampflos)' : '') : '  läuft');
+      if (!x && lead){
+        for (const side of ['a', 'b']){
+          const b = document.createElement('button'); b.className = 'ghost mini'; b.textContent = tourName(p[side]) + ' kampflos';
+          b.addEventListener('click', () => { tourPut('res/' + rd + '_' + i, { ga:0, gb:0, w:side, ff:1 }).then(tourTick); });
+          li.append(b);
+        }
+      }
+      gl.append(li);
+    });
+  }
+  $('#tourGamesHead').hidden = d.state !== 'run';
+  $('#tourLeave').textContent = d.state === 'done' ? 'Turnier schließen' : 'Turnier verlassen';
+}
+function tourStartMatch(){
+  const T = TOUR; if (!T.match || T.matchDone || !NET.host || !NET.peer || NET.started || !T.d) return;
+  const hall = GAME === 'hall', pen = T.d.info.kind === 'pen';
+  const kind = hall ? (pen ? '7m' : 'full') : (pen ? 'so' : 'full'), eng = hall ? 'h3' : 'g3';
+  running = false; M = null; A = null; Z.active = false; zbar.hidden = true; showOverlay(null);
+  const keep = [S.hhalf, S.fhalf]; S.hhalf = S.fhalf = String(T.d.info.half);
+  curMode = hall ? (pen ? 'h7m' : 'h3d') : 'g3d';
+  NET.names = [tourName(T.match.a), tourName(T.match.b)];
+  NET.mode3 = true; NET.started = true; NET.eng = eng;
+  netSend('3start', { kind, mode:curMode, names:NET.names, eng });
+  const ok = (hall ? H3 : G3).start(kind, null, { online:true });
+  S.hhalf = keep[0]; S.fhalf = keep[1];
+  if (!ok){ NET.started = false; openTour(); }
+}
+function tourEnd(w, sc){
+  const T = TOUR; if (!T.match || !NET.host) return false;
+  const m = T.match;
+  tourPut('res/' + m.r + '_' + m.i, { ga:sc[0], gb:sc[1], w:w === 0 ? 'a' : 'b' });
+  T.matchDone = true;
+  const txt = NET.names[w] + ' gewinnt ' + sc[0] + ':' + sc[1] + '.';
+  netSend('tdone', { txt, r:m.r });
+  NET3().localMsg('Turnier · Runde ' + (m.r + 1), 'Spiel vorbei', txt, [{ label:'Zum Turnier', primary:true, fn:tourBack }]);
+  return true;
+}
+function tourGuestDone(d){
+  TOUR.matchDone = true;
+  NET3().localMsg('Turnier · Runde ' + ((d.r || 0) + 1), 'Spiel vorbei', d.txt || '', [{ label:'Zum Turnier', primary:true, fn:tourBack }]);
+}
+function tourBack(){
+  try { if (H3.on) H3.stop(); if (typeof G3 !== 'undefined' && G3.on) G3.stop(); document.getElementById('g3msg').hidden = true; } catch (e) {}
+  if (NET.on) netLeave(true);
+  TOUR.match = null; TOUR.matchDone = false;
+  toMenu(); openTour();
+}
+// Mitspieler im Turnierspiel weg: vor Spielende kampflos gewonnen, sonst einfach zurück zum Turnier
+function tourPeerGone(txt){
+  const m = TOUR.match; if (!m) return false;
+  if (!TOUR.matchDone && NET.started){
+    const meA = m.a === TOUR.me;
+    tourPut('res/' + m.r + '_' + m.i, { ga:0, gb:0, w:meA ? 'a' : 'b', ff:1 });
+    toast(txt + ' Du gewinnst kampflos.', 5000);
+  } else if (!TOUR.matchDone) return false;
+  tourBack();
+  return true;
+}
+function syncTourBtn(){
+  const b = $('#tourResume'); if (!b) return;
+  b.hidden = !TOUR.code; if (TOUR.code) $('#tourResumeName').textContent = 'Turnier ' + TOUR.code + (TOUR.d && TOUR.d.state === 'done' ? ' · beendet' : '');
+}
+// Nach dem Neuladen: laufendes Turnier wieder aufnehmen
+(function tourRestore(){
+  try {
+    const t = JSON.parse(localStorage.getItem('bd_tour') || 'null');
+    if (t && t.code && t.g === GAME && netUrl()){ TOUR.code = t.code; TOUR.me = tourMe(); tourPoll(); tourTick(); }
+  } catch (e) {}
 })();
 
 /* @@G3D-JS-END@@ */
