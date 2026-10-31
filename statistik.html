@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#132F3A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Handball-Duell · Statistik</title>
+<style>
+:root{--ink:#132F3A;--paper:#FFF7E8;--sun:#FFC63A;--home:#0B8C7F;--cta:#D9481F}
+body{margin:0;background:var(--paper);color:var(--ink);font:500 16px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:720px;margin:0 auto;padding:20px 16px 40px}
+h1{margin:0 0 4px;font-size:26px}
+p{margin:0 0 14px;color:#4E6268}
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:18px}
+.card{background:#fff;border:2px solid var(--ink);border-radius:12px;padding:10px}
+.card b{display:block;font-size:24px}
+.card span{font-size:13px;color:#4E6268}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:15px}
+th,td{text-align:right;padding:6px 6px;border-bottom:1px solid #E5DAC4}
+th:first-child,td:first-child{text-align:left}
+th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:#4E6268}
+.bar{display:inline-block;height:10px;background:var(--home);border-radius:3px;vertical-align:middle;margin-right:6px}
+.wrap{overflow-x:auto}
+small{color:#6E8389}
+a{color:var(--home)}
+</style></head><body><main>
+<h1>Nutzung</h1>
+<p>Anonym: gezählt werden Geräte, nicht Personen. Zeit nur, solange das Spiel sichtbar offen ist (auf 30 Sekunden genau).</p>
+<div class="cards"><div class="card"><b id="cToday">–</b><span>Geräte heute</span></div><div class="card"><b id="cMin">–</b><span>Minuten heute</span></div><div class="card"><b id="c7">–</b><span>Geräte in 7 Tagen</span></div></div>
+<div class="wrap"><table><thead><tr><th>Tag</th><th>Geräte</th><th>Besuche</th><th>Minuten</th><th>Ø pro Gerät</th><th>Beach / Halle</th></tr></thead><tbody id="rows"><tr><td colspan="6">Lade …</td></tr></tbody></table></div>
+<p style="margin-top:16px"><small>Fehlermeldungen stehen in der Firebase-Konsole unter „reports“.</small> <a href="index.html">Zur Startseite</a></p>
+</main><script>
+const DB = 'https://handball-duell-default-rtdb.europe-west1.firebasedatabase.app';
+const fmt = s => s < 60 ? Math.round(s) + ' s' : (s/60).toFixed(s < 600 ? 1 : 0).replace('.', ',') + ' min';
+fetch(DB + '/stats.json?orderBy=%22$key%22&limitToLast=30').then(r => r.json()).then(all => {
+  all = all || {};
+  const days = Object.keys(all).sort().reverse(), rows = document.getElementById('rows');
+  rows.textContent = '';
+  const seen7 = new Set(); let max = 1;
+  const D = days.map(d => {
+    const devs = all[d] || {}, ids = Object.keys(devs);
+    let v = 0, s = 0, b = 0, h = 0;
+    for (const id of ids){ const e = devs[id] || {}; v += (e.v_beach || 0) + (e.v_hall || 0); s += (e.s_beach || 0) + (e.s_hall || 0); if (e.v_beach || e.s_beach) b++; if (e.v_hall || e.s_hall) h++; }
+    max = Math.max(max, ids.length);
+    return { d, n:ids.length, ids, v, s, b, h };
+  });
+  D.slice(0, 7).forEach(x => x.ids.forEach(i => seen7.add(i)));
+  const today = new Date(), key = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+  const t = D.find(x => x.d === key);
+  document.getElementById('cToday').textContent = t ? t.n : 0;
+  document.getElementById('cMin').textContent = t ? Math.round(t.s/60) : 0;
+  document.getElementById('c7').textContent = seen7.size;
+  if (!D.length){ rows.innerHTML = '<tr><td colspan="6">Noch keine Daten.</td></tr>'; return; }
+  for (const x of D){
+    const tr = document.createElement('tr');
+    const [y, m, dd] = x.d.split('-');
+    tr.innerHTML = '<td>' + dd + '.' + m + '.</td><td><span class="bar" style="width:' + Math.round(x.n/max*60) + 'px"></span>' + x.n + '</td><td>' + x.v + '</td><td>' + Math.round(x.s/60) + '</td><td>' + (x.n ? fmt(x.s/x.n) : '–') + '</td><td>' + x.b + ' / ' + x.h + '</td>';
+    rows.append(tr);
+  }
+}).catch(() => { document.getElementById('rows').innerHTML = '<tr><td colspan="6">Keine Verbindung zur Datenbank.</td></tr>'; });
+</script></body></html>
