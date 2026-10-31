@@ -108,6 +108,34 @@ button:focus-visible,summary:focus-visible{outline:3px solid var(--sun);outline-
 .mode.m3d em{color:var(--sun)}
 .mode em{grid-column:1;font-style:normal;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#0B7A6F}
 .mgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mlist{display:flex;flex-direction:column;gap:8px}
+.mlist[hidden]{display:none}
+.mode.mc{padding:10px 14px}
+.mode.mc b{font-size:18px}
+.mode.mc span{font-size:13.5px;line-height:1.3}
+.mode.mc[data-mode="train"]{background:var(--sun)}
+.mode.mc[data-mode="train"] small{color:var(--ink)}
+.mode.mc.off{display:none}
+.tiles2{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.linkbtn{border:0;background:none;color:#4E6268;font:inherit;font-size:14px;font-weight:600;text-decoration:underline;padding:4px;align-self:center}
+#lbList{display:flex;flex-direction:column;gap:10px}
+.lbcat{border:2px solid var(--ink);border-radius:12px;padding:8px 12px;background:#fff}
+.lbcat h3{margin:0 0 4px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--home)}
+.lbcat ol{margin:0;padding:0;list-style:none;counter-reset:r}
+.lbcat li{display:flex;gap:8px;font-size:15px;padding:1px 0;counter-increment:r}
+.lbcat li::before{content:counter(r) ".";min-width:1.4em;font-weight:700;color:#6E8389}
+.lbcat li span{flex:1}
+.lbcat li b{font-variant-numeric:tabular-nums}
+.lbcat li.me{color:var(--cta);font-weight:700}
+.lbempty{margin:0;font-size:14px;color:#6E8389}
+#bugText{width:100%;font:inherit;font-size:15px;resize:vertical;min-height:110px}
+.seg.who{grid-auto-columns:1fr;gap:6px;background:transparent;padding:0}
+.seg.who button{border:2px solid var(--ink);border-radius:12px;padding:8px 4px;font-size:14px;line-height:1.15;background:var(--paper)}
+.seg.who button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.seg.who button i{display:block;font-style:normal;font-size:18px;line-height:1.1;margin-bottom:2px}
+@keyframes pulse{0%,100%{transform:none}30%{transform:scale(1.03)}60%{transform:scale(.99)}}
+#netSlot .field.pulse{animation:pulse .45s}
+#netSlot .field{background:#E8F4F0;border:2px dashed var(--home);border-radius:13px;padding:10px}
 .mode.mt{display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:3px;padding:11px 12px;min-height:94px;position:relative}
 .mode.mt::after{display:none}
 .mode.mt svg{width:30px;height:30px;color:var(--cta);margin-bottom:2px}
@@ -277,6 +305,11 @@ input.txt{user-select:text;-webkit-user-select:text}
 #g3.replay #g3hint{top:auto;bottom:14px;width:90%}
 #g3btns.lock button{opacity:.38;transition:opacity .15s}
 
+#g3you{position:absolute;left:0;top:0;width:40px;text-align:center;font:700 13px/1 var(--f-display,'Arial Black'),sans-serif;letter-spacing:.04em;color:#fff;background:#C8102E;border-radius:6px;padding:4px 0 3px;pointer-events:none;z-index:2;box-shadow:0 2px 0 rgba(0,0,0,.3)}
+#g3you.t1{background:#0B8C7F}
+#g3you::after{content:"";position:absolute;left:50%;bottom:-5px;margin-left:-5px;border:5px solid transparent;border-bottom:0;border-top-color:#C8102E}
+#g3you.t1::after{border-top-color:#0B8C7F}
+
 /* @@G3D-CSS-END@@ */
 </style>
 
@@ -315,28 +348,35 @@ input.txt{user-select:text;-webkit-user-select:text}
     <div class="panel">
       <p class="eyebrow">Beachhandball</p>
       <h1>Beach-Duell</h1>
-      <div class="tiles">
-        <button class="mode tile" data-mode="train"><b>Training</b><small id="trainBadge"></small></button>
+      <button id="resumeBtn" class="resume" hidden><span class="rl">Weiterspielen</span><b id="resumeName"></b><span class="ra" aria-hidden="true">›</span></button>
+      <div class="seg sport" data-key="sport"><button data-v="beach">Beach</button><button data-v="hall">Halle</button></div>
+      <span class="flabel">Mit wem?</span>
+      <div class="seg who" data-key="opp"><button data-v="cpu"><i>●</i>Allein</button><button data-v="two"><i>●●</i>Zu zweit<br>ein Handy</button><button data-v="online"><i>⇄</i>Online</button></div>
+      <div id="netSlot"></div>
+      <span class="flabel">Spielen</span>
+      <div class="mlist" id="mgHall">
+        <button class="mode mc m3d" data-mode="h3d" data-opp="cpu online"><b>Halle 3D</b><span data-cpu="Ganzes Spiel, 6 + Torwart, du steuerst mit dem Joystick" data-online="Jeder steuert sein Team mit dem Joystick"></span></button>
+        <button class="mode mc" data-mode="hfull" data-opp="cpu two online"><b>Spiel von oben</b><span data-cpu="Spielzüge zeichnen, Tor gegen Tor" data-two="Das Handy liegt zwischen euch, jeder hat ein Tor" data-online="Angreifer zeichnet, Verteidiger hält"></span></button>
+        <button class="mode mc" data-mode="h7m" data-opp="cpu online"><b>7-Meter</b><span data-cpu="Abwechselnd werfen und halten" data-online="Abwechselnd werfen und halten"></span></button>
+      </div>
+      <div class="mlist" id="mgBeach">
+        <button class="mode mc m3d" data-mode="g3d" data-opp="cpu online"><b>3D-Arena</b><span data-cpu="Beachhandball in 3D, du steuerst mit dem Joystick" data-online="Jeder steuert sein Team mit dem Joystick"></span></button>
+        <button class="mode mc" data-mode="full" data-opp="cpu two online"><b>Spiel von oben</b><span data-cpu="Spielzüge zeichnen, Tor gegen Tor" data-two="Das Handy liegt zwischen euch, jeder hat ein Tor" data-online="Angreifer zeichnet, Verteidiger hält"></span></button>
+        <button class="mode mc" data-mode="werfen" data-opp="cpu two online"><b>Werfen</b><span data-cpu="Wurfduell oder Shoot-out gegen den Computer" data-two="Shoot-out, je 5 Würfe abwechselnd" data-online="Shoot-out, je 5 Würfe abwechselnd"></span></button>
+        <button class="mode mc" data-mode="tactic" data-opp="cpu two online"><b>Taktik-Duell</b><span data-cpu="Abwehr aufstellen, Angriff zeichnen" data-two="Einer stellt die Abwehr, der andere greift an" data-online="Einer stellt die Abwehr, der andere greift an"></span></button>
+      </div>
+      <span class="flabel" id="lblPractice">Üben</span>
+      <div class="mlist" id="mgPractice">
+        <button class="mode mc" data-mode="train"><b>Training</b><span id="trainSub">Steuerung, Würfe, Kleingruppen</span><small id="trainBadge"></small></button>
+        <button class="mode mc" data-mode="hlevels" data-game="hall"><b>Spielzüge</b><span>16 Level mit Sternen</span><small id="hmodeStars"></small></button>
+        <button class="mode mc" data-mode="levels" data-game="beach"><b>Spielzüge</b><span>22 Level mit Sternen</span><small id="modeStars"></small></button>
+      </div>
+      <div class="tiles2">
         <button class="mode tile" data-mode="prof"><b>Profil</b><small id="profBadge"></small></button>
         <button class="mode tile" data-mode="rec"><b>Rekorde</b><small id="recBadge"></small></button>
+        <button class="mode tile" data-mode="board"><b>Bestenliste</b><small>alle Spieler</small></button>
       </div>
-      <button id="resumeBtn" class="resume" hidden><span class="rl">Weiterspielen</span><b id="resumeName"></b><span class="ra" aria-hidden="true">›</span></button>
-      <span class="flabel">Spielen</span>
-      <div class="seg sport" data-key="sport"><button data-v="beach">Beach</button><button data-v="hall">Halle</button></div>
-      <div class="mgrid" id="mgHall">
-        <button class="mode mt m3d mhall wide" data-mode="h3d"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M3 27V12L16 5l13 7v15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="M3 27h26M10 27v-7a6 6 0 0 1 12 0v7" fill="none" stroke="currentColor" stroke-width="2.2"/></svg><b>Halle 3D</b><i>6 + Torwart · auch online</i></button>
-        <button class="mode mt" data-mode="hfull"><svg viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="7" width="26" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M16 7v18M3 11a5 5 0 0 1 0 10M29 11a5 5 0 0 0 0 10" fill="none" stroke="currentColor" stroke-width="2.2"/></svg><b>Ganzes Spiel</b><i>Allein oder zu zweit</i></button>
-        <button class="mode mt" data-mode="hlevels"><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="7" cy="24" r="3" fill="currentColor"/><path d="M9.5 21.5C14 16 18 20 22 11" fill="none" stroke="currentColor" stroke-width="2.2" stroke-dasharray="3 3"/><path d="m19 11 3.5-3 1.2 4.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/></svg><b>Spielzüge</b><i>Allein · 16 Level</i><small id="hmodeStars"></small></button>
-        <button class="mode mt wide" data-mode="h7m"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 24V9h22v15" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/><path d="M9 13h14M9 17h14M13 9v15M19 9v15" stroke="currentColor" stroke-width="1" opacity=".5"/><text x="16" y="31" font-size="8" font-weight="900" text-anchor="middle" fill="currentColor">7m</text></svg><b>7-Meter-Werfen</b><i>Werfer gegen Torwart · auch online</i></button>
-      </div>
-      <div class="mgrid" id="mgBeach">
-        <button class="mode mt m3d wide" data-mode="g3d"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3 28 9.5v13L16 29 4 22.5v-13Z M4 9.5 16 16l12-6.5M16 16v13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/></svg><b>3D-Arena</b><i>Computer oder online</i></button>
-        <button class="mode mt" data-mode="full"><svg viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="7" width="26" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M16 7v18M3 12h4v8H3M29 12h-4v8h4" fill="none" stroke="currentColor" stroke-width="2.2"/></svg><b>Ganzes Spiel</b><i>Allein oder zu zweit</i></button>
-        <button class="mode mt" data-mode="so"><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="12" fill="none" stroke="currentColor" stroke-width="2.2"/><circle cx="16" cy="16" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><circle cx="16" cy="16" r="2" fill="currentColor"/></svg><b>Shoot-out</b><i>Allein oder zu zweit</i></button>
-        <button class="mode mt" data-mode="duell"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 26V8h22v18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/><path d="M9 12h14M9 16h14M9 20h14M12 8v18M16 8v18M20 8v18" stroke="currentColor" stroke-width="1" opacity=".5"/><circle cx="22" cy="23" r="3.2" fill="currentColor"/></svg><b>Wurfduell</b><i>Allein</i></button>
-        <button class="mode mt" data-mode="levels"><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="7" cy="24" r="3" fill="currentColor"/><path d="M9.5 21.5C14 16 18 20 22 11" fill="none" stroke="currentColor" stroke-width="2.2" stroke-dasharray="3 3"/><path d="m19 11 3.5-3 1.2 4.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/></svg><b>Spielzüge</b><i>Allein · 22 Level</i><small id="modeStars"></small></button>
-        <button class="mode mt" data-mode="tactic"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M6 8l5 5M11 8l-5 5" stroke="currentColor" stroke-width="2.4"/><circle cx="22" cy="22" r="4" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M10 20c2 6 6 6 8 4M20 10c3-1 5 1 5 4" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="2.5 2.5"/></svg><b>Taktik-Duell</b><i>Allein oder zu zweit</i></button>
-      </div>
+      <button id="bugBtn" class="linkbtn" type="button">Fehler melden</button>
     </div>
   </section>
 
@@ -345,6 +385,10 @@ input.txt{user-select:text;-webkit-user-select:text}
       <p class="eyebrow" id="setupEyebrow"></p>
       <h2 id="setupTitle"></h2>
       <p class="msgtext" id="setupText"></p>
+      <div class="field" id="wkField">
+        <span class="flabel">Art</span>
+        <div class="seg" data-key="wk"><button data-v="duell">Wurfduell</button><button data-v="so">Shoot-out</button></div>
+      </div>
       <div class="field" id="g3Field">
         <span class="flabel">Spiel</span>
         <div class="seg" data-key="g3k"><button data-v="full">Ganzes Spiel</button><button data-v="so">Shoot-out</button></div>
@@ -445,10 +489,32 @@ input.txt{user-select:text;-webkit-user-select:text}
     </div>
   </section>
 
+  <section id="lbOv" class="overlay" hidden aria-label="Bestenliste">
+    <div class="panel">
+      <p class="eyebrow">Alle Spieler</p>
+      <h2>Bestenliste</h2>
+      <p class="fnote" id="lbNote"></p>
+      <div id="lbList"></div>
+      <button id="lbBack" class="cta">Zurück</button>
+    </div>
+  </section>
+  <section id="bugOv" class="overlay" hidden aria-label="Fehler melden">
+    <div class="panel">
+      <p class="eyebrow">Hilf mit</p>
+      <h2>Fehler melden</h2>
+      <p class="fnote" id="bugNote"></p>
+      <textarea id="bugText" class="txt" rows="6" maxlength="1000" placeholder="z. B. Halle 3D online: Nach der Parade konnte ich nicht passen."></textarea>
+      <p class="fnote">Mitgeschickt werden nur Spiel, Modus, Bildschirmgröße, Browser und dein Profilname.</p>
+      <button id="bugSend" class="cta">Senden</button>
+      <button id="bugCopy" class="ghost" hidden>Text kopieren</button>
+      <button id="bugBack" class="ghost">Zurück</button>
+    </div>
+  </section>
   <section id="profOv" class="overlay" hidden aria-label="Profil">
     <div class="panel">
-      <p class="eyebrow">Für dich · nur auf diesem Handy</p>
-      <h2>Profil</h2>
+      <p class="eyebrow" id="profEye">Für dich · nur auf diesem Handy</p>
+      <h2 id="profTitle">Profil</h2>
+      <p class="msgtext" id="profIntro" hidden>Wie heißt du? Dein Name steht dann auf der Anzeige und dein Mitspieler sieht ihn im Online-Spiel. Alles bleibt nur auf diesem Handy.</p>
       <div class="pchips" id="profChips"></div>
       <div class="profhead">
         <canvas id="avatar" aria-label="Vorschau deines Spielers"></canvas>
@@ -469,6 +535,7 @@ input.txt{user-select:text;-webkit-user-select:text}
       <div class="field"><span class="flabel">Wurfhand</span>
         <div class="seg pseg" data-pkey="lefty"><button data-v="false">Rechts</button><button data-v="true">Links</button></div></div>
       <button id="profBack" class="cta">Fertig</button>
+      <button id="profSkip" class="ghost" hidden>Ohne Profil weiter</button>
       <button id="profDel" class="ghost">Profil löschen</button>
     </div>
   </section>
@@ -517,6 +584,7 @@ input.txt{user-select:text;-webkit-user-select:text}
   <button id="g3pause" aria-label="Pause">II</button>
   <div id="g3ban" hidden><strong></strong><span></span></div>
   <div id="g3hold" hidden></div>
+  <div id="g3you" hidden>DU</div>
   <div id="g3steps" hidden></div>
   <div id="g3gauge" hidden><span class="gl"></span><b class="gb"></b><div class="gbar"><i class="gf"></i><i class="gz"></i><i class="gz"></i></div><span class="gs"></span></div>
   <div id="g3joy"><div class="base"><div class="knob"></div></div></div>
@@ -541,7 +609,8 @@ S.half = [30,45,60,90].includes(Number(S.half)) ? Number(S.half) : 45;
 S.mode = '1p';   // Wurfduell ist reiner 1-Spieler-Modus
 if (!['duell','zug'].includes(S.game)) S.game = 'duell';
 if (!['1','2','3','4'].includes(String(S.zp))) S.zp = '1';
-if (!['cpu','two','online'].includes(S.opp)) S.opp = 'cpu';
+if (!['cpu','two'].includes(S.opp)) S.opp = 'cpu';   // online startet nie automatisch
+if (!['duell','so'].includes(S.wk)) S.wk = 'duell';
 if (!['full','so'].includes(S.g3k)) S.g3k = 'full';
 if (!['beach','hall'].includes(S.sport)) S.sport = 'beach';
 if (!['180','300','480'].includes(String(S.hhalf))) S.hhalf = '300';
@@ -619,7 +688,7 @@ function pirOutcome(deg, pw){
   if (deg >= 720 && deg <= 720 + dw) return { ok:true, pts:2, sd:.1 + .2*Math.abs(deg - (720 + dw/2))/(dw/2), dbl:true };
   return { ok:false, note: deg < 720 ? 'Zu weit gedreht · kein Torwurf möglich' : 'Doppel-Pirouette überdreht' };
 }
-const names = () => S.mode === '1p' ? ['Du','Gegner'] : ['Spieler 1','Spieler 2'];
+const names = () => S.mode === '1p' ? [curProf().name.trim() || 'Du','Gegner'] : ['Spieler 1','Spieler 2'];
 const isHuman = t => S.mode === '2p' || t === 0;
 
 const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
@@ -1002,7 +1071,7 @@ function frame(now){
     if (NET.guest) netGuestTick(dt);
     else if (!Z.paused && !rotAsk){ zUpdate(dt); netHostTick(); }
     zDraw(); zHud();
-  } else if (GAME === 'hall' && !running){
+  } else if (GAME === 'hall' && !running && !NET.waitSnap){
     // Hallen-Duell: hinter dem Menü das Hallenfeld statt des Strands
     if (!Z.hall || Z.phase !== 'menu'){ zCourt(true); zSetup(HLEVELS[7], ZLV[0], 6); Z.phase = 'menu'; }
     zDraw();
@@ -1768,7 +1837,7 @@ function banner(main, sub, tone, ms){
 
 function showOverlay(id){
   if (NET.host && NET.started && id == null) netSend('ov', { id:null });
-  for (const o of ['menu','setupOv','pauseOv','endOv','levelsOv','msgOv','trainOv','recOv','shareOv','profOv']) $('#' + o).hidden = o !== id;
+  for (const o of ['menu','setupOv','pauseOv','endOv','levelsOv','msgOv','trainOv','recOv','shareOv','profOv','lbOv','bugOv']) $('#' + o).hidden = o !== id;
 }
 
 /* ---------- Menü ----------
@@ -1776,15 +1845,15 @@ function showOverlay(id){
 const MODES = {
   duell:  { game:'duell', zp:'1', eyebrow:'Allein · gegen den Computer', title:'Wurfduell', start:'Anpfiff',
             text:'Du wirfst, der Computer hält. Dann hältst du, der Computer wirft. Wer gewinnt mehr Halbzeiten?',
-            fields:['diffField','halfField'] },
+            fields:['wkField','diffField','halfField'] },
   levels: { game:'zug', zp:'1' },
   hlevels: { game:'zug', zp:'1', title:'Spielzüge Halle' },
-  hfull:  { game:'zug', zp:'3', title:'Ganzes Spiel Halle', start:'Anpfiff',
+  hfull:  { game:'zug', zp:'3', title:'Spiel von oben', start:'Anpfiff',
             text:{ cpu:'Hallenhandball in der Draufsicht: Du (Rot) gegen den Computer, 6 Feldspieler und Torwart pro Team. Linie zeichnen wie bei den Spielzügen.',
                    online:'Zwei Handys über das Internet: Einer erstellt einen Raum, der andere tritt mit dem Code bei. Wer angreift, zeichnet auf seinem Handy, wer verteidigt, schiebt seinen Torwart.' ,
                    two:'Zwei Spieler am Tisch: Das Handy liegt zwischen euch, jeder hat sein Tor vor sich. 6 gegen 6 plus Torwart, Linie zeichnen wie bei den Spielzügen.' },
             fields:['oppField','cdiffField','fdiffField','fhalfField'] },
-  so:     { game:'zug', zp:'4', title:'Shoot-out', start:'Los geht’s',
+  so:     { game:'zug', zp:'4', title:'Shoot-out', start:'Los geht’s', fieldsX:['wkField'],
             text:{ cpu:'Du gegen den Computer, je 5 Würfe, abwechselnd. Wirft der Computer, schiebst du deinen Torwart: einfach irgendwo quer zum Tor wischen.',
                    online:'Zwei Handys über das Internet: Einer erstellt einen Raum, der andere tritt mit dem Code bei. Wer angreift, zeichnet auf seinem Handy, wer verteidigt, schiebt seinen Torwart.' ,
                    two:'Zwei Spieler am Tisch: Das Handy liegt zwischen euch, jeder hat sein Tor vor sich. Je 5 Würfe, abwechselnd.' },
@@ -1807,7 +1876,7 @@ const MODES = {
             text:{ cpu:'Abwechselnd je 5 Würfe von der 7-m-Linie. Du wirfst mit Wurf, Heber oder Aufsetzer. Wirft der Computer, steuerst du deinen Torwart.',
                    online:'7-Meter-Duell auf zwei Handys: abwechselnd werfen und halten. Einer erstellt den Raum, der andere gibt den Code ein.', two:'' },
             fields:['oppField','cdiffField'] },
-  full:   { game:'zug', zp:'3', title:'Ganzes Spiel', start:'Anpfiff',
+  full:   { game:'zug', zp:'3', title:'Spiel von oben', start:'Anpfiff',
             text:{ cpu:'Du (Rot) gegen den Computer (Türkis) auf zwei Tore. Nach Tor, Parade oder Ballverlust geht es sofort in die andere Richtung.',
                    online:'Zwei Handys über das Internet: Einer erstellt einen Raum, der andere tritt mit dem Code bei. Wer angreift, zeichnet auf seinem Handy, wer verteidigt, schiebt seinen Torwart.' ,
                    two:'Zwei Spieler am Tisch: Das Handy liegt zwischen euch, jeder hat sein Tor vor sich. Nach Tor, Parade oder Ballverlust geht es sofort in die andere Richtung.' },
@@ -1913,6 +1982,12 @@ const RULES = {
 let curMode = 'duell';
 function fillRules(el, list){ el.innerHTML = list.map(t => '<li>' + t + '</li>').join(''); }
 function openMode(key){
+  if (key === 'werfen') key = S.opp === 'cpu' && S.wk !== 'so' ? 'duell' : 'so';
+  // Online: erst Raum, dann wählt der Raum-Ersteller das Spiel
+  if (S.opp === 'online' && MODES[key] && (MODES[key].fields || []).includes('oppField')){
+    if (!NET.peer){ netStatus(NET.host ? 'Warte noch auf deinen Mitspieler, dann ein Spiel antippen.' : 'Erst einen Raum erstellen oder mit dem Code beitreten.'); const f = $('#netField'); f.classList.remove('pulse'); void f.offsetWidth; f.classList.add('pulse'); return; }
+    if (NET.guest){ netStatus(NET.names[0] + ' wählt das Spiel. Warte auf den Anpfiff.'); return; }
+  }
   trainOff();
   const m = MODES[key]; curMode = key;
   S.game = m.game; S.zp = m.zp; saveS();
@@ -1927,15 +2002,14 @@ function openMode(key){
 function setupFields(){
   const m = MODES[curMode]; if (!m || !m.fields) return;
   const opp = m.fields.includes('oppField');
-  $('#setupEyebrow').textContent = opp ? (S.opp === 'cpu' ? 'Allein · gegen den Computer' : S.opp === 'online' ? 'Zu zweit · zwei Handys online' : 'Zu zweit an einem Handy') : m.eyebrow;
+  $('#setupEyebrow').textContent = opp ? (S.opp === 'cpu' ? 'Allein · gegen den Computer' : S.opp === 'online' ? 'Online gegen ' + (NET.peer ? NET.names[NET.host ? 1 : 0] : 'deinen Mitspieler') : 'Zu zweit an einem Handy') : (m.eyebrow || 'Allein');
   $('#setupText').textContent = typeof m.text === 'string' ? m.text : m.text[S.opp];
   const no2 = ['h3d','h7m','g3d'].includes(curMode);
   const twoBtn = document.querySelector('#oppField button[data-v="two"]'); if (twoBtn) twoBtn.style.display = no2 ? 'none' : '';
   if (no2 && S.opp === 'two'){ S.opp = 'cpu'; syncMenu(); }
-  $('#netField').hidden = !(opp && S.opp === 'online');
   netUi();
-  for (const f of ['g3Field','oppField','cdiffField','diffField','halfField','fhalfField','fdiffField','hhalfField'])
-    $('#' + f).hidden = !m.fields.includes(f) || (f === 'cdiffField' && opp && S.opp !== 'cpu') || (f === 'fhalfField' && curMode === 'g3d' && S.g3k === 'so');
+  for (const f of ['wkField','g3Field','oppField','cdiffField','diffField','halfField','fhalfField','fdiffField','hhalfField'])
+    $('#' + f).hidden = !(m.fields.includes(f) || (m.fieldsX || []).includes(f)) || f === 'oppField' || (f === 'wkField' && S.opp !== 'cpu') || (f === 'cdiffField' && opp && S.opp !== 'cpu') || (f === 'fhalfField' && curMode === 'g3d' && S.g3k === 'so');
 }
 function syncMenu(){
   document.querySelectorAll('.seg[data-key]').forEach(seg => {
@@ -1965,16 +2039,31 @@ function syncMenu(){
   const rn = resumeName(); $('#resumeBtn').hidden = !rn; $('#resumeName').textContent = rn;
   const hall = S.sport === 'hall';
   $('#mgHall').hidden = !hall; $('#mgBeach').hidden = hall;
+  // Menü: nur Spiele, die zu „Mit wem?“ passen; Üben nur allein
+  document.querySelectorAll('#menu .mode.mc[data-opp]').forEach(b => {
+    b.classList.toggle('off', !b.dataset.opp.split(' ').includes(S.opp));
+    const sp = b.querySelector('span'); if (sp) sp.textContent = sp.dataset[S.opp] || sp.dataset.cpu || '';
+  });
+  document.querySelectorAll('#mgPractice .mode[data-game]').forEach(b => b.classList.toggle('off', b.dataset.game !== (hall ? 'hall' : 'beach')));
+  $('#lblPractice').hidden = $('#mgPractice').hidden = S.opp !== 'cpu';
+  $('#netField').hidden = S.opp !== 'online';
   $('#menu .eyebrow').textContent = hall ? 'Hallenhandball' : 'Beachhandball';
   $('#trainBadge').textContent = td ? td + '/' + TRL().filter(L => L.kind !== 'info').length + ' ✓' : 'Hier starten';
 }
-document.querySelectorAll('.mode').forEach(b => b.addEventListener('click', () => b.dataset.mode === 'train' ? openTraining() : b.dataset.mode === 'rec' ? openRecords() : b.dataset.mode === 'prof' ? openProfile() : openMode(b.dataset.mode)));
+document.querySelectorAll('.mode').forEach(b => b.addEventListener('click', () => b.dataset.mode === 'train' ? openTraining() : b.dataset.mode === 'rec' ? openRecords() : b.dataset.mode === 'prof' ? openProfile() : b.dataset.mode === 'board' ? openBoard() : openMode(b.dataset.mode)));
+$('#bugBtn').addEventListener('click', () => openBug());
+$('#lbBack').addEventListener('click', () => showOverlay('menu'));
+$('#bugBack').addEventListener('click', () => showOverlay('menu'));
+$('#bugSend').addEventListener('click', () => sendBug());
+$('#bugCopy').addEventListener('click', () => copyBug());
 $('#setupBack').addEventListener('click', () => showOverlay('menu'));
 document.querySelectorAll('.seg[data-key]').forEach(seg => seg.addEventListener('click', e => {
   const b = e.target.closest('button'); if (!b) return;
   const key = seg.dataset.key;
   S[key] = key === 'half' ? Number(b.dataset.v) : b.dataset.v;
+  if (key === 'opp' && S.opp !== 'online' && NET.on) netLeave(false);
   saveS(); syncMenu(); if (key === 'opp' || key === 'g3k') setupFields();
+  if (key === 'wk' && ['duell','so'].includes(curMode)) openMode('werfen');
 }));
 function startCur(){
   const onl = S.opp === 'online' && MODES[curMode] && (MODES[curMode].fields || []).includes('oppField');
@@ -3038,6 +3127,13 @@ function zSoAfter(){
 }
 function zFullEnd(w){
   const fm = Z.fm, nm = zNames();
+  try {
+    if (Z.cpu || (NET.on && NET.host)){
+      const tot = Z.hall ? zHallTotals() : [0, 1].map(t => fm.score[0][t] + fm.score[1][t]);
+      const rep = me => ({ online:NET.on, full:true, win:w === me, gf:tot[me], ga:tot[1 - me] });
+      lbMatch(rep(0)); if (NET.on) netSend('lbm', rep(1));
+    }
+  } catch (e) {}
   if (Z.hall){ if (Z.cpu) recCpu('hfull', w === 0); else recTwo('hfull'); }
   else if (Z.cpu) recCpu('full', w === 0); else { recTwo('full'); earn('team'); }
   Z.phase = 'hand';
@@ -4070,7 +4166,7 @@ function zTrainAfter(){
   if (ok) return trainSuccess(L);
   let why = FAIL_TXT[r] || '';
   if (r === 'tor') why = 'Tor, aber nicht mit der geübten Bewegung.';
-  zMsg({ replay:true, eyebrow:'Training · ' + L.name, title:'Noch nicht', text: why + ' Schau dir die Schritte nochmal an.', steps:L.steps,
+  zMsg({ eyebrow:'Training · ' + L.name, title:'Noch nicht', text: why + ' Schau dir die Schritte nochmal an.', steps:L.steps,
     buttons:[{ label:'Nochmal', primary:true, fn:() => zStartTrain(L) }, { label:'Zur Übersicht', fn:openTraining }] });
 }
 $('#trainBack').addEventListener('click', () => { trainOff(); syncMenu(); showOverlay('menu'); });
@@ -4321,10 +4417,18 @@ function profSync(){
   $('#profDel').textContent = PROF.list.length > 1 ? 'Profil löschen' : 'Profil zurücksetzen'; $('#profDel').dataset.armed = '';
   drawAvatar();
 }
-function openProfile(){
+function openProfile(first){
   trainOff(); running = false; M = null; A = null; Z.active = false; zbar.hidden = true;
+  first = first === true;
+  $('#profEye').textContent = first ? 'Willkommen' : 'Für dich · nur auf diesem Handy';
+  $('#profTitle').textContent = first ? 'Dein Profil' : 'Profil';
+  $('#profIntro').hidden = !first; $('#profSkip').hidden = !first; $('#profDel').hidden = first; $('#profChips').hidden = first;
+  $('#profBack').textContent = first ? 'Los geht’s' : 'Fertig';
   profSync(); showOverlay('profOv');
 }
+// Beim ersten Öffnen: Profil anlegen oder überspringen (dann heißt man online „Spieler 1“ bzw. „Spieler 2“)
+function introDone(){ try { localStorage.setItem('beachduell_intro', '1'); } catch (e) {} }
+$('#profSkip').addEventListener('click', () => { introDone(); syncMenu(); showOverlay('menu'); });
 document.querySelectorAll('.pseg').forEach(seg => seg.addEventListener('click', e => {
   const b = e.target.closest('button'); if (!b) return;
   const p = curProf(), key = seg.dataset.pkey;
@@ -4343,7 +4447,7 @@ $('#profDel').addEventListener('click', e => {
   else { PROF.list = [PDEF(p.id)]; }
   saveProf(); loadProfileData(); profSync(); toast('Erledigt.');
 });
-$('#profBack').addEventListener('click', () => { syncMenu(); showOverlay('menu'); });
+$('#profBack').addEventListener('click', () => { introDone(); syncMenu(); showOverlay('menu'); });
 $('#recProf').addEventListener('click', openProfile);
 loadProfileData();
 /* @@G3D-JS@@ */
@@ -5187,7 +5291,10 @@ const G3 = { on:false };
     resize();
     const D = DIFF3[S.cdiff] || DIFF3.mittel;
     st = { kind, D, diff:S.cdiff, half:0, len:Number(S.fhalf) || 180, clock:Number(S.fhalf) || 180, score:[[0,0],[0,0]], sets:[0,0], golden:false,
-           timeUp:false, phase:'play', deadT:0, after:null, poss:0, think:.8, ts:1, so:null, hist:[], banT:0, hint:'', ctrls:[null, null], online:!!(opts && opts.online), me:0 };
+           timeUp:false, phase:'play', deadT:0, after:null, poss:0, think:.8, ts:1, so:null, hist:[], banT:0, hint:'', ctrls:[null, null], online:!!(opts && opts.online), me:0,
+           mx:{ g:[0, 0], sv:[0, 0], kempa:[0, 0], pir:[0, 0] } };
+    if (IN[1] === inp) IN[1] = { jx:0, jy:0, keys:{}, act:{}, hold:{} };   // war das Handy vorher Gast, gehört Team 1 wieder dem Mitspieler bzw. Computer
+    IN[1].act = {}; IN[1].jx = IN[1].jy = 0;
     Object.defineProperty(st, 'ctrl', { get(){ return this.ctrls[0]; }, set(v){ this.ctrls[0] = v; } });
     IN[1].act = {}; IN[1].jx = IN[1].jy = 0; IN[1].hold = {};
     setNames();
@@ -5198,7 +5305,7 @@ const G3 = { on:false };
     cancelAnimationFrame(raf); raf = requestAnimationFrame(loop);
     return true;
   }
-  function setNames(){ const tn = document.querySelectorAll('#g3 .g3sb .tn'); if (tn.length === 2){ tn[0].textContent = st.online ? NET.names[0].slice(0, 10) : 'DU'; tn[1].textContent = st.online ? NET.names[1].slice(0, 10) : 'CPU'; } }
+  function setNames(){ const tn = document.querySelectorAll('#g3 .g3sb .tn'); if (tn.length === 2){ tn[0].textContent = st.online ? NET.names[0].slice(0, 10) : ((typeof curProf === 'function' && curProf().name.trim()) || 'DU').slice(0, 10); tn[1].textContent = st.online ? NET.names[1].slice(0, 10) : 'CPU'; } }
   function stop(){
     G3.on = false; cancelAnimationFrame(raf);
     if (ui) ui.hidden = true;
@@ -5278,8 +5385,10 @@ const G3 = { on:false };
     return { x, y, m:Math.min(1, m) };
   }
   // Bildschirmrichtung -> Feldrichtung (relativ zur Kamera)
-  function toWorld(jx, jy){
-    const bx = Math.sin(cam.yaw), bz = Math.cos(cam.yaw);   // Rückwärtsvektor der Kamera
+  function toWorld(jx, jy, t){
+    // Online rechnet der Host den Joystick des Gastes mit dessen Kamerablick um (jedes Handy schaut von hinter dem eigenen Team)
+    const yaw = (t === 1 && st && st.online && !st.remote && IN[1].cy != null) ? IN[1].cy : cam.yaw;
+    const bx = Math.sin(yaw), bz = Math.cos(yaw);   // Rückwärtsvektor der Kamera
     const fx = -bx, fz = -bz, rx = -fz, rz = fx;            // vorne und rechts
     return { x: rx*jx + fx*(-jy), z: rz*jx + fz*(-jy) };
   }
@@ -5425,6 +5534,7 @@ const G3 = { on:false };
     const t = f.team;
     if (st.so){ st.so.score[t] += f.pts; banner(f.pts === 2 ? 'Tor! +2' : 'Tor!', label(f)); return soResult(true); }
     st.score[st.half][t] += f.pts;
+    if (st.mx){ st.mx.g[t]++; if (f.kempa) st.mx.kempa[t]++; if (f.pir) st.mx.pir[t]++; }
     banner(f.pts === 2 ? 'Tor! +2' : 'Tor!', nm(t) + (label(f) ? ' · ' + label(f) : ''));
     for (const p of field(t)) if (!p.gk){ p.st = 'cheer'; p.stT = 0; }
     if (st.golden) return dead(1.6, () => halfWon(t, true));
@@ -5454,6 +5564,13 @@ const G3 = { on:false };
   }
   function endGame(w){
     st.phase = 'menu';
+    // Bestenliste: Werte dieses Spiels (Tore = Anzahl Treffer, nicht Punkte)
+    try {
+      const mx = st.mx || { g:[0, 0], sv:[0, 0], kempa:[0, 0], pir:[0, 0] };
+      const pts = me => st.score[0][me] + st.score[1][me];
+      const rep = me => ({ online:!!st.online, full:st.kind === 'full', win:w === me, gf:mx.g[me], ga:mx.g[1 - me], pf:pts(me), pa:pts(1 - me), saves:mx.sv[me], kempa:mx.kempa[me], pir:mx.pir[me] });
+      if (typeof lbMatch === 'function'){ lbMatch(rep(0)); if (st.online && NET.host) netSend('lbm', rep(1)); }
+    } catch (e) {}
     if (!st.online) try { if (typeof Z !== 'undefined') Z.cdiff = S.cdiff; recCpu(st.kind === 'so' && !st.so.inGame ? 'so' : 'full', w === 0); } catch (e) {}
     const lines = st.hist.map(h => h[0] + '  ' + h[1]).join(' · ');
     msg('Abpfiff', st.online ? nm(w) + ' gewinnt' : w === 0 ? 'Gewonnen!' : 'Der Computer gewinnt', lines || '',
@@ -5728,7 +5845,7 @@ const G3 = { on:false };
     if (so) soStep(rdt, dt);
     if (c) c.hold += dt;
     aiTargets(dt);
-    const JW = [0, 1].map(t => { const j = joyVec(t); return { j, w:toWorld(j.x, j.y) }; });
+    const JW = [0, 1].map(t => { const j = joyVec(t); return { j, w:toWorld(j.x, j.y, t) }; });
     const AT = [0, 1].map(t => ({ a:take('a', t), b:take('b', t), c:take('c', t), d:take('d', t) })); const A = AT[0]; st.A = A; st.AT = AT;
     // Ballbesitz wechselt: Tasten kurz sperren, damit ein Tipp auf „Verteidigen“ nicht zum Wurf wird
     // Ein Tipp gilt nur in der Rolle, die beim Tippen angezeigt wurde: Wer gerade „Verteidigen“ tippt und dabei den Ball gewinnt, wirft nicht aus Versehen
@@ -5835,7 +5952,7 @@ const G3 = { on:false };
     }
   }
   function pickMate(p){
-    const j = joyVec(p.team); let dir = toWorld(j.x, j.y);
+    const j = joyVec(p.team); let dir = toWorld(j.x, j.y, p.team);
     if (j.m < .3){ dir = { x:0, z:dirOf(p.team) }; }
     let best = null, bs = -1e9;
     for (const q of field(p.team)){
@@ -5988,6 +6105,7 @@ const G3 = { on:false };
   function save(k){
     giveBall(k); k.st = 'save'; k.stT = 0;
     banner('Parade!', st.online ? 'Torwart von ' + nm(k.team) : k.team === 0 ? 'Dein Torwart hält' : 'Der Torwart hält');
+    if (st.mx) st.mx.sv[k.team]++;
     if (st.so) return soResult(false);
     dead(.9, () => { k.dive = 0; st.phase = 'play'; });
   }
@@ -6038,7 +6156,7 @@ const G3 = { on:false };
       }
     }
     // Dein Torwart: hechten
-    if (HUM(1 - t) && !G3.auto && AK.a){ const k = gkOf(1 - t); if (!k.dive){ const j = joyVec(1 - t); const w = toWorld(j.x, 0); k.dive = .01; k.diveDir = Math.sign(w.x || (ball.x - k.x) || 1); k.diveH = j.y < -.4 ? 1.8 : j.y > .4 ? .4 : 1.0; } }
+    if (HUM(1 - t) && !G3.auto && AK.a){ const k = gkOf(1 - t); if (!k.dive){ const j = joyVec(1 - t); const w = toWorld(j.x, 0, 1 - t); k.dive = .01; k.diveDir = Math.sign(w.x || (ball.x - k.x) || 1); k.diveH = j.y < -.4 ? 1.8 : j.y > .4 ? .4 : 1.0; } }
     if (HUM(1 - t) && !G3.auto){ const k = gkOf(1 - t); if (k.dive){ k.dive = Math.min(1, k.dive + rdt*4); } }
   }
 
@@ -6123,7 +6241,8 @@ const G3 = { on:false };
   function updateCam(dt){
     const att = ball.owner ? ball.owner.team : (ball.fl ? ball.fl.team : st.poss);
     const back0 = st.so && st.so.step === 0;   // Shoot-out: erst Blick zum eigenen Torwart
-    const tYaw = dirOf(st.so ? st.so.t : att)*(back0 ? -1 : 1) < 0 ? 0 : Math.PI;
+    const vt = st.so ? st.so.t : (st.online ? MY() : att);   // online: immer von hinter dem eigenen Team
+    const tYaw = dirOf(vt)*(back0 ? -1 : 1) < 0 ? 0 : Math.PI;
     cam.yaw = lerpAng(cam.yaw, tYaw, Math.min(1, dt*2.2));
     const o = ball.owner, ad = dirOf(st.so ? st.so.t : att);
     const fx = o ? o.x : ball.x, fz = (o ? o.z : ball.z) + ad*(back0 ? -4 : o && o.gk ? 5 : 1.2);
@@ -6142,6 +6261,14 @@ const G3 = { on:false };
   const $3 = id => document.getElementById(id);
   const fmtT = s => { s = Math.ceil(s); return Math.floor(s/60) + ':' + String(s % 60).padStart(2, '0'); };
   function hud(){
+    // Online: „DU“ über dem eigenen Spieler
+    if (st.online && !st.youHint){ st.youHint = true; st.hint = 'Du spielst ' + (MY() === 0 ? 'Rot' : 'Türkis') + ' · dein Spieler hat „DU“ über dem Kopf'; st.hintT = 5; }
+    const you = $3('g3you');
+    if (you){
+      const p = st.online && st.phase !== 'menu' ? st.ctrls[MY()] : null;
+      const q = p && !p.out ? R3.project([p.x, (p.y || 0) + 2.45, p.z], cvs.clientWidth, cvs.clientHeight) : null;
+      you.hidden = !q; if (q){ you.style.transform = 'translate(' + Math.round(q.x - 20) + 'px,' + Math.round(q.y - 14) + 'px)'; you.classList.toggle('t1', MY() === 1); }
+    }
     const so = st.so;
     const sc = so ? so.score : st.score[st.half];
     $3('g3s0').textContent = sc[0]; $3('g3s1').textContent = sc[1];
@@ -6157,7 +6284,7 @@ const G3 = { on:false };
       if (so.t === MY()){
         if (so.step === 0) mode = 'so0'; else if (so.step === 1) mode = 'so1'; else mode = c && c.air ? 'air' : 'so2';
       } else mode = 'gk';
-    } else if (c && c === me) mode = c.air ? 'air' : c.gk ? 'gkball' : 'att';
+    } else if (c && (c === me || (c.team === MY() && !c.gk && HUM(MY())))) mode = c.air ? 'air' : c.gk ? 'gkball' : 'att';
     else if (c && c.team !== MY()) mode = 'def';
     else mode = 'wait';
     if (mode !== st.btnMode){
@@ -6323,9 +6450,9 @@ const G3 = { on:false };
     for (const p of PL){ if (!p.out) animate(p, dt); }
     for (const a of ['a', 'b', 'c', 'd']) if (inp.act[a]){ netSend('a3', { a, m:inp.act[a] }); inp.act[a] = false; }
     const now = performance.now();
-    if (now - inT > 50 && NET.T){ inT = now; const j = joyVec(1); NET.T.state(1, { jx:r2(j.x), jy:r2(j.y), hc:inp.hold.c ? 1 : 0 }); }
+    if (now - inT > 50 && NET.T){ inT = now; const j = joyVec(1); NET.T.state(1, { jx:r2(j.x), jy:r2(j.y), hc:inp.hold.c ? 1 : 0, cy:Math.round(cam.yaw*1000)/1000 }); }
   }
-  function remoteIn(d){ IN[1].jx = d.jx || 0; IN[1].jy = d.jy || 0; IN[1].hold = { c:!!d.hc }; }
+  function remoteIn(d){ IN[1].jx = d.jx || 0; IN[1].jy = d.jy || 0; IN[1].hold = { c:!!d.hc }; IN[1].cy = d.cy; }
   function remoteAct(d){ if (st && st.online && NET.host) IN[1].act[d.a] = d.m || '?'; }
   function showRemoteMsg(d){
     msg(d.eye, d.title, d.text, d.btns.map((b, i) => ({ label:b.label, primary:b.primary, fn:() => { netSend('b3', { id:d.id, i }); if (/Menü|verlassen/.test(b.label)){ netSend('end', {}); exit(); } } })), true);
@@ -6453,7 +6580,10 @@ const H3 = { on:false };
     const D = DIFF[S.cdiff] || DIFF.mittel;
     const len = Number(S.hhalf) || 300;
     st = { kind, D, diff:S.cdiff, half:0, len, clock:len, score:[0, 0], hs:[[0, 0], [0, 0]], timeUp:false, phase:'play', deadT:0, after:null, poss:0, ctrl:null,
-           think:.8, ts:1, pen:null, seven:null, hist:[], banT:0, hint:'', suspT: Math.max(8, len*2/30), ctrls:[null, null], online:!!(opts && opts.online), me:0 };
+           think:.8, ts:1, pen:null, seven:null, hist:[], banT:0, hint:'', suspT: Math.max(8, len*2/30), ctrls:[null, null], online:!!(opts && opts.online), me:0,
+           mx:{ g:[0, 0], sv:[0, 0], jump:[0, 0], seven:[0, 0] } };
+    if (IN[1] === inp) IN[1] = { jx:0, jy:0, keys:{}, act:{}, hold:{} };   // war das Handy vorher Gast, gehört Team 1 wieder dem Mitspieler bzw. Computer
+    IN[1].act = {}; IN[1].jx = IN[1].jy = 0;
     Object.defineProperty(st, 'ctrl', { get(){ return this.ctrls[0]; }, set(v){ this.ctrls[0] = v; } });
     IN[1].act = {}; IN[1].jx = IN[1].jy = 0; IN[1].hold = {};
     setNames();
@@ -6465,7 +6595,7 @@ const H3 = { on:false };
     cancelAnimationFrame(raf); raf = requestAnimationFrame(loop);
     return true;
   }
-  function setNames(){ const tn = document.querySelectorAll('#g3 .g3sb .tn'); if (tn.length === 2){ tn[0].textContent = st.online ? NET.names[0].slice(0, 10) : 'DU'; tn[1].textContent = st.online ? NET.names[1].slice(0, 10) : 'CPU'; } }
+  function setNames(){ const tn = document.querySelectorAll('#g3 .g3sb .tn'); if (tn.length === 2){ tn[0].textContent = st.online ? NET.names[0].slice(0, 10) : ((typeof curProf === 'function' && curProf().name.trim()) || 'DU').slice(0, 10); tn[1].textContent = st.online ? NET.names[1].slice(0, 10) : 'CPU'; } }
   function stop(){
     H3.on = false; cancelAnimationFrame(raf);
     if (ui){ ui.hidden = true; ui.classList.remove('hall'); }
@@ -6550,8 +6680,10 @@ const H3 = { on:false };
     const m = Math.hypot(x, y); if (m > 1){ x /= m; y /= m; }
     return { x, y, m:Math.min(1, m) };
   }
-  function toWorld(jx, jy){
-    const bx = Math.sin(cam.yaw), bz = Math.cos(cam.yaw);
+  function toWorld(jx, jy, t){
+    // Online rechnet der Host den Joystick des Gastes mit dessen Kamerablick um (jedes Handy schaut von hinter dem eigenen Team)
+    const yaw = (t === 1 && st && st.online && !st.remote && IN[1].cy != null) ? IN[1].cy : cam.yaw;
+    const bx = Math.sin(yaw), bz = Math.cos(yaw);
     const fx = -bx, fz = -bz, rx = -fz, rz = fx;
     return { x: rx*jx + fx*(-jy), z: rz*jx + fz*(-jy) };
   }
@@ -6722,6 +6854,7 @@ const H3 = { on:false };
     if (st.train){ banner('Tor!', f.type === 'heber' ? 'Heber' : f.type === 'aufsetzer' ? 'Aufsetzer' : f.jump ? 'Sprungwurf' : 'Schlagwurf'); if (trainEvent('goal', f)) return; return dead(1.4, () => trainSetup()); }
     if (st.pen){ st.pen.score[t]++; banner('Tor!', f.type === 'heber' ? 'Heber' : f.type === 'aufsetzer' ? 'Aufsetzer' : ''); return penResult(true); }
     st.score[t]++; st.hs[st.half][t]++;
+    if (st.mx){ st.mx.g[t]++; if (f.jump) st.mx.jump[t]++; if (f.seven) st.mx.seven[t]++; }
     const lab = f.seven ? '7-Meter' : f.from && f.from.gk ? 'Torwart-Tor' : f.jump ? 'Sprungwurf' : '';
     banner('Tor!', nm(t) + (lab ? ' · ' + lab : ''));
     for (const p of field(t)){ p.st = 'cheer'; p.stT = 0; }
@@ -6744,6 +6877,12 @@ const H3 = { on:false };
   }
   function endGame(w){
     st.phase = 'menu';
+    // Bestenliste: Werte dieses Spiels (online bekommt der Gast seine Werte per Nachricht)
+    try {
+      const mx = st.mx || { g:[0, 0], sv:[0, 0], jump:[0, 0], seven:[0, 0] };
+      const rep = me => ({ online:!!st.online, full:st.kind === 'full', win:w === me, gf:st.score[me], ga:st.score[1 - me], saves:mx.sv[me], jump:mx.jump[me], seven:mx.seven[me] });
+      if (typeof lbMatch === 'function' && !st.train){ lbMatch(rep(0)); if (st.online && NET.host) netSend('lbm', rep(1)); }
+    } catch (e) {}
     if (!st.online) try { if (typeof Z !== 'undefined') Z.cdiff = S.cdiff; recCpu(st.kind === '7m' ? 'h7m' : 'hall', w === 0); } catch (e) {}
     const lines = st.hist.map(h => h[0] + '  ' + h[1]).join(' · ');
     msg('Abpfiff', st.online ? nm(w) + ' gewinnt' : w === 0 ? 'Gewonnen!' : 'Der Computer gewinnt', (st.kind === '7m' ? '' : 'Endstand ' + st.score[0] + ':' + st.score[1] + ' · ') + lines,
@@ -6868,7 +7007,7 @@ const H3 = { on:false };
     const sv = st.seven || {}, d = dirOf(k.team), oz = ownZ(k.team);
     if (HUM(k.team) && !H3.auto){
       // du hältst: Joystick seitlich, Taste „Position“ wechselt die Stellung, Hechten zum richtigen Zeitpunkt
-      const j = joyVec(k.team), w = toWorld(j.x, 0);
+      const j = joyVec(k.team), w = toWorld(j.x, 0, k.team);
       const tz = oz + d*KPOS[sv.hkp || 0], dz = tz - k.z;
       if (!k.dive) movePlayer(k, dt, w.x*j.m, Math.abs(dz) > .08 ? Math.sign(dz)*Math.min(1, Math.abs(dz)) : 0, Math.abs(dz) > .08 ? 3.4 : 4.2);
       k.yaw = Math.atan2(0, d);
@@ -6930,7 +7069,7 @@ const H3 = { on:false };
       const defPos = { 1:[-4.6, 7.4], 2:[0, 7.6], 3:[4.6, 7.4], 5:[.4, 6.7] };
       idx.forEach(i => { const sp = startPos[i], dp = defPos[i]; P(a, i, sp[0] + ra(-.4, .4), sp[1], a); P(1 - a, i, dp[0], dp[1], a); });
       keeper(1 - a);
-      car = PL.find(q => q.team === a && q.i === 2) || PL.find(q => q.team === a && q.i === 1);
+      car = PL.find(q => q.team === a && q.i === 2 && !q.out) || PL.find(q => q.team === a && !q.out && !q.gk);
       tr.blockers = true;
     }
     else if (id === 'tw' || id === 'heber' || id === 'aufs' || id === 'taeusch'){
@@ -7325,7 +7464,7 @@ const H3 = { on:false };
     if (st.phase !== 'play') return;
     if (c && !c.drib) c.hold += dt;
     if (!sv) aiTargets(dt);
-    const JW = [0, 1].map(t => { const j = joyVec(t); return { j, w:toWorld(j.x, j.y) }; });
+    const JW = [0, 1].map(t => { const j = joyVec(t); return { j, w:toWorld(j.x, j.y, t) }; });
     if (H3.auto) st.ctrls = [null, null];
     else if (!sv){
       st.swT = Math.max(0, (st.swT || 0) - rdt);
@@ -7426,7 +7565,7 @@ const H3 = { on:false };
     }
   }
   function pickMate(p){
-    const j = joyVec(p.team); let dir = toWorld(j.x, j.y);
+    const j = joyVec(p.team); let dir = toWorld(j.x, j.y, p.team);
     if (j.m < .3){ dir = { x:0, z:dirOf(p.team) }; }
     let best = null, bs = -1e9;
     for (const q of field(p.team)){
@@ -7588,6 +7727,7 @@ const H3 = { on:false };
   function save(k){
     giveBall(k); k.st = 'save'; k.stT = 0;
     banner('Parade!', st.online ? 'Torwart von ' + nm(k.team) : k.team === 0 ? 'Dein Torwart hält' : 'Der Torwart hält');
+    if (!st.train && st.mx) st.mx.sv[k.team]++;
     if (st.train && trainEvent('save', k)) return;
     if (st.pen) return penResult(false);
     st.seven = null;
@@ -7597,7 +7737,7 @@ const H3 = { on:false };
   function humanDive(AT){
     const sv = st.seven; if (!sv || !HUM(1 - sv.t) || H3.auto) return;
     const kt = 1 - sv.t, A = AT[kt] || {}, k = gkOf(kt);
-    if (A.a && !k.dive){ const j = joyVec(kt); const w = toWorld(j.x, 0); k.dive = .01; k.diveDir = Math.sign(w.x || (ball.x - k.x) || 1); k.diveH = j.y < -.4 ? 1.8 : j.y > .4 ? .4 : 1.0; }
+    if (A.a && !k.dive){ const j = joyVec(kt); const w = toWorld(j.x, 0, kt); k.dive = .01; k.diveDir = Math.sign(w.x || (ball.x - k.x) || 1); k.diveH = j.y < -.4 ? 1.8 : j.y > .4 ? .4 : 1.0; }
     if (k.dive) k.dive = Math.min(1, k.dive + st.rdt*4);
   }
 
@@ -7676,10 +7816,10 @@ const H3 = { on:false };
   /* ---------- Kamera ---------- */
   function updateCam(dt){
     const att = ball.owner ? ball.owner.team : (ball.fl ? ball.fl.team : st.poss);
-    const sv = st.seven, ref = sv ? sv.t : att;
+    const sv = st.seven, ref = sv ? sv.t : (st.online ? MY() : att);   // online: immer von hinter dem eigenen Team
     const tYaw = dirOf(ref) < 0 ? 0 : Math.PI;
     cam.yaw = lerpAng(cam.yaw, tYaw, Math.min(1, dt*2.2));
-    const o = ball.owner, ad = dirOf(ref);
+    const o = ball.owner, ad = dirOf(sv ? sv.t : att);   // Blickpunkt vor dem Ballführer in seine Angriffsrichtung
     let fx = o ? o.x : ball.x, fz = (o ? o.z : ball.z) + ad*(o && o.gk ? 6 : 1.4);
     if (sv && !sv.shot){ fx = 0; fz = sv.sh.z + ad*2.2; }
     cam.f.x += (fx - cam.f.x)*Math.min(1, dt*3.5); cam.f.z += (fz - cam.f.z)*Math.min(1, dt*3.5);
@@ -7698,6 +7838,14 @@ const H3 = { on:false };
   const $3 = id => document.getElementById(id);
   const fmtT = s => { s = Math.ceil(s); return Math.floor(s/60) + ':' + String(s % 60).padStart(2, '0'); };
   function hud(){
+    // Online: „DU“ über dem eigenen Spieler
+    if (st.online && !st.youHint){ st.youHint = true; st.hint = 'Du spielst ' + (MY() === 0 ? 'Rot' : 'Türkis') + ' · dein Spieler hat „DU“ über dem Kopf'; st.hintT = 5; }
+    const you = $3('g3you');
+    if (you){
+      const p = st.online && st.phase !== 'menu' ? st.ctrls[MY()] : null;
+      const q = p && !p.out ? R3.project([p.x, (p.y || 0) + 2.45, p.z], cvs.clientWidth, cvs.clientHeight) : null;
+      you.hidden = !q; if (q){ you.style.transform = 'translate(' + Math.round(q.x - 20) + 'px,' + Math.round(q.y - 14) + 'px)'; you.classList.toggle('t1', MY() === 1); }
+    }
     const pen = st.pen, sv = st.seven;
     const sc = pen ? pen.score : st.score;
     $3('g3s0').textContent = sc[0]; $3('g3s1').textContent = sc[1];
@@ -7710,7 +7858,7 @@ const H3 = { on:false };
     let mode = 'none';
     if (sv && !sv.shot){ mode = sv.t === MY() ? 'seven' : 'gk'; }
     else if (sv && sv.shot && sv.t !== MY()) mode = 'gk';
-    else if (c && c === me) mode = c.air ? 'air' : c.gk ? 'gkball' : c.drib ? 'drib' : 'att';
+    else if (c && (c === me || (c.team === MY() && !c.gk && HUM(MY())))) mode = c.air ? 'air' : c.gk ? 'gkball' : c.drib ? 'drib' : 'att';
     else if (c && c.team !== MY()) mode = 'def';
     else mode = 'wait';
     if (mode !== st.btnMode){
@@ -7863,9 +8011,9 @@ const H3 = { on:false };
     // eigene Eingaben zum Host: Joystick als Zustand, Tipps als einzelne Nachrichten (mit der Rolle beim Tippen)
     for (const a of ['a', 'b', 'c', 'd']) if (inp.act[a]){ netSend('a3', { a, m:inp.act[a] }); inp.act[a] = false; }
     const now = performance.now();
-    if (now - inT > 60 && NET.T){ inT = now; const j = joyVec(1); NET.T.state(1, { jx:r2(j.x), jy:r2(j.y), hc:inp.hold.c ? 1 : 0 }); }
+    if (now - inT > 60 && NET.T){ inT = now; const j = joyVec(1); NET.T.state(1, { jx:r2(j.x), jy:r2(j.y), hc:inp.hold.c ? 1 : 0, cy:Math.round(cam.yaw*1000)/1000 }); }
   }
-  function remoteIn(d){ IN[1].jx = d.jx || 0; IN[1].jy = d.jy || 0; IN[1].hold = { c:!!d.hc }; }
+  function remoteIn(d){ IN[1].jx = d.jx || 0; IN[1].jy = d.jy || 0; IN[1].hold = { c:!!d.hc }; IN[1].cy = d.cy; }
   function remoteAct(d){ if (st && st.online && NET.host) IN[1].act[d.a] = d.m || '?'; }
   function showRemoteMsg(d){
     msg(d.eye, d.title, d.text, d.btns.map((b, i) => ({ label:b.label, primary:b.primary, fn:() => { netSend('b3', { id:d.id, i }); if (/Menü|verlassen/.test(b.label)){ netSend('end', {}); exitH(); } } })), true);
@@ -8259,12 +8407,12 @@ function netOnMsg(m){
       NET.peer = true; NET.names[1] = String(d.name || 'Spieler 2').slice(0, 14);
       if (NET.T.rtcStart && !NET.T.rtc) NET.T.rtcStart();
       netSend('welcome', { name:NET.names[0], mode:curMode });
-      netStatus('Raum ' + NET.room + ' · ' + NET.names[1] + ' ist da. Tippe auf „' + ($('#startBtn').textContent || 'Anpfiff') + '“.');
+      netStatus('Raum ' + NET.room + ' · ' + NET.names[1] + ' ist da. Tippe jetzt ein Spiel an.');
       netUi(); break;
     case 'welcome':
       if (!NET.guest) return;
       NET.peer = true; NET.names[0] = String(d.name || 'Spieler 1').slice(0, 14);
-      netStatus('Verbunden mit ' + NET.names[0] + ' · warte auf den Anpfiff');
+      netStatus('Verbunden mit ' + NET.names[0] + ' · ' + NET.names[0] + ' wählt das Spiel');
       netUi(); break;
     case 'start':
       if (!NET.guest) return;
@@ -8276,6 +8424,7 @@ function netOnMsg(m){
       if (!NET3().startRemote(d.kind)){ toast('3D wird auf diesem Gerät nicht unterstützt.'); netSend('end', {}); netLeave(true); toMenu(); }
       break;
     case 'rtc': if (NET.T && NET.T.rtcSignal) NET.T.rtcSignal(d); break;
+    case 'lbm': if (NET.guest && typeof lbMatch === 'function') lbMatch(d); break;
     case 'pg': if (NET.host) netSend('po', { t:d.t }); break;
     case 'po': if (NET.guest && d.t){ const r = performance.now() - d.t; if (r >= 0 && r < 5000) NET.rtt = NET.rtt ? NET.rtt*.7 + r*.3 : r; } break;
     case 'a3': if (NET.host) NET3().remoteAct(d); break;
@@ -8447,6 +8596,168 @@ function net3Apply(PL, s, ball, dt, me, want, lerpAng){
   ball.vx = b[3]; ball.vy = b[4]; ball.vz = b[5];
 }
 
+/* ======================= Bestenliste, Fehlermeldung, Nutzungszahlen =======================
+   Alles läuft über dieselbe Firebase-Datenbank wie das Online-Spiel (nur auf der GitHub-Seite eingetragen).
+   /lb/<spiel>/<gerät_profil>   ein Eintrag pro Profil mit Name und Bestwerten
+   /reports/<id>                Fehlermeldungen (nur schreiben, lesen nur in der Firebase-Konsole)
+   /stats/<tag>/<gerät>         anonyme Nutzung: Besuche und Sekunden pro Gerät und Tag
+   Ohne Datenbank zeigt die Bestenliste nur die Profile auf diesem Handy. */
+const LB_CATS = {
+  beach: [
+    { k:'win',    t:'Höchster Sieg', u:'Tore Vorsprung', f:e => '+' + e.win.d + ' (' + e.win.s + ')', v:e => e.win && e.win.d },
+    { k:'goals',  t:'Meiste Tore in einem Spiel', v:e => e.goals },
+    { k:'saves',  t:'Meiste Paraden in einem Spiel', v:e => e.saves },
+    { k:'kempa',  t:'Meiste Kempa-Tore in einem Spiel', v:e => e.kempa },
+    { k:'pir',    t:'Meiste Pirouetten-Tore in einem Spiel', v:e => e.pir },
+    { k:'clean',  t:'Wenigste Gegentore bei einem Sieg', low:true, v:e => e.clean },
+    { k:'wins',   t:'Siege insgesamt', v:e => e.wins },
+    { k:'onl',    t:'Online-Siege', v:e => e.onl },
+    { k:'streak', t:'Längste Siegesserie im Wurfduell', v:e => e.streak },
+    { k:'stars',  t:'Sterne in den Spielzügen', v:e => e.stars },
+    { k:'badges', t:'Abzeichen', v:e => e.badges },
+    { k:'train',  t:'Trainings geschafft', v:e => e.train }
+  ],
+  hall: [
+    { k:'win',    t:'Höchster Sieg', u:'Tore Vorsprung', f:e => '+' + e.win.d + ' (' + e.win.s + ')', v:e => e.win && e.win.d },
+    { k:'goals',  t:'Meiste Tore in einem Spiel', v:e => e.goals },
+    { k:'saves',  t:'Meiste Paraden in einem Spiel', v:e => e.saves },
+    { k:'jump',   t:'Meiste Sprungwurf-Tore in einem Spiel', v:e => e.jump },
+    { k:'seven',  t:'Meiste 7-Meter-Tore in einem Spiel', v:e => e.seven },
+    { k:'clean',  t:'Wenigste Gegentore bei einem Sieg', low:true, v:e => e.clean },
+    { k:'wins',   t:'Siege insgesamt', v:e => e.wins },
+    { k:'onl',    t:'Online-Siege', v:e => e.onl },
+    { k:'stars',  t:'Sterne in den Spielzügen', v:e => e.stars },
+    { k:'badges', t:'Abzeichen', v:e => e.badges },
+    { k:'train',  t:'Trainings geschafft', v:e => e.train }
+  ]
+};
+const lbDb = () => { const u = typeof netUrl === 'function' ? netUrl() : ''; return /^https:\/\/|^http:\/\/127\.0\.0\.1/.test(u) ? u : ''; };
+function lbDev(){
+  try { let d = localStorage.getItem('bd_dev'); if (!d){ d = Math.random().toString(36).slice(2, 10); localStorage.setItem('bd_dev', d); } return d; }
+  catch (e) { return 'x' + Math.random().toString(36).slice(2, 8); }
+}
+// Ergebnis eines Spiels übernehmen. Zählt nur gegen den Computer ab „Mittel“ oder online.
+function lbMatch(m){
+  try {
+    if (!REC.lb) REC.lb = {};
+    const L = REC.lb[GAME] || (REC.lb[GAME] = {});
+    if (m.online && m.win) L.onl = (L.onl || 0) + 1;
+    if (!m.full || (!m.online && S.cdiff === 'leicht')){ saveRec(); lbPush(); return; }
+    const mx = (k, v) => { if (v != null && v > (L[k] || 0)) L[k] = v; };
+    mx('goals', m.gf); mx('saves', m.saves); mx('kempa', m.kempa); mx('pir', m.pir); mx('jump', m.jump); mx('seven', m.seven);
+    if (m.win){
+      const d = m.gf - m.ga;
+      if (d > 0 && (!L.win || d > L.win.d)) L.win = { d, s:m.gf + ':' + m.ga };
+      if (L.clean == null || m.ga < L.clean) L.clean = m.ga;
+    }
+    saveRec(); lbPush();
+  } catch (e) {}
+}
+// Eintrag dieses Profils für das aktuelle Spiel
+function lbEntry(){
+  const L = (REC.lb && REC.lb[GAME]) || {};
+  const kinds = GAME === 'hall' ? ['hall', 'h7m', 'hfull'] : ['full', 'tactic', 'so'];
+  let wins = kinds.reduce((a, k) => a + ['leicht', 'mittel', 'schwer'].reduce((b, d) => b + ((((REC.cpu || {})[k] || {})[d]) || { w:0 }).w, 0), 0) + (L.onl || 0);
+  if (GAME !== 'hall') wins += ['leicht', 'mittel', 'schwer'].reduce((a, d) => a + ((REC.duell && REC.duell[d]) ? REC.duell[d].w : 0), 0);
+  const stars = GAME === 'hall' ? HLEVELS.reduce((a, _, i) => a + zStarsH(i), 0) : ZLEVELS.reduce((a, _, i) => a + zStars(i), 0);
+  const e = { name:curProf().name.trim().slice(0, 16), goals:L.goals || 0, saves:L.saves || 0, wins, onl:L.onl || 0, stars, badges:badgeCount(),
+              train:TRL().filter(x => x.kind !== 'info' && trainDone.includes(x.id)).length, t:Date.now() };
+  if (L.win) e.win = L.win;
+  if (L.clean != null) e.clean = L.clean;
+  if (GAME === 'hall'){ e.jump = L.jump || 0; e.seven = L.seven || 0; }
+  else { e.kempa = L.kempa || 0; e.pir = L.pir || 0; e.streak = REC.bestStreak || 0; }
+  return e;
+}
+const lbId = () => lbDev() + '_' + curProf().id;
+let lbPushT = 0;
+function lbPush(){
+  const db = lbDb(); const e = lbEntry();
+  if (!db || !e.name) return Promise.resolve(false);
+  lbPushT = Date.now();
+  return fetch(db + '/lb/' + GAME + '/' + lbId() + '.json', { method:'PUT', body:JSON.stringify(e) }).then(r => r.ok).catch(() => false);
+}
+async function openBoard(){
+  trainOff(); running = false; M = null; A = null; Z.active = false; zbar.hidden = true;
+  const list = $('#lbList'), note = $('#lbNote');
+  list.textContent = ''; note.textContent = 'Lade …';
+  showOverlay('lbOv');
+  let all = null;
+  const db = lbDb();
+  if (db){
+    await lbPush();
+    try { const r = await fetch(db + '/lb/' + GAME + '.json'); if (r.ok) all = await r.json() || {}; } catch (e) { all = null; }
+  }
+  const mine = lbId();
+  let rows;
+  if (all){
+    rows = Object.keys(all).map(k => Object.assign({ id:k }, all[k])).filter(e => e && typeof e.name === 'string' && e.name.trim());
+    note.textContent = curProf().name.trim() ? 'Alle Spieler mit Profilnamen. Gezählt werden Spiele gegen den Computer ab „Mittel“ und Online-Spiele.'
+      : 'Du stehst noch nicht drin: Trag im Profil einen Namen ein. Gezählt werden Spiele gegen den Computer ab „Mittel“ und Online-Spiele.';
+  } else {
+    const e = lbEntry(); e.id = mine; if (!e.name) e.name = 'Du';
+    rows = [e];
+    note.textContent = 'Keine Verbindung zur Bestenliste. Hier stehen nur deine eigenen Werte.';
+  }
+  for (const c of LB_CATS[GAME]){
+    const top = rows.filter(e => { const v = c.v(e); return v != null && (c.low || v > 0); })
+      .sort((a, b) => c.low ? c.v(a) - c.v(b) : c.v(b) - c.v(a)).slice(0, 5);
+    const box = document.createElement('div'); box.className = 'lbcat';
+    const h = document.createElement('h3'); h.textContent = c.t; box.append(h);
+    if (!top.length){ const p = document.createElement('p'); p.className = 'lbempty'; p.textContent = 'Noch kein Eintrag'; box.append(p); }
+    else {
+      const ol = document.createElement('ol');
+      top.forEach(e => {
+        const li = document.createElement('li'); if (e.id === mine) li.className = 'me';
+        const n = document.createElement('span'); n.textContent = e.name.slice(0, 16);
+        const v = document.createElement('b'); v.textContent = c.f ? c.f(e) : String(c.v(e));
+        li.append(n, v); ol.append(li);
+      });
+      box.append(ol);
+    }
+    list.append(box);
+  }
+}
+/* ---------- Fehler melden ---------- */
+function openBug(){
+  $('#bugText').value = ''; $('#bugNote').textContent = 'Was ist passiert? Je genauer, desto besser: Spielmodus, was du gemacht hast, was stattdessen passiert ist.';
+  $('#bugSend').disabled = false; $('#bugCopy').hidden = true;
+  showOverlay('bugOv');
+}
+function bugInfo(){
+  return { game:GAME, mode:S.lastMode || '', opp:S.opp || '', name:curProf().name.trim().slice(0, 16), ua:navigator.userAgent.slice(0, 180),
+           scr:innerWidth + 'x' + innerHeight, t:Date.now(), day:new Date().toLocaleString('de-DE') };
+}
+async function sendBug(){
+  const text = $('#bugText').value.trim();
+  if (text.length < 5){ $('#bugNote').textContent = 'Schreib bitte kurz, was passiert ist.'; return; }
+  const db = lbDb(), body = Object.assign({ text:text.slice(0, 1000) }, bugInfo());
+  $('#bugSend').disabled = true;
+  let ok = false;
+  if (db){ try { const r = await fetch(db + '/reports.json', { method:'POST', body:JSON.stringify(body) }); ok = r.ok; } catch (e) { ok = false; } }
+  if (ok){ showOverlay('menu'); toast('Danke! Deine Meldung ist angekommen.'); return; }
+  $('#bugSend').disabled = false; $('#bugCopy').hidden = false;
+  $('#bugNote').textContent = 'Senden hat nicht geklappt. Kopier den Text und schick ihn deinem Trainer.';
+}
+function copyBug(){
+  const i = bugInfo(), t = 'Fehlermeldung ' + (GAME === 'hall' ? 'Hallen-Duell' : 'Beach-Duell') + '\n' + $('#bugText').value.trim() + '\n\n' + i.day + ' · ' + i.mode + ' · ' + i.scr + '\n' + i.ua;
+  try { navigator.clipboard.writeText(t).then(() => toast('Kopiert.'), () => toast('Kopieren ging nicht.')); } catch (e) { toast('Kopieren ging nicht.'); }
+}
+/* ---------- Nutzung: anonym, ein Zähler pro Gerät und Tag ---------- */
+(function lbStats(){
+  const db = lbDb(); if (!db) return;
+  const dev = lbDev();
+  const day = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+  const ping = first => {
+    if (document.hidden && !first) return;
+    const b = { t:{ '.sv':'timestamp' } };
+    b['s_' + GAME] = { '.sv':{ increment:first ? 0 : 30 } };
+    if (first) b['v_' + GAME] = { '.sv':{ increment:1 } };
+    fetch(db + '/stats/' + day() + '/' + dev + '.json', { method:'PATCH', body:JSON.stringify(b) }).catch(() => {});
+  };
+  ping(true);
+  setInterval(() => ping(false), 30000);
+})();
+
 /* @@G3D-JS-END@@ */
 new ResizeObserver(resize).observe(stage);
 /* Ein Spiel pro Datei: Beach-Duell oder Hallen-Duell */
@@ -8458,7 +8769,10 @@ function applyGame(){
   $('#menu h1').textContent = hall ? 'Hallen-Duell' : 'Beach-Duell';
 }
 applyGame();
+$('#netSlot').append($('#netField'));
 resize(); syncMenu();
+{ let seen = false; try { seen = !!localStorage.getItem('beachduell_intro'); } catch (e) { seen = true; }
+  if (!seen && !curProf().name.trim()) openProfile(true); else introDone(); }
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => draw());
 requestAnimationFrame(frame);
 })();
