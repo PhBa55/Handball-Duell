@@ -117,6 +117,7 @@ button:focus-visible,summary:focus-visible{outline:3px solid var(--sun);outline-
 .mode.mc[data-mode="train"]{background:var(--sun)}
 .mode.mc[data-mode="train"] small{color:var(--ink)}
 .mode.mc.off{display:none}
+.mode.mcomp{background:#FFF1C9;border-color:#8A5F00;box-shadow:0 3px 0 #8A5F00}
 .tiles2{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .cuplist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
 .cuplist li{display:grid;grid-template-columns:1fr auto;column-gap:8px;border:2px solid var(--ink);border-radius:12px;padding:8px 12px;background:#fff}
@@ -338,6 +339,8 @@ input.txt{user-select:text;-webkit-user-select:text}
 #g3you::after{content:"";position:absolute;left:50%;bottom:-5px;margin-left:-5px;border:5px solid transparent;border-bottom:0;border-top-color:#C8102E}
 #g3you.t1::after{border-top-color:#0B8C7F}
 
+#g3.watch #g3btns,#g3.watch #g3joy,#g3.watch #g3you{display:none}
+
 /* @@G3D-CSS-END@@ */
 </style>
 
@@ -392,17 +395,18 @@ input.txt{user-select:text;-webkit-user-select:text}
       <div class="mlist" id="mgHall">
         <button class="mode mc m3d" data-mode="h3d" data-opp="cpu online"><b>Halle 3D</b><span data-cpu="Ganzes Spiel, 6 + Torwart, du steuerst mit dem Joystick" data-online="Jeder steuert sein Team mit dem Joystick"></span></button>
         <button class="mode mc" data-mode="hfull" data-opp="cpu two online"><b>Spiel von oben</b><span data-cpu="Spielzüge zeichnen, Tor gegen Tor" data-two="Das Handy liegt zwischen euch, jeder hat ein Tor" data-online="Angreifer zeichnet, Verteidiger hält"></span></button>
-        <button class="mode mc" data-mode="cup" data-opp="cpu"><b>Pokal</b><span data-cpu="4 Runden gegen immer stärkere Gegner, wer verliert, ist raus"></span><small id="cupBadgeH"></small></button>
-        <button class="mode mc" data-mode="tour" data-opp="online"><b>Turnier</b><span data-online="Bis zu 8 Spieler, jeder gegen jeden"></span></button>
         <button class="mode mc" data-mode="h7m" data-opp="cpu online"><b>7-Meter</b><span data-cpu="Abwechselnd werfen und halten" data-online="Abwechselnd werfen und halten"></span></button>
       </div>
       <div class="mlist" id="mgBeach">
         <button class="mode mc m3d" data-mode="g3d" data-opp="cpu online"><b>3D-Arena</b><span data-cpu="Beachhandball in 3D, du steuerst mit dem Joystick" data-online="Jeder steuert sein Team mit dem Joystick"></span></button>
-        <button class="mode mc" data-mode="cup" data-opp="cpu"><b>Pokal</b><span data-cpu="4 Runden gegen immer stärkere Gegner, wer verliert, ist raus"></span><small id="cupBadgeB"></small></button>
-        <button class="mode mc" data-mode="tour" data-opp="online"><b>Turnier</b><span data-online="Bis zu 8 Spieler, jeder gegen jeden"></span></button>
         <button class="mode mc" data-mode="full" data-opp="cpu two online"><b>Spiel von oben</b><span data-cpu="Spielzüge zeichnen, Tor gegen Tor" data-two="Das Handy liegt zwischen euch, jeder hat ein Tor" data-online="Angreifer zeichnet, Verteidiger hält"></span></button>
         <button class="mode mc" data-mode="werfen" data-opp="cpu two online"><b>Werfen</b><span data-cpu="Wurfduell oder Shoot-out gegen den Computer" data-two="Shoot-out, je 5 Würfe abwechselnd" data-online="Shoot-out, je 5 Würfe abwechselnd"></span></button>
         <button class="mode mc" data-mode="tactic" data-opp="cpu two online"><b>Taktik-Duell</b><span data-cpu="Abwehr aufstellen, Angriff zeichnen" data-two="Einer stellt die Abwehr, der andere greift an" data-online="Einer stellt die Abwehr, der andere greift an"></span></button>
+      </div>
+      <span class="flabel">Wettbewerbe</span>
+      <div class="mlist" id="mgComp">
+        <button class="mode mc mcomp" data-mode="cup"><b>Pokal</b><span>Allein gegen den Computer: 4 Runden, wer verliert, ist raus</span><small id="cupBadge"></small></button>
+        <button class="mode mc mcomp" data-mode="tour"><b>Online-Turnier</b><span>Bis zu 8 Spieler auf ihren Handys, jeder gegen jeden</span></button>
       </div>
       <span class="flabel" id="lblPractice">Üben</span>
       <div class="mlist" id="mgPractice">
@@ -410,7 +414,9 @@ input.txt{user-select:text;-webkit-user-select:text}
         <button class="mode mc" data-mode="hlevels" data-game="hall"><b>Spielzüge</b><span>16 Level mit Sternen</span><small id="hmodeStars"></small></button>
         <button class="mode mc" data-mode="levels" data-game="beach"><b>Spielzüge</b><span>22 Level mit Sternen</span><small id="modeStars"></small></button>
       </div>
+      <button id="updBtn" class="resume" hidden><span class="rl">Neue Version da</span><b>Jetzt neu laden</b><span class="ra" aria-hidden="true">↻</span></button>
       <button id="bugBtn" class="linkbtn" type="button">Fehler melden</button>
+      <p class="fnote" id="verNote" style="text-align:center;margin:0"></p>
     </div>
   </section>
 
@@ -567,6 +573,7 @@ input.txt{user-select:text;-webkit-user-select:text}
         <p class="fnote" id="tourHead"></p>
         <p class="msgtext" id="tourState"></p>
         <button id="tourGo" class="cta">Turnier starten</button>
+        <button id="tourReady" class="cta" hidden>Bereit</button>
         <table class="ttab"><thead id="tourTabHead"><tr><th>#</th><th>Name</th><th>Sp</th><th>S</th><th>N</th><th>Tore</th><th>Pkt</th></tr></thead><tbody id="tourTab"></tbody></table>
         <span class="flabel" id="tourGamesHead">Spiele dieser Runde</span>
         <ul class="tgames" id="tourGames"></ul>
@@ -688,7 +695,8 @@ const $ = s => document.querySelector(s);
 const cvs = $('#cv'), ctx = cvs.getContext('2d'), stage = $('#stage');
 
 /* ---------- Einstellungen ---------- */
-const GAME = 'hall';   // @@GAME@@ beach = Beach-Duell, hall = Hallen-Duell (beide Spiele aus derselben Quelle gebaut)
+const GAME = 'hall';   // @@GAME@@
+const BUILD = '02.11.2026 15:46';   // @@BUILD@@ beach = Beach-Duell, hall = Hallen-Duell (beide Spiele aus derselben Quelle gebaut)
 const HALL_MODES = ['h3d','h7m','hfull','hlevels'];
 const S = { mode:'1p', half:45, diff:'mittel', game:'duell', zp:'1', fhalf:'180', fdiff:'leicht', opp:'cpu', cdiff:'mittel' };
 try { Object.assign(S, JSON.parse(localStorage.getItem('beachduell') || '{}')); } catch (e) {}
@@ -2021,12 +2029,14 @@ const RULES = {
     '<b>Kempa (wie im Wurfduell):</b> Hoher Pass in den Torraum vor einen Mitspieler. Tippe „Sprung“, wenn der Marker im grünen Bereich ist, sonst klappt der Fang nicht. In der Luft dann werfen, bevor der Luftbalken leer ist. 2 Punkte.',
     '<b>Abwehr:</b> Du steuerst den Abwehrspieler mit dem gelben Ring. Lauf in die Passwege, Block springt hoch, Wechsel nimmt den Spieler am nächsten zum Ball. Dein Torwart hält selbst.',
     '<b>Regeln:</b> Mit dem Ball höchstens 3 Schritte (Punkte über dem Kopf) und 5 Sekunden (Zeitring). Feldspieler dürfen nicht in den Torraum laufen, nur hineinspringen.',
+    '<b>Seitenaus:</b> Geht der Ball über die Seitenlinie oder läufst du mit dem Ball darüber, gibt es Einwurf für den Gegner an der Stelle, aus dem Stand. Ball über die Torlinie = Abwurf vom Torwart.',
     '<b>Verteidigen:</b> In der Abwehr stellst du dich vor den Ballführer und tippst „Verteidigen“: Er wird kurz gestoppt. Von der Seite oder von hinten ist es ein Foul, dann darf er neu anlaufen.',
     '<b>Wechsel wie im Beachhandball:</b> Bei Ballgewinn läuft der Torwart über den Torwart-Wechselbereich raus, dann kommt der Spezialist (Torwarttrikot, 2 Punkte). Hat der Torwart selbst den Ball, passt er und läuft als Spezialist mit. Bei Ballverlust geht der Spezialist raus und der Torwart kommt zurück: Bis er im Tor steht, ist das Tor leer. Dazu fliegende Wechsel der Feldspieler.',
     '<b>Shoot-out:</b> Pass zum eigenen Torwart, sprinten, Rückpass oder Kempa anfordern, dann werfen. Wirft der Computer, steuerst du deinen Torwart und hechtest: Joystick nach oben für hohe, nach unten für flache Bälle.'
   ],
   h3d: [
     '<b>Steuerung:</b> Links der Joystick zum Laufen, rechts die Tasten. Am Computer: Pfeiltasten oder WASD, K = Wurf/Block, J = Pass/Wechsel, L = Sprungwurf/Verteidigen, I = Täuschen.',
+    '<b>Wurf- und Passarten:</b> Wurf antippen = Schlagwurf, auf der Taste nach oben wischen = Sprungwurf, zur Seite wischen = Knickwurf (geht am Block vorbei, flacher). Pass antippen = gerader Pass, nach unten wischen = Bodenpass (unter den Armen der Abwehr durch, gut zum Kreis).',
     '<b>Schlagwurf:</b> Wurf aus dem Stand oder Lauf, schnell und flach. <b>Sprungwurf:</b> Absprung vor der 6-m-Linie, Wurf am höchsten Punkt über den Block. Zielen mit dem Joystick: links/rechts, hoch nach oben, flach nach unten. Jedes Tor zählt 1.',
     '<b>Prellen (automatisch):</b> Läufst du nach 3 Schritten weiter, prellt dein Spieler von selbst. Bleibst du stehen, fängt er den Ball und hat noch einmal 3 Schritte. Ein zweites Prellen gibt es nicht (Doppeldribbling), dann musst du passen oder werfen.',
     '<b>Torraum:</b> Der Halbkreis (6 m) gehört dem Torwart. Hineinspringen beim Sprungwurf ist erlaubt. Läufst du mit dem Ball hinein, gibt es Abwurf für den Gegner. Verteidigst du im eigenen Torraum, gibt es 7-Meter (Ballführer innerhalb von 9 m) oder Freiwurf.',
@@ -2147,7 +2157,7 @@ function syncMenu(){
   document.querySelectorAll('.kpen').forEach(b => b.textContent = hall ? '7-Meter' : 'Shoot-out');
   document.querySelectorAll('.k3d').forEach(b => b.textContent = hall ? 'Halle 3D' : '3D-Arena');
   if ($('#thalfHField')){ $('#thalfHField').hidden = !hall || S.tourk === 'pen'; $('#thalfBField').hidden = hall || S.tourk === 'pen'; }
-  { const c = REC.cup && REC.cup[GAME], el = $(hall ? '#cupBadgeH' : '#cupBadgeB'); if (el) el.textContent = c && !c.out && !c.won ? CUP_ROUNDS[c.round] : (REC.cups ? REC.cups + '× gewonnen' : ''); }
+  { const c = REC.cup && REC.cup[GAME], el = $('#cupBadge'); if (el) el.textContent = c && !c.out && !c.won ? CUP_ROUNDS[c.round] : (REC.cups ? REC.cups + '× gewonnen' : ''); }
   if (typeof syncTourBtn === 'function') syncTourBtn();
   $('#menu .eyebrow').textContent = hall ? 'Hallenhandball' : 'Beachhandball';
   $('#trainBadge').textContent = td ? td + '/' + TRL().filter(L => L.kind !== 'info').length + ' ✓' : 'Hier starten';
@@ -2160,6 +2170,7 @@ $('#cupBack').addEventListener('click', () => showOverlay('menu'));
 $('#tourCreate').addEventListener('click', () => tourCreate());
 $('#tourJoin').addEventListener('click', () => tourJoin());
 $('#tourGo').addEventListener('click', () => tourStart());
+$('#tourReady').addEventListener('click', () => tourReady());
 $('#tourLeave').addEventListener('click', () => tourLeave());
 $('#tourBack').addEventListener('click', () => { syncMenu(); showOverlay('menu'); });
 $('#tourResume').addEventListener('click', () => openTour());
@@ -5440,7 +5451,7 @@ const G3 = { on:false };
   }
   function giveBall(p){
     ball = ball || { x:0, y:1, z:0, vx:0, vy:0, vz:0 };
-    ball.owner = p; ball.fl = null; ball.loose = false; ball.lt = 0;
+    ball.owner = p; ball.fl = null; ball.loose = false; ball.lt = 0; ball.lastTeam = p.team;
     if (p.team !== st.poss || p.gk) st.passN = 0;
     if (p.team !== st.poss){ subs(p.team, p); if (!st.gainAt) st.gainAt = [0, 0]; st.gainAt[p.team] = performance.now(); }
     for (const q of PL) if (q !== p) q.ftStand = false;
@@ -5661,6 +5672,20 @@ const G3 = { on:false };
       for (const q of field(1 - t)){ const dd = h2(q, p); if (dd < 1.05){ const ux = (q.x - p.x)/(dd || 1), uz = (q.z - p.z)/(dd || 1); q.x = cl(p.x + ux*1.1, -HW + .3, HW - .3); q.z = cl(p.z + uz*1.1, -AREA + .05, AREA - .05); } }
       giveBall(p); p.yaw = Math.atan2(0, dirOf(t)); p.ftStand = true;
       if (HUM(t)) flashT(t, 'Freiwurf aus dem Stand: passen oder werfen');
+      st.phase = 'play';
+    });
+  }
+  // Einwurf: Ball oder Ballführer über die Seitenlinie. Der nächste Feldspieler von Team t wirft an der Stelle ein, aus dem Stand.
+  function throwIn(t, x, z, a, b){
+    banner(a || 'Seitenaus', b || ('Einwurf ' + (st.online ? nm(t) : t === 0 ? 'für dich' : 'Computer')));
+    if (st.so) return soResult(false);
+    dead(1.0, () => {
+      const sx = Math.sign(x || 1)*(HW - .15), sz = cl(z, -AREA + .4, AREA - .4);
+      const p = nearestTo(field(t), { x:sx, z:sz }); if (!p){ const g = ensureGK(t); giveBall(g); st.phase = 'play'; return; }
+      p.x = sx; p.z = sz; p.vx = p.vz = 0; p.air = false; p.y = 0; p.st = ''; p.spin = 0; p.hang = null;
+      for (const q of field(1 - t)){ const dd = h2(q, p); if (dd < 1.05){ q.x = cl(q.x - Math.sign(sx)*1.1, -HW + .3, HW - .3); } }
+      giveBall(p); p.yaw = Math.atan2(-Math.sign(sx), 0); p.ftStand = true;
+      if (HUM(t)) flashT(t, 'Einwurf aus dem Stand: passen oder werfen');
       st.phase = 'play';
     });
   }
@@ -5933,7 +5958,7 @@ const G3 = { on:false };
     p.x += p.vx*dt; p.z += p.vz*dt;
     if (ball && ball.owner === p && !p.air && !p.gk) p.stepDist = (p.stepDist || 0) + Math.hypot(p.vx, p.vz)*dt;
     // Feldgrenzen und Torräume
-    if (!p.enter) p.x = cl(p.x, -HW + .2, HW - .2);
+    if (!p.enter) p.x = p.sideFree && ball && ball.owner === p ? cl(p.x, -HW - .3, HW + .3) : cl(p.x, -HW + .2, HW - .2);
     if (p.gk && !p.enter){
       const oz = ownZ(p.team), d = dirOf(p.team);
       const lo = Math.min(oz, oz + d*(L - AREA)), hi = Math.max(oz, oz + d*(L - AREA));
@@ -6022,6 +6047,7 @@ const G3 = { on:false };
       if (p.st === 'pir' || p.st === 'pirH' || p.hang || (p.recv && ball.fl && ball.fl.to === p && ball.fl.kind === 'lob')){ /* eigene Bewegung */ }
       else if (isMe && p.gk && so){ if (!p.dive) movePlayer(p, dt, w.x*j.m, 0, 4.2); p.yaw = Math.atan2(0, dirOf(p.team)); }
       else if (isMe && !p.gk && !(p.recv && ball.fl && ball.fl.to === p)){
+        p.sideFree = !so && st.phase === 'play';
         if (p.st === 'windup') movePlayer(p, dt, 0, 0, 0);
         else if (p.faceBall && j.m < .15){
           // Joystick losgelassen: dein Abwehrspieler hält seine Position (vor dem Gegenspieler, zwischen Ball und Tor)
@@ -6039,6 +6065,8 @@ const G3 = { on:false };
         const sp = (!HUM(p.team) && (!c || c.team !== p.team) ? st.D.dsp : .95)*(dd > 2 ? 5.8 : 4.2);
         movePlayer(p, dt, dd > .15 ? dx/dd : 0, dd > .15 ? dz/dd : 0, dd > .15 ? Math.min(sp, dd*3) : 0);
       }
+      if (!isMe) p.sideFree = false;
+      if (p.sideFree && c === p && !p.air && Math.abs(p.x) > HW - .02){ const t2 = 1 - p.team; p.x = Math.sign(p.x)*(HW - .3); return throwIn(t2, p.x, p.z, 'Seitenaus', 'Mit dem Ball über die Linie · Einwurf ' + (st.online ? nm(t2) : t2 === 0 ? 'für dich' : 'Computer')); }
       if (p.landed){ p.landed = false; if (ball.owner === p && !p.gk && p.st !== 'pir'){ p.hang = null; return faultFree(1 - p.team, 'Schrittfehler', 'Mit dem Ball gelandet', p); } }
       animate(p, dt);
     }
@@ -6190,7 +6218,7 @@ const G3 = { on:false };
     if (ball.y < .12){ ball.y = .12; ball.vy = Math.abs(ball.vy)*.25; ball.vx *= .7; ball.vz *= .7; if (ball.fl && ball.fl.kind !== 'shot'){ ball.fl = null; ball.loose = true; } }
     if (Math.abs(ball.x) > HW + 1.5 || Math.abs(ball.z) > L + 3) ball.vx = ball.vz = 0;
     // Netz: Ein Ball im Tor bleibt im Netz (Rückwand, Seitennetze, Dach)
-    if (Math.abs(ball.z) > L && Math.abs(ball.z) < L + 1 && Math.abs(ball.x) < GW + .05 && ball.y < GH + .05){
+    if (Math.abs(ball.z) > L && (Math.abs(ball.z) < L + 1 || Math.abs(pz) < L + .8) && Math.abs(ball.x) < GW + .05 && ball.y < GH + .05){
       const sz = Math.sign(ball.z);
       if (Math.abs(ball.z) > L + .78){ ball.z = sz*(L + .78); ball.vz = -ball.vz*.12; ball.vx *= .4; }
       if (Math.abs(ball.x) > GW - .14){ ball.x = Math.sign(ball.x)*(GW - .14); ball.vx = -ball.vx*.2; }
@@ -6206,7 +6234,7 @@ const G3 = { on:false };
         if (f.t > .06 && f.t < f.T*.45 && !f.kempa && !f.pir){
           for (const p of field(1 - f.team)){
             const r = p.st === 'block' ? .65 : .42, top = (p.st === 'block' ? 2.5 : 1.95) + p.y;
-            if (h2(p, ball) < r && ball.y < top){ ball.vx = -ball.vx*.25 + ra(-1, 1); ball.vz = -ball.vz*.25; ball.vy = 2; ball.fl = null; ball.loose = true; banner('Geblockt!', ''); return; }
+            if (h2(p, ball) < r && ball.y < top){ ball.vx = -ball.vx*.25 + ra(-1, 1); ball.vz = -ball.vz*.25; ball.vy = 2; ball.fl = null; ball.loose = true; ball.lastTeam = p.team; banner('Geblockt!', ''); return; }
           }
         }
         const gz = atkZ(f.team);
@@ -6225,7 +6253,16 @@ const G3 = { on:false };
           }
           }
           ball.fl = null;
-          const post = Math.abs(Math.abs(bx) - GW) < .1 || Math.abs(by - GH) < .08;
+          const onPost = Math.abs(Math.abs(bx) - GW) < .13 && by < GH + .08, onBar = Math.abs(by - GH) < .1 && Math.abs(bx) < GW + .08;
+          if (onPost || onBar){
+            // Aluminium: Der Ball prallt zurück ins Feld, das Spiel läuft weiter (beim 7-Meter-Werfen/Shoot-out zählt es als vorbei)
+            ball.z = gz - Math.sign(gz)*.15; ball.vz = -ball.vz*.45; ball.vx = (onPost ? -Math.sign(bx)*Math.abs(ball.vx)*.6 - Math.sign(bx)*1.2 : ball.vx*.5); ball.vy = onBar ? -Math.abs(ball.vy)*.4 - 1 : ball.vy*.5 + 1.2;
+            ball.loose = true; ball.lastTeam = f.team;
+            banner(onBar ? 'Latte!' : 'Pfosten!', '');
+            if (st.so) return soResult(false);
+            return;
+          }
+          const post = false;
           if (st.so) { banner(post ? 'Pfosten!' : 'Vorbei', ''); return soResult(false); }
           return turnover(1 - f.team, post ? 'Pfosten!' : 'Vorbei', 'Abwurf');
         }
@@ -6260,6 +6297,7 @@ const G3 = { on:false };
         if (p){ giveBall(p); return; }
       }
       for (const p of PL){ if (!active(p)) continue; if (h2(p, ball) < .55 && ball.y < 1.2){ giveBall(p); if (st.so && p.team !== st.so.t){ return soResult(false); } return; } }
+      if (Math.abs(ball.x) > HW + .2 && Math.abs(ball.z) < L){ ball.loose = false; return throwIn(ball.lastTeam != null ? 1 - ball.lastTeam : 1 - st.poss, ball.x, ball.z); }
       if (Math.abs(ball.x) > HW + .2 || Math.abs(ball.z) > L + .2){ ball.loose = false; return turnover(ball.lastTeam != null ? 1 - ball.lastTeam : 1 - st.poss, 'Aus', 'Abwurf'); }
     }
   }
@@ -6402,7 +6440,7 @@ const G3 = { on:false };
   function updateCam(dt){
     const att = ball.owner ? ball.owner.team : (ball.fl ? ball.fl.team : st.poss);
     const back0 = st.so && st.so.step === 0;   // Shoot-out: erst Blick zum eigenen Torwart
-    const vt = st.so ? st.so.t : (st.online ? MY() : att);   // online: immer von hinter dem eigenen Team
+    const vt = st.so ? st.so.t : (st.online && !st.watch ? MY() : att);   // online: immer von hinter dem eigenen Team
     const tYaw = dirOf(vt)*(back0 ? -1 : 1) < 0 ? 0 : Math.PI;
     cam.yaw = lerpAng(cam.yaw, tYaw, Math.min(1, dt*2.2));
     const o = ball.owner, ad = dirOf(st.so ? st.so.t : att);
@@ -6423,10 +6461,10 @@ const G3 = { on:false };
   const fmtT = s => { s = Math.ceil(s); return Math.floor(s/60) + ':' + String(s % 60).padStart(2, '0'); };
   function hud(){
     // Online: „DU“ über dem eigenen Spieler
-    if (st.online && !st.youHint){ st.youHint = true; st.hint = 'Du spielst ' + (MY() === 0 ? 'Rot' : 'Türkis') + ' · dein Spieler hat „DU“ über dem Kopf'; st.hintT = 5; }
+    if (st.online && !st.youHint && !st.watch){ st.youHint = true; st.hint = 'Du spielst ' + (MY() === 0 ? 'Rot' : 'Türkis') + ' · dein Spieler hat „DU“ über dem Kopf'; st.hintT = 5; }
     const you = $3('g3you');
     if (you){
-      const p = st.phase !== 'menu' && !(st.train && !st.online) ? (st.btnMode === 'gkshot' ? gkOf(MY()) : st.ctrls[MY()]) : null;
+      const p = st.phase !== 'menu' && !st.watch && !(st.train && !st.online) ? (st.btnMode === 'gkshot' ? gkOf(MY()) : st.ctrls[MY()]) : null;
       const q = p && !p.out ? R3.project([p.x, (p.y || 0) + 2.45, p.z], cvs.clientWidth, cvs.clientHeight) : null;
       you.hidden = !q; if (q){ you.style.transform = 'translate(' + Math.round(q.x - 20) + 'px,' + Math.round(q.y - 14) + 'px)'; you.classList.toggle('t1', MY() === 1); }
     }
@@ -6463,6 +6501,7 @@ const G3 = { on:false };
     }
     if (st.hintT > 0){ st.hintT -= 1/60; $3('g3hint').textContent = st.hint; }
     else $3('g3hint').textContent = st.hintBase || '';
+    if (st.watch) $3('g3hint').textContent = 'Du schaust zu · „II“ = zurück zum Turnier';
     // Anzeige wie im Wurfduell: Drehung, Kempa-Timing, Luftzeit
     const gg = $3('g3gauge');
     if (mode === 'pirH' && c.pirH){
@@ -6532,6 +6571,7 @@ const G3 = { on:false };
   function hideMsg(){ $3('g3msg').hidden = true; if (st && st.online && NET.host) netSend('h3', {}); }
   function pause(){
     if (!G3.on || st.phase === 'menu') return;
+    if (st.watch){ if (typeof tourStopWatch === 'function'){ tourStopWatch(); toMenu(); openTour(); } return; }
     if (st.online){ const by = typeof myName === 'function' ? myName() : ''; netSend('pz3', { on:1, by }); return remotePause({ on:1, by }); }
     st.paused = true;
     msg('Pause', '3D-Arena', 'Joystick links: laufen. Rechts: Aktionen. Am Computer: Pfeiltasten/WASD, K = Wurf/Block, J = Pass/Wechsel, L = Pirouette, I = Kempa.',
@@ -6569,7 +6609,9 @@ const G3 = { on:false };
   function hostNet(){
     const now = performance.now();
     if (now - snapT < 70 || !NET.T) return;
-    snapT = now; NET.T.state(0, snap());
+    snapT = now; const sn = snap(); NET.T.state(0, sn);
+    // Turnier: Zuschauer lesen etwa 5 Bilder pro Sekunde aus der Datenbank
+    if (NET.tour && now - (st.wT || 0) > 200 && /^https?:/.test(netUrl())){ st.wT = now; fetch(netUrl() + '/rooms/' + NET.room + '/w.json', { method:'PUT', body:JSON.stringify(JSON.stringify(sn)) }).catch(() => {}); }
   }
   function startRemote(kind){
     if (!ensure()) return false;
@@ -6621,6 +6663,7 @@ const G3 = { on:false };
       else for (const p of PL) if (p.recv) p.recv = null;
     }
     for (const p of PL){ if (!p.out) animate(p, dt); }
+    if (st.watch){ for (const k in inp.act) inp.act[k] = false; return; }   // Zuschauer senden nichts
     for (const a of ['a', 'b', 'c', 'd']) if (inp.act[a]){ netSend('a3', { a, m:inp.act[a] }); inp.act[a] = false; }
     const now = performance.now();
     if (now - inT > 50 && NET.T){ inT = now; const j = joyVec(1); NET.T.state(1, { jx:r2(j.x), jy:r2(j.y), hc:inp.hold.c ? 1 : 0, cy:Math.round(cam.yaw*1000)/1000 }); }
@@ -6903,9 +6946,26 @@ const H3 = { on:false };
     window.addEventListener('blur', reset); document.addEventListener('visibilitychange', () => { if (document.hidden) reset(); });
     H3.resetInput = reset;
     document.querySelectorAll('#g3btns button').forEach(b => {
-      b.addEventListener('pointerdown', e => { if (!H3.on) return; e.preventDefault(); inp.act[b.dataset.a] = (st && st.btnMode) || '?'; inp.hold[b.dataset.a] = true; });
-      const up = () => { inp.hold[b.dataset.a] = false; };
-      b.addEventListener('pointerup', up); b.addEventListener('pointercancel', up); b.addEventListener('pointerleave', up);
+      // Im Angriff: Wurf antippen = Schlagwurf, nach oben wischen = Sprungwurf, zur Seite = Knickwurf.
+      // Pass antippen = gerader Pass, nach unten wischen = Bodenpass. Sonst (Abwehr, 7 m, Torwart) löst die Taste sofort aus.
+      let g = null;
+      const fire = (v) => { const a = b.dataset.a; inp.act[a] = g ? g.mode : ((st && st.btnMode) || '?'); inp.vr = inp.vr || {}; inp.vr[a] = v || ''; g = null; b.classList.remove('down'); };
+      b.addEventListener('pointerdown', e => {
+        if (!H3.on) return; e.preventDefault();
+        const a = b.dataset.a, mode = (st && st.btnMode) || '?';
+        inp.hold[a] = true;
+        if ((a === 'a' || a === 'b') && (mode === 'att' || mode === 'drib')){ g = { x:e.clientX, y:e.clientY, mode, id:e.pointerId }; b.classList.add('down'); try { b.setPointerCapture(e.pointerId); } catch (_) {} return; }
+        inp.act[a] = mode;
+      });
+      b.addEventListener('pointermove', e => {
+        if (!g || e.pointerId !== g.id) return;
+        const dx = e.clientX - g.x, dy = e.clientY - g.y;
+        if (Math.hypot(dx, dy) < 22) return;
+        if (b.dataset.a === 'a') fire(dy < -Math.abs(dx)*.8 ? 'jump' : Math.abs(dx) > Math.abs(dy) ? 'knick' : '');
+        else fire(dy > Math.abs(dx)*.8 ? 'boden' : '');
+      });
+      const up = () => { if (g) fire(''); inp.hold[b.dataset.a] = false; };
+      b.addEventListener('pointerup', up); b.addEventListener('pointercancel', up); b.addEventListener('pointerleave', () => { if (!g) inp.hold[b.dataset.a] = false; });
     });
     const map = { j:'b', k:'a', l:'c', i:'d', ' ':'a' };
     window.addEventListener('keydown', e => {
@@ -6949,15 +7009,20 @@ const H3 = { on:false };
     ball.owner = null; ball.loose = false; ball.lastTeam = from.team;
     from.st = 'throw'; from.stT = 0; from.hold = 0; from.drib = false;
   }
-  function pass(from, to){
+  function pass(from, to, opt){
     if (from.midThrow){ from.midThrow = false; st.mid = null; }
     const s = handPos(from);
-    const spd = from.gk ? 17 : 14;
+    const bounce = !!(opt && opt.bounce) && !from.gk;
+    const spd = from.gk ? 17 : bounce ? 11 : 14;
     let tgt = { x:to.x, y:1.35, z:to.z };
     for (let k = 0; k < 2; k++){ const T = Math.max(.3, h2(s, tgt)/spd); tgt = { x:cl(to.x + to.vx*T*.8, -HW + .3, HW - .3), y:1.35, z:cl(to.z + to.vz*T*.8, -L + .3, L - .3) }; }
     const T = Math.max(.3, h2(s, tgt)/spd);
-    launch(from, tgt, T);
-    ball.fl = { kind:'pass', from, to, team:from.team, t:0, T, tgt };
+    if (bounce){
+      // Bodenpass: Aufsetzpunkt bei 60 % des Weges, der Ball springt dem Mitspieler auf Hüfthöhe entgegen
+      const bp = { x:s.x + (tgt.x - s.x)*.6, y:.12, z:s.z + (tgt.z - s.z)*.6 };
+      launch(from, bp, Math.max(.22, h2(s, bp)/spd));
+    } else launch(from, tgt, T);
+    ball.fl = { kind:'pass', from, to, team:from.team, t:0, T:bounce ? T*1.25 : T, tgt, bounce };
     st.passN = (st.passN || 0) + 1;
     const pv = st.pas;
     if (pv && pv.warn && pv.team === from.team && !from.gk){
@@ -6978,7 +7043,7 @@ const H3 = { on:false };
     const jump = !!flags.jump && !p.air && !p.gk;
     if (jump && inArea(p, .1)){ if (HUM(p.team)) flashT(p.team, 'Absprung vor der 6-m-Linie! Die Linie gehört zum Torraum.'); flags.jump = false; return throwAt(p, tx, ty, flags); }
     p.drib = false;
-    p.st = 'windup'; p.stT = 0; p.wu = { t:0, T: jump ? .36 : flags.type ? .3 : .22, tx, ty, flags };
+    p.st = 'windup'; p.stT = 0; p.wu = { t:0, T: jump ? .36 : flags.type ? .3 : flags.knick ? .2 : .22, tx, ty, flags };
     if (jump){
       p.air = true; p.vy = 3.7; const d = dirOf(p.team); p.vx = p.vx*.5; p.vz = p.vz*.5 + d*1.2;
       // Außen: Absprung nach innen Richtung 7-m-Strich, das vergrößert den Wurfwinkel
@@ -6991,7 +7056,7 @@ const H3 = { on:false };
       const vx = 0 - p.x, vz = gz - p.z, l = Math.hypot(vx, vz) || 1, dd = h2(q, p) || 1;
       if (((q.x - p.x)*vx + (q.z - p.z)*vz)/(l*dd) < .4) continue;
       const D = q.team === 1 ? st.D : DIFF.mittel;
-      if (Math.random() < D.tackle*.45){ q.air = true; q.vy = 3.4; q.st = 'block'; q.stT = 0; }
+      if (Math.random() < D.tackle*.45*(flags.knick ? .4 : 1)){ q.air = true; q.vy = 3.4; q.st = 'block'; q.stT = 0; }   // Knickwurf geht am Block vorbei
     }
   }
   function windupStep(p, dt){
@@ -7004,13 +7069,14 @@ const H3 = { on:false };
     st.pas = null;
     const gz = atkZ(p.team), d = dirOf(p.team);
     const s = handPos(p);
+    if (flags.knick){ s.y = Math.max(.75, s.y - .45); ty = cl(ty, .25, 1.45); }   // Knickwurf: seitlich-tief abgeworfen, eher halbhoch/flach
     const dist = Math.hypot(s.x - cl(tx, -GW, GW), gz - s.z);
     const ang = Math.abs(s.x)/Math.max(1, Math.abs(gz - s.z) + 1);   // spitzer Winkel von außen
     const cpu = !HUM(p.team);
     const type = flags.type || 'wurf';
     const far = Math.max(0, dist - 7.5);
     const pen7 = !!(flags.seven || st.pen);
-    const sd = (type === 'heber' ? .06 : .07) + (pen7 ? .03 : 0) + Math.max(0, dist - 7)*.035 + far*.015 + (flags.jump ? .03 : 0) + Math.max(0, ang - .8)*.12 + (p.gk ? .25 : 0) + (cpu ? st.D.aim*.5 : 0);
+    const sd = (type === 'heber' ? .06 : .07) + (pen7 ? .03 : 0) + (flags.knick ? .02 : 0) + Math.max(0, dist - 7)*.035 + far*.015 + (flags.jump ? .03 : 0) + Math.max(0, ang - .8)*.12 + (p.gk ? .25 : 0) + (cpu ? st.D.aim*.5 : 0);
     const ax = cl(tx, -1.4, 1.4) + gs()*sd, ay = cl(ty + gs()*sd*.6, .15, 2.1);
     const K = HUM(1 - p.team) ? HUMAN_K : st.D;
     let tgt, T;
@@ -7028,7 +7094,7 @@ const H3 = { on:false };
     launch(p, tgt, T);
     const k = gkOf(1 - p.team);
     ball.fl = { kind:'shot', from:p, team:p.team, t:0, T, tgt, sx:ball.x, sz:ball.z, type, jump:!!flags.jump, seven:!!flags.seven, k,
-                kr:K.kr + (type === 'aufsetzer' ? .06 : 0) + (flags.jump ? .02 : 0) - Math.min(.06, far*.02) - (pen7 ? .04 : 0), kChecked:false, seven7:pen7,
+                kr:K.kr + (type === 'aufsetzer' ? .06 : 0) + (flags.jump ? .02 : 0) + (flags.knick ? .05 : 0) - Math.min(.06, far*.02) - (pen7 ? .04 : 0), kChecked:false, seven7:pen7,
                 kg: tgt.x + gs()*(K.ge + (type === 'aufsetzer' ? .15 : 0))*(pen7 ? .75 : 1)/(1 + far*.25), ky: type === 'aufsetzer' ? .35 : tgt.y, far };
     // Computer-Torwart hat sich beim 7-Meter früh für eine Ecke entschieden
     if (st.seven && st.seven.commit && p === st.seven.sh){ ball.fl.kg = st.seven.commit*1.05; ball.fl.kr -= .08; }
@@ -7286,6 +7352,9 @@ const H3 = { on:false };
     if (HUM(k.team) && !H3.auto){
       // du hältst: Joystick seitlich, Taste „Position“ wechselt die Stellung, Hechten zum richtigen Zeitpunkt
       const j = joyVec(k.team), w = toWorld(j.x, 0, k.team);
+      // zu früh gehechtet: nach 0,7 s steht der Torwart wieder auf und kann sich wieder bewegen
+      if (k.dive && !shot){ k.dive = Math.min(1, k.dive + dt*4); k.dvT = (k.dvT || 0) + dt; if (k.dvT > .7){ k.dive = 0; k.dvT = 0; k.x = cl(k.x, -1.3, 1.3); } }
+      else k.dvT = 0;
       const tz = oz + d*KPOS[sv.hkp || 0], dz = tz - k.z;
       if (!k.dive) movePlayer(k, dt, w.x*j.m, Math.abs(dz) > .08 ? Math.sign(dz)*Math.min(1, Math.abs(dz)) : 0, Math.abs(dz) > .08 ? 3.4 : 4.2);
       k.yaw = Math.atan2(0, d);
@@ -7651,7 +7720,7 @@ const H3 = { on:false };
       v += ra(-.5, .5);
       if (v > bs){ bs = v; best = q; }
     }
-    if (best && (bs > Math.min(openness(c), 3.5)*.8 + .3 || late)) return pass(c, best);
+    if (best && (bs > Math.min(openness(c), 3.5)*.8 + .3 || late)) return pass(c, best, { bounce: aDist(best.x, best.z, gz) < 7.6 && Math.random() < .5 });
     if (c.hold > 2.5 || steps > 2.6){
       const any = field(c.team).filter(q => q !== c).find(q => laneOpen(c, q, c.team, .5));
       if (any && dist > 10) return pass(c, any);
@@ -7703,7 +7772,7 @@ const H3 = { on:false };
     if (p.stopT > 0){ p.stopT -= dt; p.vx *= .5; p.vz *= .5; }
     p.x += p.vx*dt; p.z += p.vz*dt;
     if (ball && ball.owner === p && !p.air && !p.gk && !p.drib) p.stepDist = (p.stepDist || 0) + Math.hypot(p.vx, p.vz)*dt;
-    p.x = cl(p.x, -HW + .2, HW - .2);
+    p.x = p.areaFree && ball && ball.owner === p ? cl(p.x, -HW - .3, HW + .3) : cl(p.x, -HW + .2, HW - .2);   // dein Ballführer kann ins Seitenaus treten
     if (p.gk){
       // Torwart bleibt im Torraum
       const oz = ownZ(p.team), d = dirOf(p.team);
@@ -7748,7 +7817,7 @@ const H3 = { on:false };
     if (st.timeUp && !st.pen && !st.seven && !(ball.fl && ball.fl.kind === 'shot')){ dead(.6, halfEnd); return; }
     const c = ball.owner;
     const me = st.ctrl;
-    const AT = [0, 1].map(t => ({ a:take('a', t), b:take('b', t), c:take('c', t), d:take('d', t) })); const A = AT[0]; st.A = A; st.AT = AT;
+    const AT = [0, 1].map(t => { const I = IN[t] || {}, v = I.vr || {}; I.vr = {}; return { a:take('a', t), b:take('b', t), c:take('c', t), d:take('d', t), va:v.a, vb:v.b }; }); const A = AT[0]; st.A = A; st.AT = AT;
     // Ballbesitz wechselt: Tasten kurz sperren, damit ein Tipp auf „Verteidigen“ nicht zum Wurf wird
     // Ein Tipp gilt nur in der Rolle, die beim Tippen angezeigt wurde: Wer gerade „Verteidigen“ tippt und dabei den Ball gewinnt, wirft nicht aus Versehen
     { const grp = m => (m === 'def' || m === 'gk' || m === 'gkshot') ? 'd' : 'o';
@@ -7823,6 +7892,7 @@ const H3 = { on:false };
         movePlayer(p, dt, dd > .15 ? dx/dd : 0, dd > .15 ? dz/dd : 0, dd > .15 ? Math.min(sp, dd*3) : 0);
       }
       if (p.areaFree && !p.air && areaRule(p, c)) return;
+      if (p.areaFree && c === p && !p.air && Math.abs(p.x) > HW - .02){ const t2 = 1 - p.team; banner('Seitenaus', 'Mit dem Ball über die Linie · Einwurf ' + (st.online ? nm(t2) : t2 === 0 ? 'für dich' : 'Computer')); p.x = Math.sign(p.x)*(HW - .3); return throwIn(t2, p.x, p.z); }
       if (p.landed){ p.landed = false; if (ball.owner === p && !p.gk){ return faultFree(1 - p.team, 'Schrittfehler', 'Mit dem Ball gelandet', p); } }
       animate(p, dt);
     }
@@ -7881,9 +7951,9 @@ const H3 = { on:false };
       if (me.midThrow && (A.a || A.c || A.d)){ A.a = A.c = A.d = false; flashT(t, 'Anwurf: zuerst zu einem Mitspieler passen'); }
       if (me.ftStand && A.c){ A.c = false; A.a = true; flashT(t, 'Freiwurf aus dem Stand: kein Sprungwurf'); }
       if (A.d && !me.gk && !me.ftStand){ const j = joyVec(t), w = toWorld(j.x, 0, t); bodyFeint(me, Math.sign(w.x) || (Math.random() < .5 ? -1 : 1)); return; }
-      if (A.a){ stopDrib(me); const a = humanAim(me); return throwAt(me, a.x, a.y, { jump:false }); }
+      if (A.a){ stopDrib(me); const a = humanAim(me); return throwAt(me, a.x, a.y, { jump:A.va === 'jump' && !me.gk, knick:A.va === 'knick' && !me.gk }); }
       if (A.c && !me.gk){ stopDrib(me); const a = humanAim(me); return throwAt(me, a.x, a.y, { jump:true }); }
-      if (A.b){ stopDrib(me); const t = pickMate(me); if (t) pass(me, t); return; }
+      if (A.b){ stopDrib(me); const t = pickMate(me); if (t) pass(me, t, { bounce:A.vb === 'boden' }); return; }
     } else if ((c && c.team !== t) || (ball.fl && ball.fl.team !== t)){
       // Wechsel: der Abwehrspieler am nächsten zum Ballführer (oder zum Fänger), ist das schon deiner, der nächstbeste
       if (A.b){
@@ -7974,10 +8044,11 @@ const H3 = { on:false };
     if (ball.y < .12){
       ball.y = .12;
       if (f0 && f0.kind === 'shot' && f0.type === 'aufsetzer' && !f0.bounced){ f0.bounced = true; ball.vy = Math.abs(ball.vy)*.62 + 1.5; ball.vx *= .92; ball.vz *= .92; }
+      else if (f0 && f0.bounce && !f0.bounced){ f0.bounced = true; ball.vy = Math.abs(ball.vy)*.62 + 1.6; ball.vx *= .9; ball.vz *= .9; }
       else { ball.vy = Math.abs(ball.vy)*.45; ball.vx *= .8; ball.vz *= .8; if (f0 && f0.kind !== 'shot'){ ball.fl = null; ball.loose = true; } }
     }
     // Netz: Ein Ball im Tor bleibt im Netz
-    if (Math.abs(ball.z) > L && Math.abs(ball.z) < L + 1 && Math.abs(ball.x) < GW + .05 && ball.y < GH + .05){
+    if (Math.abs(ball.z) > L && (Math.abs(ball.z) < L + 1 || Math.abs(pz) < L + .8) && Math.abs(ball.x) < GW + .05 && ball.y < GH + .05){
       const sz = Math.sign(ball.z);
       if (Math.abs(ball.z) > L + .78){ ball.z = sz*(L + .78); ball.vz = -ball.vz*.12; ball.vx *= .4; }
       if (Math.abs(ball.x) > GW - .14){ ball.x = Math.sign(ball.x)*(GW - .14); ball.vx = -ball.vx*.2; }
@@ -8020,7 +8091,16 @@ const H3 = { on:false };
           const u = (gz - pz)/((ball.z - pz) || 1e-6), bx = px + (ball.x - px)*u, by = py + (ball.y - py)*u;
           if (Math.abs(bx) < GW && by < GH){ ball.fl = null; ball.vz *= .45; ball.vx *= .3; return goalScored(f); }
           ball.fl = null;
-          const post = Math.abs(Math.abs(bx) - GW) < .1 || Math.abs(by - GH) < .08;
+          const onPost = Math.abs(Math.abs(bx) - GW) < .13 && by < GH + .08, onBar = Math.abs(by - GH) < .1 && Math.abs(bx) < GW + .08;
+          if (onPost || onBar){
+            // Aluminium: Der Ball prallt zurück ins Feld, das Spiel läuft weiter (beim 7-Meter-Werfen/Shoot-out zählt es als vorbei)
+            ball.z = gz - Math.sign(gz)*.15; ball.vz = -ball.vz*.45; ball.vx = (onPost ? -Math.sign(bx)*Math.abs(ball.vx)*.6 - Math.sign(bx)*1.2 : ball.vx*.5); ball.vy = onBar ? -Math.abs(ball.vy)*.4 - 1 : ball.vy*.5 + 1.2;
+            ball.loose = true; ball.lastTeam = f.team;
+            banner(onBar ? 'Latte!' : 'Pfosten!', '');
+            if (st.pen) return penResult(false);
+            return;
+          }
+          const post = false;
           if (st.pen){ banner(post ? 'Pfosten!' : 'Vorbei', ''); return penResult(false); }
           return turnover(1 - f.team, post ? 'Pfosten!' : 'Vorbei', 'Abwurf');
         }
@@ -8029,13 +8109,14 @@ const H3 = { on:false };
       }
       // Pass: Abfangen durch Gegner, Fangen durch Mitspieler
       for (const p of team(1 - f.team)){
-        const r = p.gk ? .65 : (p.st === 'block' ? .72 : .52), top = (p.gk ? 2.5 : (p.st === 'block' ? 2.6 : 2.15)) + p.y;
+        let r = p.gk ? .65 : (p.st === 'block' ? .72 : .52), top = (p.gk ? 2.5 : (p.st === 'block' ? 2.6 : 2.15)) + p.y;
+        if (f.bounce && !p.gk){ r = .36; top = .8; }   // Bodenpass: unter den Armen durch, nur mit dem Fuß/tief zu erwischen
         if (f.t > .08 && h2(p, ball) < r && ball.y < top && ball.y > .15){ ball.fl = null; giveBall(p); banner(p.gk ? 'Gefangen!' : 'Abgefangen!', 'Ballverlust'); return; }
       }
       const to = f.to;
       if (to && active(to)){
-        const hy = to.y + 1.35;
-        if (h2(to, ball) < .75 && Math.abs(ball.y - hy) < .8){ ball.fl = null; giveBall(to); if (st.train) trainEvent('pass', { team:to.team, from:f.from }); return; }
+        const hy = to.y + (f.bounce ? 1.0 : 1.35);
+        if (h2(to, ball) < .75 && Math.abs(ball.y - hy) < .8 && !(f.bounce && !f.bounced)){ ball.fl = null; giveBall(to); if (st.train) trainEvent('pass', { team:to.team, from:f.from }); return; }
       }
       if (f.t > f.T + .5){ ball.fl = null; ball.loose = true; }
     }
@@ -8157,7 +8238,7 @@ const H3 = { on:false };
   /* ---------- Kamera ---------- */
   function updateCam(dt){
     const att = ball.owner ? ball.owner.team : (ball.fl ? ball.fl.team : st.poss);
-    const sv = st.seven, ref = sv ? sv.t : (st.online ? MY() : att);   // online: immer von hinter dem eigenen Team
+    const sv = st.seven, ref = sv ? sv.t : (st.online && !st.watch ? MY() : att);   // online: immer von hinter dem eigenen Team
     const tYaw = dirOf(ref) < 0 ? 0 : Math.PI;
     cam.yaw = lerpAng(cam.yaw, tYaw, Math.min(1, dt*2.2));
     const o = ball.owner, ad = dirOf(sv ? sv.t : att);   // Blickpunkt vor dem Ballführer in seine Angriffsrichtung
@@ -8180,10 +8261,10 @@ const H3 = { on:false };
   const fmtT = s => { s = Math.ceil(s); return Math.floor(s/60) + ':' + String(s % 60).padStart(2, '0'); };
   function hud(){
     // Online: „DU“ über dem eigenen Spieler
-    if (st.online && !st.youHint){ st.youHint = true; st.hint = 'Du spielst ' + (MY() === 0 ? 'Rot' : 'Türkis') + ' · dein Spieler hat „DU“ über dem Kopf'; st.hintT = 5; }
+    if (st.online && !st.youHint && !st.watch){ st.youHint = true; st.hint = 'Du spielst ' + (MY() === 0 ? 'Rot' : 'Türkis') + ' · dein Spieler hat „DU“ über dem Kopf'; st.hintT = 5; }
     const you = $3('g3you');
     if (you){
-      const p = st.phase !== 'menu' && !(st.train && !st.online) ? (st.btnMode === 'gkshot' ? gkOf(MY()) : st.ctrls[MY()]) : null;
+      const p = st.phase !== 'menu' && !st.watch && !(st.train && !st.online) ? (st.btnMode === 'gkshot' ? gkOf(MY()) : st.ctrls[MY()]) : null;
       const q = p && !p.out ? R3.project([p.x, (p.y || 0) + 2.45, p.z], cvs.clientWidth, cvs.clientHeight) : null;
       you.hidden = !q; if (q){ you.style.transform = 'translate(' + Math.round(q.x - 20) + 'px,' + Math.round(q.y - 14) + 'px)'; you.classList.toggle('t1', MY() === 1); }
     }
@@ -8208,10 +8289,10 @@ const H3 = { on:false };
       st.btnMode = mode;
       const B = { a:$3('g3a'), b:$3('g3b'), c:$3('g3cc'), d:$3('g3d') };
       const set = (el, txt) => { el.hidden = !txt; if (txt) el.querySelector('b').textContent = txt; };
-      const cfg = { att:['Wurf','Pass','Sprungwurf','Täuschen'], drib:['Wurf','Pass','Sprungwurf','Täuschen'], air:['','','',''], gkball:['Wurf','Pass','',''],
+      const cfg = { att:['Wurf ↑','Pass ↓','Sprungwurf','Täuschen'], drib:['Wurf ↑','Pass ↓','Sprungwurf','Täuschen'], air:['','','',''], gkball:['Wurf','Pass','',''],
                     def:['Block','Wechsel','Verteidigen',''], gkshot:['Hechten','','',''], wait:['','','',''], seven:['Wurf','Täuschen','Heber','Aufsetzer'], gk:['Hechten','','Position',''], none:['','','',''] }[mode];
       set(B.a, cfg[0]); set(B.b, cfg[1]); set(B.c, cfg[2]); set(B.d, cfg[3]);
-      const hints = { att:'Joystick: laufen · nach 3 Schritten wird automatisch geprellt · „Täuschen“: Ausfallschritt in Joystick-Richtung', drib:'Du prellst · stehen bleiben = fangen, dann noch 3 Schritte', air:'Sprungwurf …', gkball:'Dein Torwart hat den Ball: Pass nach vorne (Gegenstoß)',
+      const hints = { att:'Wurf: tippen = Schlagwurf, hoch wischen = Sprungwurf, zur Seite = Knickwurf · Pass: tippen = gerade, runter wischen = Bodenpass', drib:'Du prellst · stehen bleiben = fangen, dann noch 3 Schritte', air:'Sprungwurf …', gkball:'Dein Torwart hat den Ball: Pass nach vorne (Gegenstoß)',
         def: st.diff === 'leicht' ? 'Abwehr: Du steuerst automatisch den Spieler am Ballführer · von vorne verteidigen, nie von hinten' : 'Abwehr: Joystick loslassen = Position halten · Wechsel = Spieler am Ball · von vorne verteidigen, nie von hinten (2 Min.)', wait:'', seven:'7-Meter: Joystick zielt · Täuschen lockt den Torwart · Heber, wenn er weit vorne steht (3 Sekunden)',
         gk:'Dein Torwart: Joystick links/rechts · „Position“: Linie, davor, 4 m · Hechten im richtigen Moment (Joystick hoch/runter = Höhe)', gkshot:'Wurf aufs Tor! Jetzt steuerst du deinen Torwart: Hechten, Joystick = Seite und Höhe', none:'' };
       st.hintBase = hints[mode];
@@ -8220,6 +8301,7 @@ const H3 = { on:false };
     if (st.hintT > 0){ st.hintT -= 1/60; $3('g3hint').textContent = st.hint; }
     else if (st.train) $3('g3hint').textContent = TRAIN[st.train.id].tip;
     else $3('g3hint').textContent = st.hintBase || '';
+    if (st.watch) $3('g3hint').textContent = 'Du schaust zu · „II“ = zurück zum Turnier';
     $3('g3gauge').hidden = true;
     // Zielkreuz beim 7-Meter, sonst Haltezeit und Schritte
     const ring = $3('g3hold'), sp = $3('g3steps');
@@ -8278,6 +8360,7 @@ const H3 = { on:false };
   function hideMsg(){ $3('g3msg').hidden = true; if (st && st.online && NET.host) netSend('h3', {}); }
   function pause(){
     if (!H3.on || st.phase === 'menu') return;
+    if (st.watch){ if (typeof tourStopWatch === 'function'){ tourStopWatch(); toMenu(); openTour(); } return; }
     if (st.online){ const by = typeof myName === 'function' ? myName() : ''; netSend('pz3', { on:1, by }); return remotePause({ on:1, by }); }
     st.paused = true;
     msg('Pause', 'Halle 3D', 'Joystick links: laufen. Rechts: Aktionen. Am Computer: Pfeiltasten/WASD, K = Wurf/Block, J = Pass/Wechsel, L = Sprungwurf/Verteidigen (7 m: Heber/Torwart-Position), I = Aufsetzer (7 m), J beim 7-Meter = Täuschen. Prellen geht automatisch.',
@@ -8314,7 +8397,9 @@ const H3 = { on:false };
   function hostNet(){
     const now = performance.now();
     if (now - snapT < 70 || !NET.T) return;
-    snapT = now; NET.T.state(0, snap());
+    snapT = now; const sn = snap(); NET.T.state(0, sn);
+    // Turnier: Zuschauer lesen etwa 5 Bilder pro Sekunde aus der Datenbank
+    if (NET.tour && now - (st.wT || 0) > 200 && /^https?:/.test(netUrl())){ st.wT = now; fetch(netUrl() + '/rooms/' + NET.room + '/w.json', { method:'PUT', body:JSON.stringify(JSON.stringify(sn)) }).catch(() => {}); }
   }
   function startRemote(kind){
     if (!ensure()) return false;
@@ -8364,12 +8449,13 @@ const H3 = { on:false };
     }
     for (const p of PL){ if (!p.out) animate(p, dt); }
     // eigene Eingaben zum Host: Joystick als Zustand, Tipps als einzelne Nachrichten (mit der Rolle beim Tippen)
-    for (const a of ['a', 'b', 'c', 'd']) if (inp.act[a]){ netSend('a3', { a, m:inp.act[a] }); inp.act[a] = false; }
+    if (st.watch){ for (const k in inp.act) inp.act[k] = false; return; }   // Zuschauer senden nichts
+    for (const a of ['a', 'b', 'c', 'd']) if (inp.act[a]){ netSend('a3', { a, m:inp.act[a], v:(inp.vr || {})[a] || '' }); inp.act[a] = false; if (inp.vr) inp.vr[a] = ''; }
     const now = performance.now();
     if (now - inT > 60 && NET.T){ inT = now; const j = joyVec(1); NET.T.state(1, { jx:r2(j.x), jy:r2(j.y), hc:inp.hold.c ? 1 : 0, cy:Math.round(cam.yaw*1000)/1000 }); }
   }
   function remoteIn(d){ IN[1].jx = d.jx || 0; IN[1].jy = d.jy || 0; IN[1].hold = { c:!!d.hc }; IN[1].cy = d.cy; }
-  function remoteAct(d){ if (st && st.online && NET.host) IN[1].act[d.a] = d.m || '?'; }
+  function remoteAct(d){ if (st && st.online && NET.host){ IN[1].act[d.a] = d.m || '?'; if (d.v){ IN[1].vr = IN[1].vr || {}; IN[1].vr[d.a] = d.v; } } }
   function showRemoteMsg(d){
     msg(d.eye, d.title, d.text, d.btns.map((b, i) => ({ label:b.label, primary:b.primary, fn:() => { netSend('b3', { id:d.id, i }); if (/Menü|verlassen/.test(b.label)){ netSend('end', {}); exitH(); } } })), true);
   }
@@ -8768,7 +8854,7 @@ function netLeave(silent){
   clearInterval(NET.pingI); netWarn(0);
   if (NET.T){ if (!silent && NET.on) try { netSend('bye', {}); } catch (_) {} NET.T.close(); }
   const wasRoom = NET.room;
-  Object.assign(NET, { lastRx:0, on:false, host:false, guest:false, room:'', peer:false, T:null, snap:null, curMsg:null, curMsg3:null, started:false, mode3:false });
+  Object.assign(NET, { tour:false, lastRx:0, on:false, host:false, guest:false, room:'', peer:false, T:null, snap:null, curMsg:null, curMsg3:null, started:false, mode3:false });
   const url = netUrl();
   if (!silent && wasRoom && url && url !== 'local') fetch(url + '/rooms/' + wasRoom + '.json', { method:'DELETE' }).catch(() => {});
   netUi();
@@ -9336,16 +9422,26 @@ async function tourTick(){
         if (rd + 1 < sched.length) await tourPut('round', rd + 1); else await tourPut('state', 'done');
       }
       // eigenes Spiel dieser Runde
-      if (!TOUR.match && !NET.on){
+      if (!TOUR.match && !NET.started){
         const i = pairs.findIndex(p => p.a === TOUR.me || p.b === TOUR.me);
         const p = pairs[i];
         if (p && p.a && p.b && !res[rd + '_' + i]){
-          TOUR.match = { r:rd, i, a:p.a, b:p.b, room:p.room }; TOUR.matchDone = false;
-          if (p.a === TOUR.me) netCreate(p.room);
+          TOUR.match = { r:rd, i, a:p.a, b:p.b, room:p.room }; TOUR.matchDone = false; TOUR.ready = false;
+          if (TOUR.watch) tourStopWatch();
+          if (NET.on && NET.room !== p.room) netLeave(true);   // alter Online-Raum aus dem Menü blockiert sonst das Turnierspiel
+          try { if (navigator.vibrate) navigator.vibrate([120, 60, 120]); } catch (e) {}
         }
       }
-      if (TOUR.match && !TOUR.matchDone && TOUR.match.b === TOUR.me && !NET.on) netJoin(TOUR.match.room);
+      // Erst nach „Bereit“ verbindet sich das Handy: Spieler a öffnet den Raum, Spieler b tritt bei
+      const M = TOUR.match;
+      if (M && !TOUR.matchDone && TOUR.ready){
+        const rk = M.r + '_' + M.i, rdy = (d.rdy && d.rdy[rk]) || {};
+        if (M.a === TOUR.me && !NET.on) netCreate(M.room);
+        if (M.b === TOUR.me && !NET.on && rdy.a) netJoin(M.room);
+        if (M.a === TOUR.me && NET.on && NET.peer && !NET.started && rdy.b) setTimeout(tourStartMatch, 600);
+      }
       if (TOUR.match && !TOUR.matchDone && res[TOUR.match.r + '_' + TOUR.match.i] && !NET.started){ if (NET.on) netLeave(true); TOUR.match = null; }
+      if (TOUR.watch && res[TOUR.watch.r + '_' + TOUR.watch.i]){ tourStopWatch(); toMenu(); openTour(); toast('Das Spiel ist vorbei.', 2500); }
     }
     if (d.state === 'done' && !TOUR.wonShown){
       const tab = tourTable(); if (tab[0] && tab[0].id === TOUR.me){ earn('turnier'); REC.tours = (REC.tours || 0) + 1; saveRec(); }
@@ -9384,14 +9480,16 @@ function tourRender(){
     let t = 'Runde ' + (rd + 1) + ' von ' + sched.length + '. ';
     if (mine && (!mine.a || !mine.b)) t += 'Du hast in dieser Runde frei.';
     else if (m && !m.done){
-      const opp = tourName(m.a === TOUR.me ? m.b : m.a);
-      t += TOUR.matchDone ? 'Dein Spiel ist vorbei, warte auf die anderen.' : NET.started ? 'Dein Spiel gegen ' + opp + ' läuft.' : NET.peer ? 'Gleich geht es los gegen ' + opp + '.' : 'Dein Spiel: gegen ' + opp + '. Warte auf ' + opp + ' …';
+      const opp = tourName(m.a === TOUR.me ? m.b : m.a), rdy = (d.rdy && d.rdy[m.r + '_' + m.i]) || {}, oppRdy = m.a === TOUR.me ? rdy.b : rdy.a;
+      t += TOUR.matchDone ? 'Dein Spiel ist vorbei, warte auf die anderen.' : NET.started ? 'Dein Spiel gegen ' + opp + ' läuft.'
+        : 'Dein Spiel: gegen ' + opp + '. ' + (TOUR.ready ? 'Du bist bereit' : 'Tippe auf „Bereit“') + ' · ' + opp + (oppRdy ? ' ist bereit' : ' noch nicht bereit') + (TOUR.ready && oppRdy ? (NET.peer ? ' · gleich geht es los' : ' · verbinde …') : '');
     } else t += 'Dein Spiel ist vorbei, warte auf die anderen.';
     st.textContent = t;
   } else {
     const tab = tourTable(); st.textContent = 'Turnier beendet. Sieger: ' + (tab[0] ? tab[0].name : '–') + '!';
   }
   $('#tourGo').hidden = !(lead && d.state === 'lobby'); $('#tourGo').disabled = players.length < 2;
+  const rb = $('#tourReady'); rb.hidden = !(d.state === 'run' && TOUR.match && !TOUR.matchDone && !NET.started && !TOUR.ready);
   // Spieler bzw. Tabelle
   const tb = $('#tourTab'); tb.textContent = '';
   if (d.state === 'lobby'){
@@ -9413,6 +9511,8 @@ function tourRender(){
       if (!p.a || !p.b){ li.textContent = tourName(p.a || p.b) + ' hat frei'; gl.append(li); return; }
       const x = res[rd + '_' + i];
       li.textContent = tourName(p.a) + ' – ' + tourName(p.b) + (x ? '  ' + x.ga + ':' + x.gb + (x.ff ? ' (kampflos)' : '') : '  läuft');
+      const mine = p.a === TOUR.me || p.b === TOUR.me;
+      if (!x && !mine && !NET.started && d.info.kind){ const wb = document.createElement('button'); wb.className = 'ghost mini'; wb.textContent = 'Zuschauen'; wb.addEventListener('click', () => tourWatch(rd, i)); li.append(wb); }
       if (!x && lead){
         for (const side of ['a', 'b']){
           const b = document.createElement('button'); b.className = 'ghost mini'; b.textContent = tourName(p[side]) + ' kampflos';
@@ -9426,6 +9526,42 @@ function tourRender(){
   $('#tourGamesHead').hidden = d.state !== 'run';
   $('#tourLeave').textContent = d.state === 'done' ? 'Turnier schließen' : 'Turnier verlassen';
 }
+function tourReady(){
+  const m = TOUR.match; if (!m || TOUR.ready) return;
+  TOUR.ready = true;
+  tourPut('rdy/' + m.r + '_' + m.i + '/' + (m.a === TOUR.me ? 'a' : 'b'), true).then(tourTick);
+  tourRender();
+}
+/* Zuschauen: Das Handy von Spieler a schreibt im Turnierspiel etwa 5 Bilder pro Sekunde zusätzlich in die Datenbank. */
+function tourWatch(r, i){
+  const p = tourSched()[r] && tourSched()[r][i]; if (!p || !p.room) return;
+  tourStopWatch();
+  const hall = GAME === 'hall', pen = TOUR.d.info.kind === 'pen';
+  const kind = hall ? (pen ? '7m' : 'full') : (pen ? 'so' : 'full'), E = hall ? H3 : G3;
+  NET.eng = hall ? 'h3' : 'g3'; NET.names = [tourName(p.a), tourName(p.b)];
+  const es = new EventSource(netUrl() + '/rooms/' + p.room + '/w.json');
+  TOUR.watch = { r, i, es, started:false };
+  const take = raw => {
+    let s = raw; if (typeof s === 'string'){ try { s = JSON.parse(s); } catch (e) { return; } }
+    if (!s || !s.P) return;
+    if (!TOUR.watch.started){
+      TOUR.watch.started = true;
+      running = false; M = null; A = null; Z.active = false; zbar.hidden = true; showOverlay(null);
+      if (!E.startRemote(kind)){ tourStopWatch(); return; }
+      E.st.watch = true; document.getElementById('g3').classList.add('watch');
+    }
+    s._t = performance.now(); E.snapIn = s;
+  };
+  es.addEventListener('put', e => { try { const j = JSON.parse(e.data); if (j.path === '/' && j.data == null && TOUR.watch && TOUR.watch.started){ tourStopWatch(); openTour(); return; } if (j.path === '/') take(j.data); } catch (_) {} });
+  toast('Verbinde zum Spiel ' + NET.names[0] + ' gegen ' + NET.names[1] + ' …', 2500);
+}
+function tourStopWatch(){
+  const w = TOUR.watch; if (!w) return;
+  try { w.es.close(); } catch (e) {}
+  TOUR.watch = null;
+  document.getElementById('g3').classList.remove('watch');
+  try { if (H3.on) H3.stop(); if (typeof G3 !== 'undefined' && G3.on) G3.stop(); } catch (e) {}
+}
 function tourStartMatch(){
   const T = TOUR; if (!T.match || T.matchDone || !NET.host || !NET.peer || NET.started || !T.d) return;
   const hall = GAME === 'hall', pen = T.d.info.kind === 'pen';
@@ -9434,7 +9570,7 @@ function tourStartMatch(){
   const keep = [S.hhalf, S.fhalf]; S.hhalf = S.fhalf = String(T.d.info.half);
   curMode = hall ? (pen ? 'h7m' : 'h3d') : 'g3d';
   NET.names = [tourName(T.match.a), tourName(T.match.b)];
-  NET.mode3 = true; NET.started = true; NET.eng = eng;
+  NET.mode3 = true; NET.started = true; NET.eng = eng; NET.tour = true;
   netSend('3start', { kind, mode:curMode, names:NET.names, eng });
   const ok = (hall ? H3 : G3).start(kind, null, { online:true });
   S.hhalf = keep[0]; S.fhalf = keep[1];
@@ -9457,7 +9593,7 @@ function tourGuestDone(d){
 function tourBack(){
   try { if (H3.on) H3.stop(); if (typeof G3 !== 'undefined' && G3.on) G3.stop(); document.getElementById('g3msg').hidden = true; } catch (e) {}
   if (NET.on) netLeave(true);
-  TOUR.match = null; TOUR.matchDone = false;
+  TOUR.match = null; TOUR.matchDone = false; TOUR.ready = false;
   toMenu(); openTour();
 }
 // Mitspieler im Turnierspiel weg: vor Spielende kampflos gewonnen, sonst einfach zurück zum Turnier
@@ -9516,6 +9652,17 @@ applyGame();
   addEventListener('orientationchange', reset); document.addEventListener('visibilitychange', () => { if (!document.hidden) reset(); });
 })();
 $('#netSlot').append($('#netField'));
+// Version: Zeigt an, welche Fassung läuft, und meldet, wenn auf der Spiele-Seite eine neuere liegt (Handys halten alte Fassungen gern im Speicher)
+$('#verNote').textContent = 'Version ' + BUILD;
+$('#updBtn').addEventListener('click', () => { location.replace(location.pathname + '?v=' + Date.now()); });
+function checkUpdate(){
+  if (!/^https?:$/.test(location.protocol) || /claude/.test(location.hostname) || BUILD === 'dev') return;
+  fetch(location.pathname + '?nocache=' + Date.now(), { cache:'no-store' }).then(r => r.ok ? r.text() : '').then(t => {
+    const m = /const BUILD = '([^']+)'/.exec(t || '');
+    if (m && m[1] !== BUILD) $('#updBtn').hidden = false;
+  }).catch(() => {});
+}
+checkUpdate(); setInterval(checkUpdate, 5*60*1000);
 resize(); syncMenu();
 { let seen = false; try { seen = !!localStorage.getItem('beachduell_intro'); } catch (e) { seen = true; }
   if (!seen && !curProf().name.trim()) openProfile(true); else introDone(); }
