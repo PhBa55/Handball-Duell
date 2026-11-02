@@ -341,6 +341,17 @@ input.txt{user-select:text;-webkit-user-select:text}
 
 #g3.watch #g3btns,#g3.watch #g3joy,#g3.watch #g3you{display:none}
 
+/* Profil: Tasten links, Joystick rechts */
+#g3.mirror #g3joy{left:auto;right:0}
+#g3.mirror #g3joy .base{left:calc(100% - 96px)}
+#g3.mirror #g3btns{right:auto;left:max(14px,env(safe-area-inset-left,0px));grid-template-areas:"d c" "a b"}
+
+#g3aim{position:absolute;left:0;top:0;width:28px;height:28px;border-radius:50%;border:3px solid #FFE600;pointer-events:none;z-index:2;box-shadow:0 0 0 2px rgba(0,0,0,.35)}
+#g3aim::before,#g3aim::after{content:"";position:absolute;background:#FFE600;left:50%;top:50%}
+#g3aim::before{width:2px;height:34px;margin:-17px 0 0 -1px}
+#g3aim::after{width:34px;height:2px;margin:-1px 0 0 -17px}
+#g3aim.auto{border-style:dashed;opacity:.7}
+
 /* @@G3D-CSS-END@@ */
 </style>
 
@@ -627,6 +638,14 @@ input.txt{user-select:text;-webkit-user-select:text}
       <div class="field" id="accColField"><span class="flabel">Farbe des Extras</span><div class="sws" id="swAcc"></div></div>
       <div class="field"><span class="flabel">Wurfhand</span>
         <div class="seg pseg" data-pkey="lefty"><button data-v="false">Rechts</button><button data-v="true">Links</button></div></div>
+      <div class="field"><span class="flabel">Steuerung 3D: Wurf-Taste antippen</span>
+        <div class="seg pseg" data-pkey="ctlTap"><button data-v="schlag">Schlagwurf</button><button data-v="sprung">Sprungwurf</button></div>
+        <span class="fnote">Nach oben wischen gibt den anderen Wurf, zur Seite den Knickwurf (Halle).</span></div>
+      <div class="field"><span class="flabel">Eigene Sprungwurf-Taste (Halle)</span>
+        <div class="seg pseg" data-pkey="ctlJbtn"><button data-v="nein">Nein</button><button data-v="ja">Ja</button></div></div>
+      <div class="field"><span class="flabel">Tasten auf welcher Seite?</span>
+        <div class="seg pseg" data-pkey="ctlSide"><button data-v="r">Rechts</button><button data-v="l">Links</button></div>
+        <span class="fnote">Links: Tasten links, Joystick rechts.</span></div>
       <button id="profBack" class="cta">Fertig</button>
       <button id="profSkip" class="ghost" hidden>Ohne Profil weiter</button>
       <button id="profDel" class="ghost">Profil löschen</button>
@@ -679,6 +698,7 @@ input.txt{user-select:text;-webkit-user-select:text}
   <div id="g3ban" hidden><strong></strong><span></span></div>
   <div id="g3hold" hidden></div>
   <div id="g3you" hidden>DU</div>
+  <div id="g3aim" hidden></div>
   <div id="g3steps" hidden></div>
   <div id="g3gauge" hidden><span class="gl"></span><b class="gb"></b><div class="gbar"><i class="gf"></i><i class="gz"></i><i class="gz"></i></div><span class="gs"></span></div>
   <div id="g3joy"><div class="base"><div class="knob"></div></div></div>
@@ -696,7 +716,7 @@ const cvs = $('#cv'), ctx = cvs.getContext('2d'), stage = $('#stage');
 
 /* ---------- Einstellungen ---------- */
 const GAME = 'hall';   // @@GAME@@
-const BUILD = '02.11.2026 16:09';   // @@BUILD@@ beach = Beach-Duell, hall = Hallen-Duell (beide Spiele aus derselben Quelle gebaut)
+const BUILD = '02.11.2026 22:57';   // @@BUILD@@ beach = Beach-Duell, hall = Hallen-Duell (beide Spiele aus derselben Quelle gebaut)
 const HALL_MODES = ['h3d','h7m','hfull','hlevels'];
 const S = { mode:'1p', half:45, diff:'mittel', game:'duell', zp:'1', fhalf:'180', fdiff:'leicht', opp:'cpu', cdiff:'mittel' };
 try { Object.assign(S, JSON.parse(localStorage.getItem('beachduell') || '{}')); } catch (e) {}
@@ -728,7 +748,7 @@ const LOOK = {
   hair:['#111111','#3B2414','#7A4A22','#C8913F','#E8D08A','#B23A1E','#6B6F7A'],
   acc:['#D9341F','#F2B632','#0B8C7F','#3E63D6','#FFFFFF','#14181B']
 };
-const PDEF = (id, name) => ({ id, name: name || '', skin:2, hair:0, style:'kurz', acc:'keins', accCol:0, num:7, lefty:false });
+const PDEF = (id, name) => ({ id, name: name || '', skin:2, hair:0, style:'kurz', acc:'keins', accCol:0, num:7, lefty:false, ctlTap:'schlag', ctlJbtn:'nein', ctlSide:'r' });
 let PROF = null;
 try { PROF = JSON.parse(localStorage.getItem('beachduell_profiles') || 'null'); } catch (e) { PROF = null; }
 if (!PROF || !Array.isArray(PROF.list) || !PROF.list.length){
@@ -2027,6 +2047,7 @@ const RULES = {
     '<b>Angriff:</b> Du steuerst den Spieler mit Ball. Pass geht zum Mitspieler in Joystick-Richtung. Beim Wurf zielst du mit dem Joystick nach links oder rechts, nach oben für hoch, nach unten für flach.',
     '<b>Pirouette (wie im Wurfduell):</b> Taste gedrückt halten: Absprung und Drehung, die Gradzahl läuft mit. Loslassen im grünen Bereich ab 360° = Wurf mit 2 Punkten. Unter 360° nur 1 Punkt, darüber überdreht (Ballverlust). Für Profis: Doppel-Pirouette ab 720°.',
     '<b>Kempa (wie im Wurfduell):</b> Hoher Pass in den Torraum vor einen Mitspieler. Tippe „Sprung“, wenn der Marker im grünen Bereich ist, sonst klappt der Fang nicht. In der Luft dann werfen, bevor der Luftbalken leer ist. 2 Punkte.',
+    '<b>Langer Ball:</b> Auf „Pass ↑“ nach oben wischen spielt einen langen Pass in den Lauf eines Mitspielers, der vorne frei ist (Tempogegenstoß, auch vom Torwart). Auf „Kempa ↑“ nach oben wischen spielt einen langen Kempa über das halbe Feld zu einem Mitspieler am Torraum. Der Ball fliegt höher und länger, das Timing für den Sprung ist dasselbe.',
     '<b>Abwehr:</b> Du steuerst den Abwehrspieler mit dem gelben Ring. Lauf in die Passwege, Block springt hoch, Wechsel nimmt den Spieler am nächsten zum Ball. Dein Torwart hält selbst.',
     '<b>Regeln:</b> Mit dem Ball höchstens 3 Schritte (Punkte über dem Kopf) und 5 Sekunden (Zeitring). Feldspieler dürfen nicht in den Torraum laufen, nur hineinspringen.',
     '<b>Seitenaus:</b> Geht der Ball über die Seitenlinie oder läufst du mit dem Ball darüber, gibt es Einwurf für den Gegner an der Stelle, aus dem Stand. Ball über die Torlinie = Abwurf vom Torwart.',
@@ -2035,8 +2056,12 @@ const RULES = {
     '<b>Shoot-out:</b> Pass zum eigenen Torwart, sprinten, Rückpass oder Kempa anfordern, dann werfen. Wirft der Computer, steuerst du deinen Torwart und hechtest: Joystick nach oben für hohe, nach unten für flache Bälle.'
   ],
   h3d: [
-    '<b>Steuerung:</b> Links der Joystick zum Laufen, rechts die Tasten. Am Computer: Pfeiltasten oder WASD, K = Wurf/Block, J = Pass/Wechsel, L = Sprungwurf/Verteidigen, I = Täuschen.',
-    '<b>Wurf- und Passarten:</b> Wurf antippen = Schlagwurf, auf der Taste nach oben wischen = Sprungwurf, zur Seite wischen = Knickwurf (geht am Block vorbei, flacher). Pass antippen = gerader Pass, nach unten wischen = Bodenpass (unter den Armen der Abwehr durch, gut zum Kreis).',
+    '<b>Steuerung:</b> Links der Joystick zum Laufen, rechts die Tasten. Am Computer: Pfeiltasten oder WASD, K = Wurf/Block, J = Pass/Wechsel, L = Sprungwurf (im Angriff)/Verteidigen, I = Täuschen.',
+    '<b>Zielen:</b> Das gelbe Kreuz im Tor zeigt, wohin dein Wurf geht. Joystick deutlich zur Seite = linke oder rechte Ecke, schräg nach vorn = oben, nach hinten = unten. Geradeaus laufen ändert das Ziel nicht. Gestricheltes Kreuz = automatisch die offene Ecke.',
+    '<b>Linkshänder:</b> Rechtsaußen (und beim Gegner auch Rückraum rechts) werfen mit links. Wer den Wurfarm innen hat, wirft auf seiner Seite genauer und aus spitzerem Winkel. Deine Wurfhand stellst du im Profil ein.',
+    '<b>Doppelpass:</b> Während dein Pass unterwegs ist, nochmal „Doppelpass“ tippen: Der Mitspieler spielt sofort zurück, du bist schon Richtung Tor gelaufen. Der Kreisläufer dreht sich nach der Ballannahme erst zum Tor.',
+    '<b>7-Meter als Torwart:</b> „Täuschen“ = du deutest das Herauskommen an und springst zurück. Wirft der Werfer dann einen Heber, stehst du wieder auf der Linie.',
+    '<b>Wurf- und Passarten:</b> Wurf antippen = Schlagwurf, auf der Taste nach oben wischen = Sprungwurf (im Profil umstellbar, dort auch eine eigene Sprungwurf-Taste und Tasten links), zur Seite wischen = Knickwurf (geht am Block vorbei, flacher). Pass antippen = gerader Pass, nach unten wischen = Bodenpass (unter den Armen der Abwehr durch, gut zum Kreis), nach oben wischen = langer Pass in die Tiefe für den Tempogegenstoß (hoher Bogen, in den Lauf des vordersten freien Mitspielers; geht auch beim Torwart).',
     '<b>Schlagwurf:</b> Wurf aus dem Stand oder Lauf, schnell und flach. <b>Sprungwurf:</b> Absprung vor der 6-m-Linie, Wurf am höchsten Punkt über den Block. Zielen mit dem Joystick: links/rechts, hoch nach oben, flach nach unten. Jedes Tor zählt 1.',
     '<b>Prellen (automatisch):</b> Läufst du nach 3 Schritten weiter, prellt dein Spieler von selbst. Bleibst du stehen, fängt er den Ball und hat noch einmal 3 Schritte. Ein zweites Prellen gibt es nicht (Doppeldribbling), dann musst du passen oder werfen.',
     '<b>Torraum:</b> Der Halbkreis (6 m) gehört dem Torwart. Hineinspringen beim Sprungwurf ist erlaubt. Läufst du mit dem Ball hinein, gibt es Abwurf für den Gegner. Verteidigst du im eigenen Torraum, gibt es 7-Meter (Ballführer innerhalb von 9 m) oder Freiwurf.',
@@ -4183,9 +4208,9 @@ const HLESSONS = [
   { id:'h3schlag', group:'3D Angriff', name:'Schlagwurf', kind:'3d', t3:'schlag', desc:'Wurf aus dem Stand.',
     steps:['Tippe „Wurf“: Das ist der Schlagwurf, schnell und flach.', 'Mit dem Joystick zielst du: links oder rechts, nach oben hoch, nach unten flach.', 'Ecken sind für den Torwart am schwersten.'], done:'Ein Tor mit dem Schlagwurf.' },
   { id:'h3sprung', group:'3D Angriff', name:'Sprungwurf', kind:'3d', t3:'sprung', desc:'Über den Block werfen.',
-    steps:['Zwei Abwehrspieler stehen vor dir und blocken flache Würfe.', 'Tippe „Sprungwurf“: Du springst ab und wirfst am höchsten Punkt.', 'Abspringen musst du vor der 6-m-Linie, landen darfst du im Torraum.'], done:'Ein Tor mit dem Sprungwurf.' },
+    steps:['Zwei Abwehrspieler stehen vor dir und blocken flache Würfe.', 'Wisch auf der Wurf-Taste nach oben (Sprungwurf): Du springst ab und wirfst am höchsten Punkt.', 'Abspringen musst du vor der 6-m-Linie, landen darfst du im Torraum.'], done:'Ein Tor mit dem Sprungwurf.' },
   { id:'h3aussen', group:'3D Angriff', name:'Wurf von Außen', kind:'3d', t3:'aussen', desc:'Nach innen springen.',
-    steps:['Von der Seitenlinie ist der Winkel zum Tor sehr klein, der Torwart deckt ihn fast ganz ab.', 'Lauf ein, zwei Schritte Richtung 7-m-Strich.', 'Dann „Sprungwurf“: Du springst nach innen und hast mehr Tor vor dir. Ziel in die lange Ecke.'], done:'Ein Tor von Außen.' },
+    steps:['Von der Seitenlinie ist der Winkel zum Tor sehr klein, der Torwart deckt ihn fast ganz ab.', 'Lauf ein, zwei Schritte Richtung 7-m-Strich.', 'Dann auf der Wurf-Taste nach oben wischen (Sprungwurf): Du springst nach innen und hast mehr Tor vor dir. Ziel in die lange Ecke.'], done:'Ein Tor von Außen.' },
   { id:'h3vert', group:'3D Abwehr', name:'Verteidigen', kind:'3d', t3:'vert', desc:'Den Angreifer stoppen.',
     steps:['Ein Angreifer prellt auf dein Tor zu. Du steuerst den Spieler mit dem gelben Ring.', 'Stell dich zwischen ihn und das Tor, also vor ihn.', 'Tippe „Verteidigen“, wenn er nah ist. Von der Seite ist es ein Foul, von hinten gibt es 2 Minuten.'], done:'Angreifer gestoppt.' },
   { id:'h3block', group:'3D Abwehr', name:'Block', kind:'3d', t3:'block', desc:'Den Wurf blocken.',
@@ -4532,6 +4557,7 @@ function profSync(){
     });
   };
   sw($('#swSkin'), LOOK.skin, 'skin'); sw($('#swHair'), LOOK.hair, 'hair'); sw($('#swAcc'), LOOK.acc, 'accCol');
+  if (!p.ctlTap) p.ctlTap = 'schlag'; if (!p.ctlJbtn) p.ctlJbtn = 'nein'; if (!p.ctlSide) p.ctlSide = 'r';
   document.querySelectorAll('.pseg').forEach(seg => {
     const key = seg.dataset.pkey;
     seg.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(String(p[key]) === b.dataset.v)));
@@ -5410,7 +5436,7 @@ const G3 = { on:false };
     if (!ensure()){ if (typeof toast === 'function') toast('3D wird auf diesem Gerät nicht unterstützt (kein WebGL2).'); return false; }
     if (typeof H3 !== 'undefined' && H3.on) H3.stop();
     Object.assign(R3.env, ENV0);
-    G3.on = true; ui.hidden = false;
+    G3.on = true; ui.hidden = false; try { ui.classList.toggle('mirror', curProf().ctlSide === 'l'); } catch (e) {}
     resize();
     const D = DIFF3[S.cdiff] || DIFF3.mittel;
     st = { kind, D, diff:S.cdiff, half:0, len:Number(S.fhalf) || 180, clock:Number(S.fhalf) || 180, score:[[0,0],[0,0]], sets:[0,0], golden:false,
@@ -5488,9 +5514,19 @@ const G3 = { on:false };
     window.addEventListener('blur', reset); document.addEventListener('visibilitychange', () => { if (document.hidden) reset(); });
     G3.resetInput = reset;
     document.querySelectorAll('#g3btns button').forEach(b => {
-      b.addEventListener('pointerdown', e => { if (!G3.on) return; e.preventDefault(); inp.act[b.dataset.a] = (st && st.btnMode) || '?'; inp.hold[b.dataset.a] = true; b.classList.add('down'); try { b.setPointerCapture(e.pointerId); } catch (_) {} });
-      const up = () => { b.classList.remove('down'); inp.hold[b.dataset.a] = false; };
-      b.addEventListener('pointerup', up); b.addEventListener('pointercancel', up); b.addEventListener('pointerleave', up);
+      // Pass und Kempa: antippen = normal, nach oben wischen = langer Pass bzw. langer Kempa (Tempogegenstoß)
+      let g = null;
+      const fire = v => { const a = b.dataset.a; inp.act[a] = g.mode; inp.vr = inp.vr || {}; inp.vr[a] = v || ''; g = null; b.classList.remove('down'); };
+      b.addEventListener('pointerdown', e => {
+        if (!G3.on) return; e.preventDefault();
+        const a = b.dataset.a, mode = (st && st.btnMode) || '?';
+        inp.hold[a] = true; b.classList.add('down'); try { b.setPointerCapture(e.pointerId); } catch (_) {}
+        if ((a === 'b' && (mode === 'att' || mode === 'gkball')) || (a === 'd' && mode === 'att')){ g = { x:e.clientX, y:e.clientY, mode, id:e.pointerId }; return; }
+        inp.act[a] = mode;
+      });
+      b.addEventListener('pointermove', e => { if (!g || e.pointerId !== g.id) return; const dx = e.clientX - g.x, dy = e.clientY - g.y; if (Math.hypot(dx, dy) < 22) return; fire(dy < -Math.abs(dx)*.8 ? 'lang' : ''); });
+      const up = () => { if (g) fire(''); b.classList.remove('down'); inp.hold[b.dataset.a] = false; };
+      b.addEventListener('pointerup', up); b.addEventListener('pointercancel', up); b.addEventListener('pointerleave', () => { if (!g){ b.classList.remove('down'); inp.hold[b.dataset.a] = false; } });
     });
     window.addEventListener('keydown', e => {
       if (!G3.on) return;
@@ -5539,17 +5575,24 @@ const G3 = { on:false };
     const d = dirOf(to.team), gz = atkZ(to.team);
     return { x:cl(to.x*.75, -4.6, 4.6), y:2.5, z: gz - d*cl(Math.abs(gz - to.z) - 2.2, 3.6, 5.2) };
   }
-  function pass(from, to, kind){
+  function pass(from, to, kind, opt){
     const s = handPos(from);
-    let tgt, spd = kind === 'lob' ? 8.6 : from.gk ? 15 : 12.5;
+    const long = !!(opt && opt.long);
+    let tgt, spd = kind === 'lob' ? (long ? 10.5 : 8.6) : long ? 15 : from.gk ? 15 : 12.5;
     if (kind === 'lob') tgt = kempaPoint(to);
+    else if (long){
+      // Langer Pass (Tempogegenstoß): gut 3 m vor den Mitspieler Richtung Tor, nicht in den Torraum
+      const dd = dirOf(from.team), gz = atkZ(from.team);
+      let lz = to.z + dd*3.2 + to.vz*.4; if (Math.sign(lz) === Math.sign(gz) && Math.abs(lz) > AREA - .7) lz = Math.sign(gz)*(AREA - .7);
+      tgt = { x:cl(to.x + to.vx*.5, -HW + .6, HW - .6), y:1.35, z:lz };
+    }
     else {
       tgt = { x:to.x, y:1.35, z:to.z };
       for (let k = 0; k < 2; k++){ const T = Math.max(.3, h2(s, tgt)/spd); tgt = { x:cl(to.x + to.vx*T*.8, -HW + .3, HW - .3), y:1.35, z:to.z + to.vz*T*.8 }; }
     }
     const T = Math.max(kind === 'lob' ? 1.0 : .32, h2(s, tgt)/spd);   // Kempa-Pass: hoher Bogen, genug Zeit für den Sprung
     launch(from, tgt, T);
-    ball.fl = { kind:kind === 'lob' ? 'lob' : 'pass', from, to, team:from.team, t:0, T, tgt };
+    ball.fl = { kind:kind === 'lob' ? 'lob' : 'pass', from, to, team:from.team, t:0, T, tgt, long };
     st.passN = (st.passN || 0) + 1;
     if (from.toSpez && !st.so){ from.toSpez = false; setRole(from, 'spez'); from.exitArea = true; }
     to.recv = { tgt, T, kind, t:0 };
@@ -5605,13 +5648,26 @@ const G3 = { on:false };
     const side = k && Math.abs(k.x) > .15 ? -Math.sign(k.x) : (Math.random() < .5 ? -1 : 1);
     return { x:side*ra(.85, 1.25), y:Math.random() < .5 ? ra(.3, .7) : ra(1.2, 1.75) };
   }
-  function humanAim(p){
-    const j = joyVec(p.team), d = dirOf(p.team);
-    const a = autoAim(p);
-    if (Math.abs(j.x) > .3) a.x = j.x*(-d)*1.2;   // links/rechts aus Sicht der Kamera
-    if (j.y < -.5) a.y = 1.7; else if (j.y > .5) a.y = .35;
-    return a;
+  /* Zielen: Das Ziel (6 Felder: links, Mitte, rechts, jeweils oben/unten) wird nur gesetzt, wenn der Joystick deutlich zur Seite
+     oder nach hinten zeigt. Geradeaus Richtung Tor laufen ändert es nicht. Ohne gewähltes Ziel wirft dein Spieler in die offene Ecke. */
+  function aimPick(p, upd){
+    const t = p.team, d = dirOf(t);
+    if (!st.aimSel) st.aimSel = [null, null];
+    if (!st.aimOwn) st.aimOwn = [null, null];
+    if (st.aimOwn[t] !== p){ st.aimOwn[t] = p; st.aimSel[t] = null; }
+    if (upd !== false){
+      const j = joyVec(t), ax = Math.abs(j.x), prev = st.aimSel[t];
+      if (ax > .5 || j.y > .6){
+        const s = ax > .5 ? Math.sign(j.x) : 0;
+        const h = j.y > .35 ? 'lo' : (j.y < -.55 && ax > .35) ? 'hi' : (prev ? prev.h : 'lo');
+        st.aimSel[t] = { s, h };
+      }
+    }
+    const sel = st.aimSel[t];
+    if (!sel){ if (!st.aimAuto || st.aimAuto.p !== p) st.aimAuto = { p, a:autoAim(p) }; return Object.assign({ auto:true }, st.aimAuto.a); }
+    return { x:sel.s*(-d)*1.15, y:sel.h === 'hi' ? 1.62 : .42, auto:false };
   }
+  function humanAim(p){ const a = aimPick(p, false); st.aimAuto = null; return { x:a.x, y:a.y }; }
   function startPir(p){
     const d = dirOf(p.team);
     p.st = 'pir'; p.stT = 0; p.air = true; p.vy = 3.6; p.spin = 0;
@@ -5874,6 +5930,9 @@ const G3 = { on:false };
     if (c.gk){
       if (st.think > 0) return;
       const mates = field(c.team).sort((a, b) => openness(b) - openness(a));
+      // Tempogegenstoß: weit vorne freier Mitspieler = langer Ball, ist er schon am Torraum, manchmal als langer Kempa
+      const run = field(c.team).filter(q => (q.z - c.z)*d > 8 && openness(q) > 2.4).sort((a, b) => (b.z - a.z)*d)[0];
+      if (run && Math.random() < .7){ const nearA = Math.abs(gz - run.z) < L - AREA + 3; pass(c, run, nearA && Math.random() < .35 ? 'lob' : 'pass', { long:true }); return; }
       const m = mates.find(q => laneOpen(c, q, c.team, 1.1)) || mates[0];
       if (m) pass(c, m, 'pass');
       return;
@@ -6007,7 +6066,7 @@ const G3 = { on:false };
     if (c) c.hold += dt;
     aiTargets(dt);
     const JW = [0, 1].map(t => { const j = joyVec(t); return { j, w:toWorld(j.x, j.y, t) }; });
-    const AT = [0, 1].map(t => ({ a:take('a', t), b:take('b', t), c:take('c', t), d:take('d', t) })); const A = AT[0]; st.A = A; st.AT = AT;
+    const AT = [0, 1].map(t => { const I = IN[t] || {}, v = I.vr || {}; I.vr = {}; return { a:take('a', t), b:take('b', t), c:take('c', t), d:take('d', t), vb:v.b, vd:v.d }; }); const A = AT[0]; st.A = A; st.AT = AT;
     // Ballbesitz wechselt: Tasten kurz sperren, damit ein Tipp auf „Verteidigen“ nicht zum Wurf wird
     // Ein Tipp gilt nur in der Rolle, die beim Tippen angezeigt wurde: Wer gerade „Verteidigen“ tippt und dabei den Ball gewinnt, wirft nicht aus Versehen
     { const grp = m => (m === 'def' || m === 'gk' || m === 'gkshot') ? 'd' : 'o';
@@ -6048,6 +6107,7 @@ const G3 = { on:false };
       else if (isMe && p.gk && so){ if (!p.dive) movePlayer(p, dt, w.x*j.m, 0, 4.2); p.yaw = Math.atan2(0, dirOf(p.team)); }
       else if (isMe && !p.gk && !(p.recv && ball.fl && ball.fl.to === p)){
         p.sideFree = !so && st.phase === 'play';
+        if (c === p) aimPick(p);
         if (p.st === 'windup') movePlayer(p, dt, 0, 0, 0);
         else if (p.faceBall && j.m < .15){
           // Joystick losgelassen: dein Abwehrspieler hält seine Position (vor dem Gegenspieler, zwischen Ball und Tor)
@@ -6110,14 +6170,14 @@ const G3 = { on:false };
     }
     if (c === me){
       if (me.st === 'pirH') return;
-      if ((A.a || A.c || A.d) && !me.air && st.gainAt && performance.now() - st.gainAt[t] < 320 && !me.ftStand){ A.a = A.c = A.d = false; }
+      if ((A.a || A.c) && !me.air && st.gainAt && performance.now() - st.gainAt[t] < 320 && !me.ftStand){ A.a = A.c = false; }
       if (me.ftStand && (A.c || A.d)){ A.c = A.d = false; flashT(t, 'Freiwurf: aus dem Stand passen oder werfen'); }
       if (me.st === 'windup') return;
       if (me.air){ if (A.a && me.st !== 'pir'){ const a = humanAim(me); throwAt(me, a.x, a.y, { kempa:true }); } return; }
       if (A.a){ const a = humanAim(me); return throwAt(me, a.x, a.y, {}); }
       if (A.c && !me.gk){ if (inArea(me, .3)) flash('Absprung vor der Torraumlinie!'); else startPirH(me); return; }
-      if (A.b){ const t = pickMate(me); if (t) pass(me, t, 'pass'); return; }
-      if (A.d && !me.gk){ const t = pickKempa(me); if (t) pass(me, t, 'lob'); else flash('Kein Mitspieler nah genug am Torraum für einen Kempa'); return; }
+      if (A.b){ const lg = A.vb === 'lang', t = (lg && pickLong(me)) || pickMate(me); if (t) pass(me, t, 'pass', { long:lg }); return; }
+      if (A.d && !me.gk){ const lg = A.vd === 'lang', t = lg ? pickLongK(me) : pickKempa(me); if (t){ pass(me, t, 'lob', { long:lg }); if (lg) flashT(me.team, 'Langer Kempa! Jetzt das Timing treffen'); } else flash(lg ? 'Für den langen Kempa muss ein Mitspieler weit weg am Torraum stehen' : 'Kein Mitspieler nah genug am Torraum für einen Kempa'); return; }
     } else if ((c && c.team !== t) || (ball.fl && ball.fl.team !== t)){
       // Wechsel: der Abwehrspieler am nächsten zum Ballführer (oder zum Fänger), ist das schon deiner, der nächstbeste
       if (A.b){
@@ -6130,6 +6190,33 @@ const G3 = { on:false };
         if (A.c && !me.air){ const r = tackle(me, c); if (r === 'miss') flashT(t, 'Zu weit weg zum Verteidigen'); }
       }
     }
+  }
+  // Langer Pass: der Mitspieler, der am weitesten Richtung gegnerisches Tor vorne und frei ist
+  function pickLong(p){
+    const d = dirOf(p.team), j = joyVec(p.team), w = toWorld(j.x, j.y, p.team);
+    let best = null, bs = -1e9;
+    for (const q of field(p.team)){
+      if (q === p || q.out || q.leave) continue;
+      const fwd = (q.z - p.z)*d; if (fwd < 3) continue;
+      let o = 9; for (const e of field(1 - p.team)) o = Math.min(o, h2(q, e));
+      const s = fwd*.25 + Math.min(o, 4)*.8 + (j.m > .3 ? ((q.x - p.x)*w.x + (q.z - p.z)*w.z)/(h2(q, p) || 1) : 0);
+      if (s > bs){ bs = s; best = q; }
+    }
+    return best;
+  }
+  // Langer Kempa: Mitspieler am Torraum, der weit genug weg steht (ab 6 m)
+  function pickLongK(p){
+    const gz = atkZ(p.team), j = joyVec(p.team), w = toWorld(j.x, j.y, p.team);
+    let best = null, bs = -1e9;
+    for (const q of field(p.team)){
+      if (q === p || q.out || q.leave) continue;
+      const gd = Math.hypot(q.x, gz - q.z), dp = h2(q, p);
+      if (dp < 6 || gd > AREA + 3.5) continue;
+      let o = 9; for (const e of field(1 - p.team)) o = Math.min(o, h2(q, e));
+      const s = Math.min(o, 4)*.8 - gd*.3 + (j.m > .3 ? ((q.x - p.x)*w.x + (q.z - p.z)*w.z)/(dp || 1) : 0);
+      if (s > bs){ bs = s; best = q; }
+    }
+    return best;
   }
   function pickMate(p){
     const j = joyVec(p.team); let dir = toWorld(j.x, j.y, p.team);
@@ -6271,6 +6358,7 @@ const G3 = { on:false };
       // Pass oder Kempa: Abfangen durch Gegner, Fangen durch Mitspieler
       for (const p of team(1 - f.team)){
         const r = p.gk ? .65 : (p.st === 'block' ? .72 : .52), top = (p.gk ? 2.5 : (p.st === 'block' ? 2.6 : 2.15)) + p.y;
+        if (f.long && !p.gk && ball.y > 2.3) continue;   // langer Ball im hohen Bogen
         if (f.t > .08 && h2(p, ball) < r && ball.y < top && ball.y > .15){ ball.fl = null; giveBall(p); p.recv = null; if (st.so) { banner('Abgefangen!', ''); return soResult(false); } banner(p.gk ? 'Gefangen!' : 'Abgefangen!', 'Ballverlust'); return; }
       }
       const to = f.to;
@@ -6460,6 +6548,14 @@ const G3 = { on:false };
   const $3 = id => document.getElementById(id);
   const fmtT = s => { s = Math.ceil(s); return Math.floor(s/60) + ':' + String(s % 60).padStart(2, '0'); };
   function hud(){
+    // Zielmarke im Tor, solange du den Ball hast
+    const am = $3('g3aim');
+    if (am){
+      const cc = ball.owner, mine = cc && cc === st.ctrls[MY()] && !cc.gk && !st.watch && (st.btnMode === 'att' || st.btnMode === 'so2');
+      const a = mine ? aimPick(cc, false) : null;
+      const q = a ? R3.project([a.x, a.y, atkZ(cc.team)], cvs.clientWidth, cvs.clientHeight) : null;
+      am.hidden = !q; if (q){ am.style.transform = 'translate(' + Math.round(q.x - 14) + 'px,' + Math.round(q.y - 14) + 'px)'; am.classList.toggle('auto', !!a.auto); }
+    }
     // Online: „DU“ über dem eigenen Spieler
     if (st.online && !st.youHint && !st.watch){ st.youHint = true; st.hint = 'Du spielst ' + (MY() === 0 ? 'Rot' : 'Türkis') + ' · dein Spieler hat „DU“ über dem Kopf'; st.hintT = 5; }
     const you = $3('g3you');
@@ -6491,10 +6587,10 @@ const G3 = { on:false };
       st.btnMode = mode;
       const B = { a:$3('g3a'), b:$3('g3b'), c:$3('g3cc'), d:$3('g3d') };
       const set = (el, txt) => { el.hidden = !txt; if (txt) el.querySelector('b').textContent = txt; };
-      const cfg = { pirH:['','','Loslassen!',''], kjump:['Sprung','','',''], att:['Wurf','Pass','Pirouette','Kempa'], air:['Wurf','','',''], gkball:['Wurf','Pass','',''], def:['Block','Wechsel','Verteidigen',''], gkshot:['Hechten','','',''], wait:['','','',''],
+      const cfg = { pirH:['','','Loslassen!',''], kjump:['Sprung','','',''], att:['Wurf','Pass ↑','Pirouette','Kempa ↑'], air:['Wurf','','',''], gkball:['Wurf','Pass ↑','',''], def:['Block','Wechsel','Verteidigen',''], gkshot:['Hechten','','',''], wait:['','','',''],
                     so0:['','Pass zum TW','',''], so1:['','Rückpass','','Kempa'], so2:['Wurf','','Pirouette',''], gk:['Hechten','','',''], none:['','','',''] }[mode];
       set(B.a, cfg[0]); set(B.b, cfg[1]); set(B.c, cfg[2]); set(B.d, cfg[3]);
-      const hints = { pirH:'Gedrückt halten = drehen · loslassen = werfen (Joystick zielt)', kjump:'Tippe „Sprung“, wenn der Marker im grünen Bereich ist', att:'Joystick: laufen · Wurf mit Joystick links/rechts zielen', air:'In der Luft! Jetzt werfen', gkball:'Dein Torwart hat den Ball: Pass nach vorne oder Wurf aufs leere Tor',
+      const hints = { pirH:'Gedrückt halten = drehen · loslassen = werfen (Joystick zielt)', kjump:'Tippe „Sprung“, wenn der Marker im grünen Bereich ist', att:'Joystick: laufen und zielen (Kreuz im Tor) · Pass oder Kempa nach oben wischen = langer Ball zum Gegenstoß', air:'In der Luft! Jetzt werfen', gkball:'Dein Torwart hat den Ball: Pass, hoch wischen = langer Ball nach vorne, oder Wurf aufs leere Tor',
         def:'Abwehr: Joystick loslassen = Position halten · vor den Ballführer und Verteidigen · Block springen', wait:'', so0:'Shoot-out: Erst zum eigenen Torwart passen', so1:'Sprinten und Rückpass oder Kempa anfordern',
         so2:'Werfen! 5 Sekunden', gk:'Dein Torwart: Joystick links/rechts, Hechten im richtigen Moment', gkshot:'Wurf aufs Tor! Jetzt steuerst du deinen Torwart: Hechten, Joystick = Seite und Höhe', none:'' };
       st.hintBase = hints[mode];
@@ -6617,7 +6713,7 @@ const G3 = { on:false };
     if (!ensure()) return false;
     if (typeof H3 !== 'undefined' && H3.on) H3.stop();
     Object.assign(R3.env, ENV0);
-    G3.on = true; ui.hidden = false;
+    G3.on = true; ui.hidden = false; try { ui.classList.toggle('mirror', curProf().ctlSide === 'l'); } catch (e) {}
     resize();
     st = { kind, D:DIFF3.mittel, diff:S.cdiff, half:0, len:180, clock:0, score:[[0,0],[0,0]], sets:[0,0], golden:false, timeUp:false, phase:'play', poss:0, ctrls:[null, null],
            online:true, me:1, remote:true, so:null, hist:[], banT:0, hint:'', ts:1, think:1 };
@@ -6663,13 +6759,14 @@ const G3 = { on:false };
       else for (const p of PL) if (p.recv) p.recv = null;
     }
     for (const p of PL){ if (!p.out) animate(p, dt); }
+    if (ball.owner && ball.owner === st.ctrls[1] && !ball.owner.gk) aimPick(ball.owner);
     if (st.watch){ for (const k in inp.act) inp.act[k] = false; return; }   // Zuschauer senden nichts
-    for (const a of ['a', 'b', 'c', 'd']) if (inp.act[a]){ netSend('a3', { a, m:inp.act[a] }); inp.act[a] = false; }
+    for (const a of ['a', 'b', 'c', 'd']) if (inp.act[a]){ netSend('a3', { a, m:inp.act[a], v:(inp.vr || {})[a] || '' }); inp.act[a] = false; if (inp.vr) inp.vr[a] = ''; }
     const now = performance.now();
     if (now - inT > 50 && NET.T){ inT = now; const j = joyVec(1); NET.T.state(1, { jx:r2(j.x), jy:r2(j.y), hc:inp.hold.c ? 1 : 0, cy:Math.round(cam.yaw*1000)/1000 }); }
   }
   function remoteIn(d){ IN[1].jx = d.jx || 0; IN[1].jy = d.jy || 0; IN[1].hold = { c:!!d.hc }; IN[1].cy = d.cy; }
-  function remoteAct(d){ if (st && st.online && NET.host) IN[1].act[d.a] = d.m || '?'; }
+  function remoteAct(d){ if (st && st.online && NET.host){ IN[1].act[d.a] = d.m || '?'; if (d.v){ IN[1].vr = IN[1].vr || {}; IN[1].vr[d.a] = d.v; } } }
   function showRemoteMsg(d){
     msg(d.eye, d.title, d.text, d.btns.map((b, i) => ({ label:b.label, primary:b.primary, fn:() => { netSend('b3', { id:d.id, i }); if (/Menü|verlassen/.test(b.label)){ netSend('end', {}); exit(); } } })), true);
   }
@@ -6712,6 +6809,8 @@ const H3 = { on:false };
   const inp = { jx:0, jy:0, joyId:null, ox:0, oy:0, keys:{}, act:{}, hold:{} };
   // Online: Team 1 wird vom zweiten Handy gesteuert (Eingaben kommen über das Netz)
   const IN = [inp, { jx:0, jy:0, keys:{}, act:{}, hold:{} }];
+  // Steuerung aus dem Profil: Wurf antippen = Schlag- oder Sprungwurf, eigene Sprungwurf-Taste, Tasten links oder rechts
+  const CTL = () => { try { const p = curProf(); return { tap:p.ctlTap === 'sprung' ? 'sprung' : 'schlag', jbtn:p.ctlJbtn === 'ja', side:p.ctlSide === 'l' ? 'l' : 'r' }; } catch (e) { return { tap:'schlag', jbtn:false, side:'r' }; } };
   const HUM = t => t === 0 || !!(st && st.online);
   const MY = () => (st && st.me) || 0;
   const nm = t => (st && st.online) ? NET.names[t] : (t === 0 ? 'Du' : 'Computer');
@@ -6755,7 +6854,7 @@ const H3 = { on:false };
         const rig = W3.player(o);
         root.add(rig.root);
         PL.push({ team:t, gk, i, role: gk ? 'TW' : ROLES[i], num, rig, x:0, z:0, vx:0, vz:0, yaw:0, y:0, vy:0, air:false, st:'', stT:0, ph:Math.random()*6, hold:0,
-                  tx:0, tz:0, spin:0, dive:0, diveDir:0, diveH:1, recv:null, out:false, susp:0, lefty: mine && me.lefty });
+                  tx:0, tz:0, spin:0, dive:0, diveDir:0, diveH:1, recv:null, out:false, susp:0, lefty: !gk && (mine ? !!me.lefty : (i === 4 || (i === 3 && t === 1))) });
       }
     }
   }
@@ -6808,7 +6907,7 @@ const H3 = { on:false };
     if (!ensure()){ if (typeof toast === 'function') toast('3D wird auf diesem Gerät nicht unterstützt (kein WebGL2).'); return false; }
     if (typeof G3 !== 'undefined' && G3.on) G3.stop();
     Object.assign(R3.env, ENV);
-    H3.on = true; ui.hidden = false; ui.classList.add('hall');
+    H3.on = true; ui.hidden = false; ui.classList.add('hall'); ui.classList.toggle('mirror', CTL().side === 'l');
     resize();
     const D = DIFF[S.cdiff] || DIFF.mittel;
     const len = Number(S.hhalf) || 300;
@@ -6892,7 +6991,7 @@ const H3 = { on:false };
       field(tm).forEach(p => {
         const k = KICK[p.i];
         let dz = tm === t ? (p.i === 2 ? .3 : k[1]*.35 + .8) : (p.i === 5 ? 9 : 10.5 + Math.abs(k[0])*.12);
-        p.x = tm === t ? k[0] : k[0]*.85; p.z = -d*dz;
+        p.x = (tm === t ? k[0] : k[0]*.85)*rightSign(tm); p.z = -d*dz;
         p.vx = p.vz = 0; p.y = 0; p.air = false; p.st = ''; p.drib = false; p.dribbled = false;
       });
       const g = gkOf(tm); g.x = 0; g.z = ownZ(tm) + dirOf(tm)*.6; g.y = 0; g.air = false;
@@ -6954,17 +7053,17 @@ const H3 = { on:false };
         if (!H3.on) return; e.preventDefault();
         const a = b.dataset.a, mode = (st && st.btnMode) || '?';
         inp.hold[a] = true;
-        if ((a === 'a' || a === 'b') && (mode === 'att' || mode === 'drib')){ g = { x:e.clientX, y:e.clientY, mode, id:e.pointerId }; b.classList.add('down'); try { b.setPointerCapture(e.pointerId); } catch (_) {} return; }
+        if ((a === 'a' || a === 'b') && (mode === 'att' || mode === 'drib' || (a === 'b' && mode === 'gkball'))){ g = { x:e.clientX, y:e.clientY, mode, id:e.pointerId }; b.classList.add('down'); try { b.setPointerCapture(e.pointerId); } catch (_) {} return; }
         inp.act[a] = mode;
       });
       b.addEventListener('pointermove', e => {
         if (!g || e.pointerId !== g.id) return;
         const dx = e.clientX - g.x, dy = e.clientY - g.y;
         if (Math.hypot(dx, dy) < 22) return;
-        if (b.dataset.a === 'a') fire(dy < -Math.abs(dx)*.8 ? 'jump' : Math.abs(dx) > Math.abs(dy) ? 'knick' : '');
-        else fire(dy > Math.abs(dx)*.8 ? 'boden' : '');
+        if (b.dataset.a === 'a'){ const up = dy < -Math.abs(dx)*.8; fire(up ? (CTL().tap === 'sprung' ? 'schlag' : 'jump') : Math.abs(dx) > Math.abs(dy) ? 'knick' : (CTL().tap === 'sprung' ? 'jump' : '')); }
+        else fire(dy > Math.abs(dx)*.8 ? 'boden' : dy < -Math.abs(dx)*.8 ? 'lang' : '');
       });
-      const up = () => { if (g) fire(''); inp.hold[b.dataset.a] = false; };
+      const up = () => { if (g) fire(b.dataset.a === 'a' && CTL().tap === 'sprung' ? 'jump' : ''); inp.hold[b.dataset.a] = false; };
       b.addEventListener('pointerup', up); b.addEventListener('pointercancel', up); b.addEventListener('pointerleave', () => { if (!g) inp.hold[b.dataset.a] = false; });
     });
     const map = { j:'b', k:'a', l:'c', i:'d', ' ':'a' };
@@ -6998,7 +7097,7 @@ const H3 = { on:false };
 
   /* ---------- Aktionen ---------- */
   function handPos(p){
-    const w = p.rig.armR.elbow.world;
+    const w = (p.lefty ? p.rig.armL : p.rig.armR).elbow.world;
     if (!w[15]) return { x:p.x, y:1.3, z:p.z };
     return { x:w[12] - .3*w[4], y:w[13] - .3*w[5], z:w[14] - .3*w[6] };
   }
@@ -7009,20 +7108,29 @@ const H3 = { on:false };
     ball.owner = null; ball.loose = false; ball.lastTeam = from.team;
     from.st = 'throw'; from.stT = 0; from.hold = 0; from.drib = false;
   }
+  function startGo(p){ const gz = atkZ(p.team), q = arcPt(gz, AR + 2.2, cl(p.x*.7, -6, 6)); p.go = { x:q.x, z:q.z, t:1.4 }; }
   function pass(from, to, opt){
     if (from.midThrow){ from.midThrow = false; st.mid = null; }
     const s = handPos(from);
     const bounce = !!(opt && opt.bounce) && !from.gk;
-    const spd = from.gk ? 17 : bounce ? 11 : 14;
+    const long = !!(opt && opt.long) && !bounce;
+    const spd = long ? 16 : from.gk ? 17 : bounce ? 11 : 14;
     let tgt = { x:to.x, y:1.35, z:to.z };
     for (let k = 0; k < 2; k++){ const T = Math.max(.3, h2(s, tgt)/spd); tgt = { x:cl(to.x + to.vx*T*.8, -HW + .3, HW - .3), y:1.35, z:cl(to.z + to.vz*T*.8, -L + .3, L - .3) }; }
-    const T = Math.max(.3, h2(s, tgt)/spd);
+    if (long){
+      // Langer Pass (Tempogegenstoß): in den Lauf, gut 3 m vor den Mitspieler Richtung Tor, nicht in den Torraum
+      const dd = dirOf(from.team), gz = atkZ(from.team);
+      let lx = cl(to.x + to.vx*.5, -HW + .6, HW - .6), lz = to.z + dd*3.2 + to.vz*.4;
+      if (aDist(lx, lz, gz) < AR + .8){ const q = arcPt(gz, AR + .9, lx); lx = q.x; lz = q.z; }
+      tgt = { x:lx, y:1.35, z:cl(lz, -L + .6, L - .6) };
+    }
+    const T = Math.max(.3, h2(s, tgt)/spd)*(long ? 1.12 : 1);
     if (bounce){
       // Bodenpass: Aufsetzpunkt bei 60 % des Weges, der Ball springt dem Mitspieler auf Hüfthöhe entgegen
       const bp = { x:s.x + (tgt.x - s.x)*.6, y:.12, z:s.z + (tgt.z - s.z)*.6 };
       launch(from, bp, Math.max(.22, h2(s, bp)/spd));
     } else launch(from, tgt, T);
-    ball.fl = { kind:'pass', from, to, team:from.team, t:0, T:bounce ? T*1.25 : T, tgt, bounce };
+    ball.fl = { kind:'pass', from, to, team:from.team, t:0, T:bounce ? T*1.25 : T, tgt, bounce, long };
     st.passN = (st.passN || 0) + 1;
     const pv = st.pas;
     if (pv && pv.warn && pv.team === from.team && !from.gk){
@@ -7043,7 +7151,7 @@ const H3 = { on:false };
     const jump = !!flags.jump && !p.air && !p.gk;
     if (jump && inArea(p, .1)){ if (HUM(p.team)) flashT(p.team, 'Absprung vor der 6-m-Linie! Die Linie gehört zum Torraum.'); flags.jump = false; return throwAt(p, tx, ty, flags); }
     p.drib = false;
-    p.st = 'windup'; p.stT = 0; p.wu = { t:0, T: jump ? .36 : flags.type ? .3 : flags.knick ? .2 : .22, tx, ty, flags };
+    p.st = 'windup'; p.stT = 0; p.wu = { t:0, T:(jump ? .36 : flags.type ? .3 : flags.knick ? .2 : .22) + Math.max(0, p.pturn || 0), tx, ty, flags };
     if (jump){
       p.air = true; p.vy = 3.7; const d = dirOf(p.team); p.vx = p.vx*.5; p.vz = p.vz*.5 + d*1.2;
       // Außen: Absprung nach innen Richtung 7-m-Strich, das vergrößert den Wurfwinkel
@@ -7076,7 +7184,9 @@ const H3 = { on:false };
     const type = flags.type || 'wurf';
     const far = Math.max(0, dist - 7.5);
     const pen7 = !!(flags.seven || st.pen);
-    const sd = (type === 'heber' ? .06 : .07) + (pen7 ? .03 : 0) + (flags.knick ? .02 : 0) + Math.max(0, dist - 7)*.035 + far*.015 + (flags.jump ? .03 : 0) + Math.max(0, ang - .8)*.12 + (p.gk ? .25 : 0) + (cpu ? st.D.aim*.5 : 0);
+    // Wurfarm innen (Linkshänder rechts, Rechtshänder links) = besserer Winkel; Wurfarm außen = mehr Verdrehen
+    const sideX = p.x*rightSign(p.team), armIn = !p.gk && (p.lefty ? sideX > 1.5 : sideX < -1.5), armOut = !p.gk && (p.lefty ? sideX < -1.5 : sideX > 1.5);
+    const sd = (type === 'heber' ? .06 : .07) + (pen7 ? .03 : 0) + (flags.knick ? .02 : 0) + Math.max(0, dist - 7)*.035 + far*.015 + (flags.jump ? .03 : 0) + Math.max(0, ang - .8)*.12*(armIn ? .45 : armOut ? 1.35 : 1) - (armIn ? .015 : 0) + (p.gk ? .25 : 0) + (cpu ? st.D.aim*.5 : 0);
     const ax = cl(tx, -1.4, 1.4) + gs()*sd, ay = cl(ty + gs()*sd*.6, .15, 2.1);
     const K = HUM(1 - p.team) ? HUMAN_K : st.D;
     let tgt, T;
@@ -7093,9 +7203,9 @@ const H3 = { on:false };
     }
     launch(p, tgt, T);
     const k = gkOf(1 - p.team);
-    ball.fl = { kind:'shot', from:p, team:p.team, t:0, T, tgt, sx:ball.x, sz:ball.z, type, jump:!!flags.jump, seven:!!flags.seven, k,
+    ball.fl = { kind:'shot', from:p, team:p.team, t:0, T, tgt, sx:ball.x, sz:ball.z, type, jump:!!flags.jump, seven:!!flags.seven, knick:!!flags.knick, dreher:!!flags.dreher, k,
                 kr:K.kr + (type === 'aufsetzer' ? .06 : 0) + (flags.jump ? .02 : 0) + (flags.knick ? .05 : 0) - Math.min(.06, far*.02) - (pen7 ? .04 : 0), kChecked:false, seven7:pen7,
-                kg: tgt.x + gs()*(K.ge + (type === 'aufsetzer' ? .15 : 0))*(pen7 ? .75 : 1)/(1 + far*.25), ky: type === 'aufsetzer' ? .35 : tgt.y, far };
+                kg: tgt.x + gs()*(K.ge + (type === 'aufsetzer' ? .15 : 0) + (flags.dreher ? .2 : 0))*(pen7 ? .75 : 1)/(1 + far*.25), ky: type === 'aufsetzer' ? .35 : tgt.y, far };
     // Computer-Torwart hat sich beim 7-Meter früh für eine Ecke entschieden
     if (st.seven && st.seven.commit && p === st.seven.sh){ ball.fl.kg = st.seven.commit*1.05; ball.fl.kr -= .08; }
     if (st.seven && st.seven.bit > 0 && p === st.seven.sh){ ball.fl.kr += .2; ball.fl.kg = k ? k.x : 0; }
@@ -7106,13 +7216,26 @@ const H3 = { on:false };
     const side = k && Math.abs(k.x) > .15 ? -Math.sign(k.x) : (Math.random() < .5 ? -1 : 1);
     return { x:side*ra(.8, 1.25), y:Math.random() < .5 ? ra(.3, .7) : ra(1.2, 1.75) };
   }
-  function humanAim(p){
-    const j = joyVec(p.team), d = dirOf(p.team);
-    const a = autoAim(p);
-    if (Math.abs(j.x) > .3) a.x = j.x*(-d)*1.2;
-    if (j.y < -.5) a.y = 1.7; else if (j.y > .5) a.y = .35;
-    return a;
+  /* Zielen: Das Ziel (6 Felder: links, Mitte, rechts, jeweils oben/unten) wird nur gesetzt, wenn der Joystick deutlich zur Seite
+     oder nach hinten zeigt. Geradeaus Richtung Tor laufen ändert es nicht. Ohne gewähltes Ziel wirft dein Spieler in die offene Ecke. */
+  function aimPick(p, upd){
+    const t = p.team, d = dirOf(t);
+    if (!st.aimSel) st.aimSel = [null, null];
+    if (!st.aimOwn) st.aimOwn = [null, null];
+    if (st.aimOwn[t] !== p){ st.aimOwn[t] = p; st.aimSel[t] = null; }
+    if (upd !== false){
+      const j = joyVec(t), ax = Math.abs(j.x), prev = st.aimSel[t];
+      if (ax > .5 || j.y > .6){
+        const s = ax > .5 ? Math.sign(j.x) : 0;
+        const h = j.y > .35 ? 'lo' : (j.y < -.55 && ax > .35) ? 'hi' : (prev ? prev.h : 'lo');
+        st.aimSel[t] = { s, h };
+      }
+    }
+    const sel = st.aimSel[t];
+    if (!sel){ if (!st.aimAuto || st.aimAuto.p !== p) st.aimAuto = { p, a:autoAim(p) }; return Object.assign({ auto:true }, st.aimAuto.a); }
+    return { x:sel.s*(-d)*1.15, y:sel.h === 'hi' ? 1.62 : .42, auto:false };
   }
+  function humanAim(p){ const a = aimPick(p, false); st.aimAuto = null; return { x:a.x, y:a.y }; }
   /* 7-Meter-Zielen: Joystick bewegt das Ziel frei über das Tor */
   function penAim(p){
     const j = joyVec(st.remote ? 1 : p.team), d = dirOf(p.team);
@@ -7195,7 +7318,7 @@ const H3 = { on:false };
       const nf = dc >= 1 ? '60' : dc <= -3 ? '321' : dc <= -1 ? '51' : old;
       if (nf !== old){ st.form[1] = nf; flash('Computer stellt die Abwehr um: ' + { '60':'6:0', '51':'5:1', '321':'3:2:1' }[nf]); }
     }
-    const lab = f.seven ? '7-Meter' : f.from && f.from.gk ? 'Torwart-Tor' : f.jump ? 'Sprungwurf' : '';
+    const lab = f.seven ? '7-Meter' : f.from && f.from.gk ? 'Torwart-Tor' : f.dreher ? 'Dreher' : f.knick ? (f.from && slotOf(f.from).r === 'rueckraum' ? 'Hüftwurf' : 'Knickwurf') : f.jump ? 'Sprungwurf' : '';
     banner('Tor!', nm(t) + (lab ? ' · ' + lab : ''));
     for (const p of field(t)){ p.st = 'cheer'; p.stT = 0; }
     st.seven = null;
@@ -7334,6 +7457,7 @@ const H3 = { on:false };
       }
     } else {
       sv.ai -= rdt;
+      if (sv.kf && sv.kfBy === 'human' && sv.kf.t > .12 && sv.kf.t < .3 && !sv.kfBit && sv.wait > .6 && !feinting){ sv.kfBit = true; if (Math.random() < .6){ const hk = gkOf(1 - sv.t), side = hk && Math.abs(hk.x) > .2 ? -Math.sign(hk.x) : (Math.random() < .5 ? -1 : 1); return fire('heber', { x:side*ra(.6, 1.0), y:1.8 }); } }
       // Computer täuscht manchmal an: wer jetzt hechtet, liegt schon am Boden
       if (sv.cpuFeint && sv.wait > .6 && sv.ai < .55 && !feinting && !sv.feints){ sv.feints = 1; feint(sh); sv.ai += .55; }
       if (sv.ai <= 0 && sv.wait > .6 && !feinting){
@@ -7352,11 +7476,13 @@ const H3 = { on:false };
     if (HUM(k.team) && !H3.auto){
       // du hältst: Joystick seitlich, Taste „Position“ wechselt die Stellung, Hechten zum richtigen Zeitpunkt
       const j = joyVec(k.team), w = toWorld(j.x, 0, k.team);
-      // zu früh gehechtet: nach 0,7 s steht der Torwart wieder auf und kann sich wieder bewegen
-      if (k.dive && !shot){ k.dive = Math.min(1, k.dive + dt*4); k.dvT = (k.dvT || 0) + dt; if (k.dvT > .7){ k.dive = 0; k.dvT = 0; k.x = cl(k.x, -1.3, 1.3); } }
+      // zu früh gehechtet: nach 0,35 s steht der Torwart wieder auf und kann sich wieder bewegen
+      if (k.dive && !shot){ k.dive = Math.min(1, k.dive + dt*4); k.dvT = (k.dvT || 0) + dt; if (k.dvT > .35){ k.dive = 0; k.dvT = 0; k.x = cl(k.x, -1.3, 1.3); } }
       else k.dvT = 0;
-      const tz = oz + d*KPOS[sv.hkp || 0], dz = tz - k.z;
-      if (!k.dive) movePlayer(k, dt, w.x*j.m, Math.abs(dz) > .08 ? Math.sign(dz)*Math.min(1, Math.abs(dz)) : 0, Math.abs(dz) > .08 ? 3.4 : 4.2);
+      if (sv.kf){ sv.kf.t += dt; if (sv.kf.t > .55) sv.kf = null; }
+      const fo = sv.kf ? Math.sin(Math.min(1, sv.kf.t/.55)*Math.PI)*1.3 : 0;   // angetäuschtes Herauskommen
+      const tz = oz + d*(KPOS[sv.hkp || 0] + fo), dz = tz - k.z;
+      if (!k.dive) movePlayer(k, dt, w.x*j.m, Math.abs(dz) > .08 ? Math.sign(dz)*Math.min(1, Math.abs(dz)) : 0, sv.kf ? 7 : Math.abs(dz) > .08 ? 3.4 : 4.2);
       k.yaw = Math.atan2(0, d);
       return;
     }
@@ -7364,9 +7490,12 @@ const H3 = { on:false };
       if (sv.bit > 0){ k.yaw = Math.atan2(0, d); return; }   // nach der Täuschung kurz aus dem Gleichgewicht
       sv.moveT -= dt;
       if (sv.moveT <= 0 && !HUM(1 - sv.t)){ sv.moveT = 9; if (Math.random() < .3) sv.kp = (sv.kp + (Math.random() < .5 ? 1 : 2)) % 3; }
-      const tz = oz + d*KPOS[sv.kp || 0], tx = sv.commit && sv.wait > .4 ? sv.commit*.35 : 0;
+      if (!sv.kf && !sv.kfDone && (sv.kp || 0) === 0 && sv.wait > .8 && HUM(sv.t) && Math.random() < dt*.6){ sv.kf = { t:0 }; sv.kfDone = true; }
+      if (sv.kf){ sv.kf.t += dt; if (sv.kf.t > .55) sv.kf = null; }
+      const fo = sv.kf ? Math.sin(Math.min(1, sv.kf.t/.55)*Math.PI)*1.3 : 0;
+      const tz = oz + d*(KPOS[sv.kp || 0] + fo), tx = sv.commit && sv.wait > .4 ? sv.commit*.35 : 0;
       const dx = tx - k.x, dz = tz - k.z, dd = Math.hypot(dx, dz);
-      movePlayer(k, dt, dd > .05 ? dx/dd : 0, dd > .05 ? dz/dd : 0, Math.min(2.6, dd*5));
+      movePlayer(k, dt, dd > .05 ? dx/dd : 0, dd > .05 ? dz/dd : 0, sv.kf ? 7 : Math.min(2.6, dd*5));
       k.yaw = Math.atan2(0, d);
     } else keeperAI(k, dt);
   }
@@ -7377,8 +7506,8 @@ const H3 = { on:false };
     pass:   { tip:'Spiel 3 Pässe zu deinen Mitspielern. Joystick zeigt die Richtung, dann „Pass“.', need:3 },
     drib:   { tip:'Lauf los: Nach 3 Schritten prellst du automatisch. Bleib stehen (fangen) und spiel dann einen Pass.' },
     schlag: { tip:'Schlagwurf: „Wurf“ drücken, mit dem Joystick in eine Ecke zielen.' },
-    sprung: { tip:'Zwei Abwehrspieler blocken. „Sprungwurf“: Du springst ab und wirfst über den Block.' },
-    aussen: { tip:'Du bist Linksaußen: Lauf zwei Schritte Richtung 7-m-Strich und nimm den „Sprungwurf“. Du springst nach innen, der Winkel wird größer.' },
+    sprung: { tip:'Zwei Abwehrspieler blocken. Sprungwurf: Auf der Wurf-Taste nach oben wischen, du springst ab und wirfst über den Block.' },
+    aussen: { tip:'Du bist Linksaußen: Lauf zwei Schritte Richtung 7-m-Strich und wisch auf der Wurf-Taste nach oben (Sprungwurf). Du springst nach innen, der Winkel wird größer.' },
     vert:   { tip:'Stell dich vor den Angreifer (zwischen ihn und das Tor) und tippe „Verteidigen“. Nicht von der Seite!' },
     block:  { tip:'Der Rückraumspieler wirft gleich. Bleib vor ihm und tippe „Block“, wenn er hochgeht.' },
     wechsel:{ tip:'Der Ball wandert. Tippe „Wechsel“, um den Abwehrspieler am Ballführer zu steuern. Zweimal genügt.', need:2 },
@@ -7528,13 +7657,15 @@ const H3 = { on:false };
     { x:-8.7, dep:1.6, r:'aussen' }, { x:-5.2, dep:10.2, r:'rueckraum' }, { x:0, dep:11, r:'rueckraum' },
     { x:5.2, dep:10.2, r:'rueckraum' }, { x:8.7, dep:1.6, r:'aussen' }, { x:0, dep:6.4, r:'kreis' }
   ];
+  const rightSign = t => dirOf(t) < 0 ? 1 : -1;   // Welt-x-Richtung, die aus Sicht des Angreifers „rechts“ ist
+  const slotOf = p => SLOTS[rightSign(p.team) > 0 ? p.i : [4, 3, 2, 1, 0, 5][p.i]] || SLOTS[0];
   function freeRun(att, c){
     const gz = atkZ(att), d = dirOf(att), dfs = field(1 - att).slice().sort((a, b) => a.x - b.x);
     const zOf = dep => gz - d*dep;
     const taken = [];
     for (const p of field(att)){
       if (p === c || p.recv) continue;
-      const s = SLOTS[p.i];
+      const s = slotOf(p);
       let best = null, bs = -1e9;
       const xr = s.r === 'kreis' ? 3.2 : s.r === 'aussen' ? 0.8 : 1.6;
       const dr = s.r === 'kreis' ? [5.2, 7] : s.r === 'aussen' ? [.6, 4.6] : [9.2, 12.4];
@@ -7573,7 +7704,7 @@ const H3 = { on:false };
     const bAdv = Math.abs(gz - (c ? c.z : ball.z));
     for (const p of offs) if (p.otx != null){
       p.tx = p.otx; p.tz = p.otz;
-      if (bAdv > 22 && SLOTS[p.i].r !== 'aussen'){ p.tz = gz - d*Math.max(SLOTS[p.i].dep, bAdv - 8); }
+      if (bAdv > 22 && slotOf(p).r !== 'aussen'){ p.tz = gz - d*Math.max(slotOf(p).dep, bAdv - 8); }
     }
     // Anbieten: hat der Ballführer schon Schritte verbraucht, kommt der freieste Mitspieler mit freiem Passweg entgegen
     if (c && !c.gk && !c.drib && (c.stepDist || 0) > STEP*1.2){
@@ -7616,7 +7747,7 @@ const H3 = { on:false };
     // der Ballführer geht auf dieser Seite vorbei, der gesperrte Abwehrspieler kommt kaum hinterher
     st.screen = null;
     const piv = field(att).find(p => p.i === 5 && p !== c && !p.recv && p !== st.ctrls[p.team]);
-    if (piv && c && !c.gk && SLOTS[c.i] && SLOTS[c.i].r === 'rueckraum' && aDist(c.x, c.z, gz) < 12.5){
+    if (piv && c && !c.gk && slotOf(c).r === 'rueckraum' && aDist(c.x, c.z, gz) < 12.5){
       const D = nearestTo(field(def), c);
       if (D && aDist(D.x, D.z, gz) < 9.5 && h2(D, c) < 5){
         if (!st.scrSide || st.scrCar !== c){ st.scrCar = c; st.scrSide = Math.abs(c.x) > 1.5 ? -Math.sign(c.x) : (Math.random() < .5 ? -1 : 1); }
@@ -7639,6 +7770,7 @@ const H3 = { on:false };
       if (tr.id === 'block'){ c.tx = c.x; c.tz = c.z; if (tr.T > tr.shootAt){ tr.noShoot = false; tr.shot = true; return throwAt(c, ra(-.9, .9), ra(.6, 1.6), { jump:true }); } return; }
       if (tr.id === 'wechsel'){ c.tx = c.x; c.tz = c.z; if (st.think <= 0){ st.think = ra(1.3, 1.9); const m = field(c.team).filter(q => q !== c); if (m.length) pass(c, m[Math.floor(Math.random()*m.length)]); } c.hold = 0; c.stepDist = 0; return; }
     }
+    if (c.pturn > 0) return;
     if (st.mid && c === gkOf(st.mid.t)) return;   // Torwart wartet, bis der Mittelspieler an der Mitte ist
     if (c.midThrow){
       if (c.hold < .25) return;
@@ -7648,18 +7780,23 @@ const H3 = { on:false };
     if (c.gk){
       if (st.think > 0) return;
       const mates = field(c.team).sort((a, b) => (openness(b) + Math.abs(b.z - c.z)*.08) - (openness(a) + Math.abs(a.z - c.z)*.08));
+      // Tempogegenstoß: Ist ein Mitspieler weit vorne frei, kommt der lange Ball
+      const run = field(c.team).filter(q => (q.z - c.z)*d > 9 && openness(q) > 2.4 && laneOpen(c, q, c.team, .6)).sort((a, b) => (b.z - a.z)*d - (a.z - b.z)*d*0)[0];
+      if (run && Math.random() < .75){ pass(c, run, { long:true }); return; }
       const m = mates.find(q => laneOpen(c, q, c.team, 1.1)) || mates[0];
       if (m) pass(c, m);
       return;
     }
     const dist = Math.hypot(c.x, gz - c.z), ad = aDist(c.x, c.z, gz);
+    // Gegenstoß aus der eigenen Hälfte: freien Läufer weit vorne mit langem Ball suchen
+    if (ad > 16 && c.hold > .15){ const run = field(c.team).filter(q => q !== c && (q.z - c.z)*d > 7 && openness(q) > 2.4).sort((a, b) => (b.z - a.z)*d)[0]; if (run && Math.random() < dt*4) return pass(c, run, { long:true }); }
     if (st.pas && st.pas.warn && st.pas.team === c.team && st.pas.passes >= PASSIVE_N - 1 && dist < 13 && c.hold > .4){ const a = autoAim(c); return throwAt(c, a.x, a.y, { jump:dist > 8 }); }
     // Körpertäuschung des Computers: steht ein Abwehrspieler direkt vor ihm, täuscht er manchmal an
     { const nd0 = nearestTo(field(1 - c.team), c);
       if (nd0 && h2(nd0, c) < 1.6 && !c.fkCd && Math.random() < st.D.brk*dt*1.2) bodyFeint(c, Math.random() < .5 ? -1 : 1); }
     const dfs = field(1 - c.team);
     const nd = nearestTo(dfs, c), ndd = nd ? h2(nd, c) : 9;
-    const role = SLOTS[c.i].r, wing = Math.abs(c.x) > 6.5, pivot = ad < 7.6;
+    const role = slotOf(c).r, wing = Math.abs(c.x) > 6.5, pivot = ad < 7.6;
     // Laufrichtung: Durchbruch in eine Lücke, sonst Richtung Tor am herausgetretenen Abwehrspieler vorbei
     let fx = cl(c.x*.85, -7, 7);
     if (nd && ndd < 2.4) fx = cl(c.x + Math.sign(c.x - nd.x || (c.x > 0 ? -1 : 1))*1.8, -8.5, 8.5);
@@ -7681,7 +7818,7 @@ const H3 = { on:false };
     // Außen mit Ball: Richtung 7-m-Strich anlaufen und nach innen abspringen
     if (wing && !c.brk && ad < 10){
       const q = arcPt(gz, AR + .45, Math.sign(c.x)*5.2); c.tx = q.x; c.tz = q.z;
-      if ((steps > 1.2 || Math.abs(c.x) < 6.4) && laneOpen(c, gp, c.team, .5)) return throwAt(c, aim.x, aim.y, { jump:true });
+      if ((steps > 1.2 || Math.abs(c.x) < 6.4) && laneOpen(c, gp, c.team, .5)) return throwAt(c, aim.x, aim.y, { jump:true, dreher:Math.random() < .3 });
     }
     // Sperre des Kreisläufers steht: am gesperrten Abwehrspieler vorbei durchbrechen
     const scr = st.screen;
@@ -7706,13 +7843,13 @@ const H3 = { on:false };
       if (gx != null && (st.passN || 0) >= 2 && Math.random() < D.brk*(gw > 3.4 ? 1.4 : 1)){ c.brk = { x:gx, t:0 }; return; }
     }
     // Rückraumwurf: Sprungwurf über den Block
-    if (role === 'rueckraum' && dist < 11.6 && ndd > 1.0 && urg >= 2 && Math.random() < D.jump*(urg >= 4 ? 1 : .45)) return throwAt(c, aim.x, aim.y, { jump: ndd < 2.6 || Math.random() < .6 });
+    if (role === 'rueckraum' && dist < 11.6 && ndd > 1.0 && urg >= 2 && Math.random() < D.jump*(urg >= 4 ? 1 : .45)) { const jp = ndd < 2.6 || Math.random() < .6; return throwAt(c, aim.x, aim.y, { jump:jp, knick:!jp && Math.random() < .45 }); }
     // Pass: bewertet nach Freiheit, Gefahr (Kreis, Außen) und freiem Passweg
     const late = c.hold > 1.9 || steps > 2.3;
     let best = null, bs = -1e9;
     for (const q of field(c.team)){
       if (q === c || !laneOpen(c, q, c.team, late ? .6 : .85)) continue;
-      const o = openness(q), qa = aDist(q.x, q.z, gz), r = SLOTS[q.i].r;
+      const o = openness(q), qa = aDist(q.x, q.z, gz), r = slotOf(q).r;
       let v = Math.min(o, 3.5)*.8 - Math.max(0, h2(c, q) - 9)*.12;
       if (qa < 7.6) v += o > 1.0 ? 1.8 : -1.5;                 // Kreisanspiel
       else if (r === 'aussen') v += o > 1.8 ? 1.0 : -.4;       // Außen frei
@@ -7720,7 +7857,12 @@ const H3 = { on:false };
       v += ra(-.5, .5);
       if (v > bs){ bs = v; best = q; }
     }
-    if (best && (bs > Math.min(openness(c), 3.5)*.8 + .3 || late)) return pass(c, best, { bounce: aDist(best.x, best.z, gz) < 7.6 && Math.random() < .5 });
+    if (best && (bs > Math.min(openness(c), 3.5)*.8 + .3 || late)){
+      const r = pass(c, best, { bounce: aDist(best.x, best.z, gz) < 7.6 && Math.random() < .5 });
+      // Spielzug Doppelpass: zwischen zwei Rückraumspielern, der erste läuft in die Lücke
+      if (ball.fl && ball.fl.kind === 'pass' && role === 'rueckraum' && slotOf(best).r === 'rueckraum' && ndd < 2.8 && Math.random() < .25){ ball.fl.ret = true; startGo(c); }
+      return r;
+    }
     if (c.hold > 2.5 || steps > 2.6){
       const any = field(c.team).filter(q => q !== c).find(q => laneOpen(c, q, c.team, .5));
       if (any && dist > 10) return pass(c, any);
@@ -7833,6 +7975,7 @@ const H3 = { on:false };
     if (c && !c.drib) c.hold += dt;
     if (!sv) aiTargets(dt);
     if (st.mid) midStep(dt);
+    if (st.retPass){ const r = st.retPass; r.t -= dt; if (ball.owner !== r.p){ st.retPass = null; } else if (r.t <= 0){ st.retPass = null; pass(r.p, r.q); } }
     const JW = [0, 1].map(t => { const j = joyVec(t); return { j, w:toWorld(j.x, j.y, t) }; });
     if (H3.auto) st.ctrls = [null, null];
     else if (!sv){
@@ -7867,8 +8010,14 @@ const H3 = { on:false };
         animate(p, dt); continue;
       }
       if (sv && p === sv.k){ animate(p, dt); continue; }
+      if (p.pturn > 0){
+        p.pturn -= dt; const gz2 = atkZ(p.team); p.yaw = lerpAng(p.yaw, Math.atan2(0 - p.x, gz2 - p.z), Math.min(1, dt*12));
+        if (ball.owner === p){ movePlayer(p, dt, 0, 0, 0); p.stepDist = 0; animate(p, dt); continue; } else p.pturn = 0;
+      }
+      if (p.go){ p.go.t -= dt; if (p.go.t <= 0 || ball.owner === p) p.go = null; else { p.tx = p.go.x; p.tz = p.go.z; } }
       if (p.ftStand){ if (ball.owner !== p) p.ftStand = false; else { movePlayer(p, dt, 0, 0, 0); p.stepDist = 0; animate(p, dt); continue; } }
       p.areaFree = isMe && !p.gk && !st.train && st.phase === 'play';
+      if (isMe && c === p && !p.gk) aimPick(p);
       if (isMe && !p.gk && !(p.recv && ball.fl && ball.fl.to === p)){
         if (p.st === 'windup' && !p.air) movePlayer(p, dt, 0, 0, 0);
         else if (p.air) movePlayer(p, dt, 0, 0, 0);
@@ -7944,6 +8093,8 @@ const H3 = { on:false };
       return;
     }
     if (st.mid && c === me && me === gkOf(t)){ if (A.a || A.b || A.c) flashT(t, 'Dein Torwart passt gleich selbst zum Anwurf'); return; }
+    const fl = ball.fl;
+    if (!c && fl && fl.kind === 'pass' && fl.team === t && fl.from && !fl.from.gk && !fl.ret && A.b && fl.t < fl.T*.9){ fl.ret = true; startGo(fl.from); flashT(t, 'Doppelpass!'); return; }
     if (c === me){
       if (me.st === 'windup' || me.air) return;
       // gerade erst den Ball bekommen: Würfe kurz sperren (Pass geht sofort), damit ein Abwehr-Tipp kein Torwurf wird
@@ -7953,7 +8104,7 @@ const H3 = { on:false };
       if (A.d && !me.gk && !me.ftStand){ const j = joyVec(t), w = toWorld(j.x, 0, t); bodyFeint(me, Math.sign(w.x) || (Math.random() < .5 ? -1 : 1)); return; }
       if (A.a){ stopDrib(me); const a = humanAim(me); return throwAt(me, a.x, a.y, { jump:A.va === 'jump' && !me.gk, knick:A.va === 'knick' && !me.gk }); }
       if (A.c && !me.gk){ stopDrib(me); const a = humanAim(me); return throwAt(me, a.x, a.y, { jump:true }); }
-      if (A.b){ stopDrib(me); const t = pickMate(me); if (t) pass(me, t, { bounce:A.vb === 'boden' }); return; }
+      if (A.b){ stopDrib(me); const lg = A.vb === 'lang', t = (lg && pickLong(me)) || pickMate(me); if (t) pass(me, t, { bounce:A.vb === 'boden', long:lg }); return; }
     } else if ((c && c.team !== t) || (ball.fl && ball.fl.team !== t)){
       // Wechsel: der Abwehrspieler am nächsten zum Ballführer (oder zum Fänger), ist das schon deiner, der nächstbeste
       if (A.b){
@@ -7966,6 +8117,18 @@ const H3 = { on:false };
         if (A.c && !me.air){ const r = tackle(me, c); if (r === 'miss') flashT(t, 'Zu weit weg zum Verteidigen'); }
       }
     }
+  }
+  // Langer Pass: der Mitspieler, der am weitesten Richtung gegnerisches Tor vorne und frei ist (Joystick-Seite zählt mit)
+  function pickLong(p){
+    const d = dirOf(p.team), j = joyVec(p.team), w = toWorld(j.x, j.y, p.team);
+    let best = null, bs = -1e9;
+    for (const q of field(p.team)){
+      if (q === p) continue;
+      const fwd = (q.z - p.z)*d; if (fwd < 4) continue;
+      const s = fwd*.25 + Math.min(openness(q), 4)*.8 + (j.m > .3 ? ((q.x - p.x)*w.x + (q.z - p.z)*w.z)/(h2(q, p) || 1) : 0);
+      if (s > bs){ bs = s; best = q; }
+    }
+    return best;
   }
   function pickMate(p){
     const j = joyVec(p.team); let dir = toWorld(j.x, j.y, p.team);
@@ -8110,13 +8273,18 @@ const H3 = { on:false };
       // Pass: Abfangen durch Gegner, Fangen durch Mitspieler
       for (const p of team(1 - f.team)){
         let r = p.gk ? .65 : (p.st === 'block' ? .72 : .52), top = (p.gk ? 2.5 : (p.st === 'block' ? 2.6 : 2.15)) + p.y;
-        if (f.bounce && !p.gk){ r = .36; top = .8; }   // Bodenpass: unter den Armen durch, nur mit dem Fuß/tief zu erwischen
+        if (f.bounce && !p.gk){ r = .36; top = .8; }
+        if (f.long && !p.gk && ball.y > 2.3) continue;   // langer Ball im hohen Bogen: unterwegs nicht zu erreichen   // Bodenpass: unter den Armen durch, nur mit dem Fuß/tief zu erwischen
         if (f.t > .08 && h2(p, ball) < r && ball.y < top && ball.y > .15){ ball.fl = null; giveBall(p); banner(p.gk ? 'Gefangen!' : 'Abgefangen!', 'Ballverlust'); return; }
       }
       const to = f.to;
       if (to && active(to)){
         const hy = to.y + (f.bounce ? 1.0 : 1.35);
-        if (h2(to, ball) < .75 && Math.abs(ball.y - hy) < .8 && !(f.bounce && !f.bounced)){ ball.fl = null; giveBall(to); if (st.train) trainEvent('pass', { team:to.team, from:f.from }); return; }
+        if (h2(to, ball) < .75 && Math.abs(ball.y - hy) < .8 && !(f.bounce && !f.bounced)){ ball.fl = null; giveBall(to);
+          // Kreisläufer fängt mit dem Rücken zum Tor und dreht sich ein
+          if (!st.train && slotOf(to).r === 'kreis' && aDist(to.x, to.z, atkZ(to.team)) < 7.8){ to.pturn = .32; to.yaw = Math.atan2(f.from.x - to.x, f.from.z - to.z); }
+          // Doppelpass: der Ball geht sofort zurück, der erste Passgeber läuft schon Richtung Tor
+          if (f.ret && f.from && active(f.from) && !f.from.gk) st.retPass = { p:to, q:f.from, t:.12 }; if (st.train) trainEvent('pass', { team:to.team, from:f.from }); return; }
       }
       if (f.t > f.T + .5){ ball.fl = null; ball.loose = true; }
     }
@@ -8159,6 +8327,7 @@ const H3 = { on:false };
   function humanDive(AT){
     const sv = st.seven; if (!sv || !HUM(1 - sv.t) || H3.auto) return;
     const kt = 1 - sv.t, A = AT[kt] || {}, k = gkOf(kt);
+    if (A.b && !k.dive && !sv.kf && !sv.shot){ sv.kf = { t:0 }; sv.kfBy = 'human'; }
     if (A.a && !k.dive){ const j = joyVec(kt); const w = toWorld(j.x, 0, kt); k.dive = .01; k.diveDir = Math.sign(w.x || (ball.x - k.x) || 1); k.diveH = j.y < -.4 ? 1.8 : j.y > .4 ? .4 : 1.0; }
     if (k.dive) k.dive = Math.min(1, k.dive + st.rdt*4);
   }
@@ -8218,6 +8387,12 @@ const H3 = { on:false };
       }
     }
     if (p.st === 'save' && p.stT < .8){ aL = [-1.5, 0, -.2]; aR = [-1.5, 0, .2]; }
+    // Linkshänder: Bewegung gespiegelt (Wurf mit links, Sprungwurf-Absprung rechts, Stemmbein rechts)
+    if (p.lefty && !p.gk){
+      [aL, aR] = [[aR[0], -aR[1], -aR[2]], [aL[0], -aL[1], -aL[2]]]; [eL, eR] = [eR, eL]; [eLz, eRz] = [-eRz, -eLz];
+      [lL, lR] = [lR, lL]; [kL, kR] = [kR, kL]; [lLz, lRz] = [-lRz, -lLz];
+      torsoRot = [torsoRot[0], -torsoRot[1], -torsoRot[2]]; bodyRot = [bodyRot[0], -bodyRot[1], -bodyRot[2]];
+    }
     r.root.pos = [p.x + (p.dive ? p.diveDir*Math.min(1, p.dive)*shift : 0), y, p.z];
     r.root.rot = [0, p.yaw + (p.spin || 0), 0];
     const kk = 1 - Math.exp(-dt*(p.gk ? 22 : 15));
@@ -8260,6 +8435,14 @@ const H3 = { on:false };
   const $3 = id => document.getElementById(id);
   const fmtT = s => { s = Math.ceil(s); return Math.floor(s/60) + ':' + String(s % 60).padStart(2, '0'); };
   function hud(){
+    // Zielmarke im Tor, solange du den Ball hast
+    const am = $3('g3aim');
+    if (am){
+      const cc = ball.owner, mine = cc && cc === st.ctrls[MY()] && !cc.gk && !st.seven && !st.watch && (st.btnMode === 'att' || st.btnMode === 'drib');
+      const a = mine ? aimPick(cc, false) : null;
+      const q = a ? R3.project([a.x, a.y, atkZ(cc.team)], cvs.clientWidth, cvs.clientHeight) : null;
+      am.hidden = !q; if (q){ am.style.transform = 'translate(' + Math.round(q.x - 14) + 'px,' + Math.round(q.y - 14) + 'px)'; am.classList.toggle('auto', !!a.auto); }
+    }
     // Online: „DU“ über dem eigenen Spieler
     if (st.online && !st.youHint && !st.watch){ st.youHint = true; st.hint = 'Du spielst ' + (MY() === 0 ? 'Rot' : 'Türkis') + ' · dein Spieler hat „DU“ über dem Kopf'; st.hintT = 5; }
     const you = $3('g3you');
@@ -8282,6 +8465,7 @@ const H3 = { on:false };
     if (sv && !sv.shot){ mode = sv.t === MY() ? 'seven' : 'gk'; }
     else if (sv && sv.shot && sv.t !== MY()) mode = 'gk';
     else if (!c && !st.train && ball.fl && ball.fl.kind === 'shot' && ball.fl.team !== MY()) mode = 'gkshot';
+    else if (!c && ball.fl && ball.fl.kind === 'pass' && ball.fl.team === MY() && !st.seven) mode = 'flight';
     else if (c && (c === me || (c.team === MY() && !c.gk && HUM(MY())))) mode = c.air ? 'air' : c.gk ? 'gkball' : c.drib ? 'drib' : 'att';
     else if (c && c.team !== MY()) mode = 'def';
     else mode = 'wait';
@@ -8289,12 +8473,13 @@ const H3 = { on:false };
       st.btnMode = mode;
       const B = { a:$3('g3a'), b:$3('g3b'), c:$3('g3cc'), d:$3('g3d') };
       const set = (el, txt) => { el.hidden = !txt; if (txt) el.querySelector('b').textContent = txt; };
-      const cfg = { att:['Wurf ↑','Pass ↓','Sprungwurf','Täuschen'], drib:['Wurf ↑','Pass ↓','Sprungwurf','Täuschen'], air:['','','',''], gkball:['Wurf','Pass','',''],
-                    def:['Block','Wechsel','Verteidigen',''], gkshot:['Hechten','','',''], wait:['','','',''], seven:['Wurf','Täuschen','Heber','Aufsetzer'], gk:['Hechten','','Position',''], none:['','','',''] }[mode];
+      const jb = CTL().jbtn ? 'Sprungwurf' : '';
+      const cfg = { att:['Wurf ↑','Pass ↕',jb,'Täuschen'], drib:['Wurf ↑','Pass ↕',jb,'Täuschen'], air:['','','',''], gkball:['Wurf','Pass ↑','',''],
+                    def:['Block','Wechsel','Verteidigen',''], gkshot:['Hechten','','',''], flight:['','Doppelpass','',''], wait:['','','',''], seven:['Wurf','Täuschen','Heber','Aufsetzer'], gk:['Hechten','Täuschen','Position',''], none:['','','',''] }[mode];
       set(B.a, cfg[0]); set(B.b, cfg[1]); set(B.c, cfg[2]); set(B.d, cfg[3]);
-      const hints = { att:'Wurf: tippen = Schlagwurf, hoch wischen = Sprungwurf, zur Seite = Knickwurf · Pass: tippen = gerade, runter wischen = Bodenpass', drib:'Du prellst · stehen bleiben = fangen, dann noch 3 Schritte', air:'Sprungwurf …', gkball:'Dein Torwart hat den Ball: Pass nach vorne (Gegenstoß)',
+      const hints = { att:(CTL().tap === 'sprung' ? 'Wurf: tippen = Sprungwurf, hoch wischen = Schlagwurf' : 'Wurf: tippen = Schlagwurf, hoch wischen = Sprungwurf') + ', zur Seite = Knickwurf · Pass: tippen = gerade, runter = Bodenpass, hoch = langer Pass in die Tiefe', drib:'Du prellst · stehen bleiben = fangen, dann noch 3 Schritte', air:'Sprungwurf …', gkball:'Dein Torwart hat den Ball: Pass, oder auf „Pass“ hoch wischen = langer Ball zum Gegenstoß',
         def: st.diff === 'leicht' ? 'Abwehr: Du steuerst automatisch den Spieler am Ballführer · von vorne verteidigen, nie von hinten' : 'Abwehr: Joystick loslassen = Position halten · Wechsel = Spieler am Ball · von vorne verteidigen, nie von hinten (2 Min.)', wait:'', seven:'7-Meter: Joystick zielt · Täuschen lockt den Torwart · Heber, wenn er weit vorne steht (3 Sekunden)',
-        gk:'Dein Torwart: Joystick links/rechts · „Position“: Linie, davor, 4 m · Hechten im richtigen Moment (Joystick hoch/runter = Höhe)', gkshot:'Wurf aufs Tor! Jetzt steuerst du deinen Torwart: Hechten, Joystick = Seite und Höhe', none:'' };
+        gk:'Dein Torwart: Joystick links/rechts · „Position“: Linie, davor, 4 m · Hechten im richtigen Moment (Joystick hoch/runter = Höhe)', gkshot:'Wurf aufs Tor! Jetzt steuerst du deinen Torwart: Hechten, Joystick = Seite und Höhe', flight:'Pass unterwegs · „Doppelpass“: Der Ball kommt sofort zu dir zurück', none:'' };
       st.hintBase = hints[mode];
     }
     if (st.train){ $3('g3ph').textContent = 'Training'; $3('g3sets').textContent = 'Versuch ' + (st.train.tries + 1); if (!sv) $3('g3clk').textContent = '–'; }
@@ -8363,7 +8548,7 @@ const H3 = { on:false };
     if (st.watch){ if (typeof tourStopWatch === 'function'){ tourStopWatch(); toMenu(); openTour(); } return; }
     if (st.online){ const by = typeof myName === 'function' ? myName() : ''; netSend('pz3', { on:1, by }); return remotePause({ on:1, by }); }
     st.paused = true;
-    msg('Pause', 'Halle 3D', 'Joystick links: laufen. Rechts: Aktionen. Am Computer: Pfeiltasten/WASD, K = Wurf/Block, J = Pass/Wechsel, L = Sprungwurf/Verteidigen (7 m: Heber/Torwart-Position), I = Aufsetzer (7 m), J beim 7-Meter = Täuschen. Prellen geht automatisch.',
+    msg('Pause', 'Halle 3D', 'Joystick links: laufen. Rechts: Aktionen. Am Computer: Pfeiltasten/WASD, K = Wurf/Block, J = Pass/Wechsel, L = Sprungwurf (im Angriff)/Verteidigen (7 m: Heber/Torwart-Position), I = Aufsetzer (7 m), J beim 7-Meter = Täuschen. Prellen geht automatisch.',
       [{ label:'Weiter', primary:true, fn:() => { hideMsg(); st.paused = false; lastT = performance.now(); } }, { label:'Neu starten', fn:() => { hideMsg(); start(st.kind); } }, { label:'Zum Menü', fn:exitH }]);
   }
   function exitH(){ hideMsg(); stop(); if (typeof toMenu === 'function') toMenu(); }
@@ -8405,7 +8590,7 @@ const H3 = { on:false };
     if (!ensure()) return false;
     if (typeof G3 !== 'undefined' && G3.on) G3.stop();
     Object.assign(R3.env, ENV);
-    H3.on = true; ui.hidden = false; ui.classList.add('hall');
+    H3.on = true; ui.hidden = false; ui.classList.add('hall'); ui.classList.toggle('mirror', CTL().side === 'l');
     resize();
     st = { kind, D:DIFF.mittel, diff:S.cdiff, half:0, len:300, clock:0, score:[0, 0], hs:[[0, 0], [0, 0]], timeUp:false, phase:'play', poss:0, ctrls:[null, null],
            online:true, me:1, remote:true, pen:null, seven:null, hist:[], banT:0, hint:'', ts:1, think:1 };
@@ -8448,6 +8633,7 @@ const H3 = { on:false };
       ball.owner = b[6] >= 0 ? PL[b[6]] : null; ball.fl = b[7] >= 0 ? { team:b[7], kind:b[8] ? 'shot' : 'pass', t:0, T:1 } : null;
     }
     for (const p of PL){ if (!p.out) animate(p, dt); }
+    if (ball.owner && ball.owner === st.ctrls[1] && !ball.owner.gk) aimPick(ball.owner);
     // eigene Eingaben zum Host: Joystick als Zustand, Tipps als einzelne Nachrichten (mit der Rolle beim Tippen)
     if (st.watch){ for (const k in inp.act) inp.act[k] = false; return; }   // Zuschauer senden nichts
     for (const a of ['a', 'b', 'c', 'd']) if (inp.act[a]){ netSend('a3', { a, m:inp.act[a], v:(inp.vr || {})[a] || '' }); inp.act[a] = false; if (inp.vr) inp.vr[a] = ''; }
