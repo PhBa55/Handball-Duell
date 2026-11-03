@@ -640,7 +640,7 @@ input.txt{user-select:text;-webkit-user-select:text}
         <div class="seg pseg" data-pkey="lefty"><button data-v="false">Rechts</button><button data-v="true">Links</button></div></div>
       <div class="field"><span class="flabel">Steuerung 3D: Wurf-Taste antippen</span>
         <div class="seg pseg" data-pkey="ctlTap"><button data-v="schlag">Schlagwurf</button><button data-v="sprung">Sprungwurf</button></div>
-        <span class="fnote">Nach oben wischen gibt den anderen Wurf, zur Seite den Knickwurf (Halle).</span></div>
+        <span class="fnote">Nach oben wischen gibt den anderen Wurf, zur Seite den Knickwurf, nach unten den Dreher (Halle).</span></div>
       <div class="field"><span class="flabel">Eigene Sprungwurf-Taste (Halle)</span>
         <div class="seg pseg" data-pkey="ctlJbtn"><button data-v="nein">Nein</button><button data-v="ja">Ja</button></div></div>
       <div class="field"><span class="flabel">Tasten auf welcher Seite?</span>
@@ -716,7 +716,7 @@ const cvs = $('#cv'), ctx = cvs.getContext('2d'), stage = $('#stage');
 
 /* ---------- Einstellungen ---------- */
 const GAME = 'beach';   // @@GAME@@
-const BUILD = '02.11.2026 22:57';   // @@BUILD@@ beach = Beach-Duell, hall = Hallen-Duell (beide Spiele aus derselben Quelle gebaut)
+const BUILD = '03.11.2026 22:22';   // @@BUILD@@ beach = Beach-Duell, hall = Hallen-Duell (beide Spiele aus derselben Quelle gebaut)
 const HALL_MODES = ['h3d','h7m','hfull','hlevels'];
 const S = { mode:'1p', half:45, diff:'mittel', game:'duell', zp:'1', fhalf:'180', fdiff:'leicht', opp:'cpu', cdiff:'mittel' };
 try { Object.assign(S, JSON.parse(localStorage.getItem('beachduell') || '{}')); } catch (e) {}
@@ -2061,7 +2061,8 @@ const RULES = {
     '<b>Linkshänder:</b> Rechtsaußen (und beim Gegner auch Rückraum rechts) werfen mit links. Wer den Wurfarm innen hat, wirft auf seiner Seite genauer und aus spitzerem Winkel. Deine Wurfhand stellst du im Profil ein.',
     '<b>Doppelpass:</b> Während dein Pass unterwegs ist, nochmal „Doppelpass“ tippen: Der Mitspieler spielt sofort zurück, du bist schon Richtung Tor gelaufen. Der Kreisläufer dreht sich nach der Ballannahme erst zum Tor.',
     '<b>7-Meter als Torwart:</b> „Täuschen“ = du deutest das Herauskommen an und springst zurück. Wirft der Werfer dann einen Heber, stehst du wieder auf der Linie.',
-    '<b>Wurf- und Passarten:</b> Wurf antippen = Schlagwurf, auf der Taste nach oben wischen = Sprungwurf (im Profil umstellbar, dort auch eine eigene Sprungwurf-Taste und Tasten links), zur Seite wischen = Knickwurf (geht am Block vorbei, flacher). Pass antippen = gerader Pass, nach unten wischen = Bodenpass (unter den Armen der Abwehr durch, gut zum Kreis), nach oben wischen = langer Pass in die Tiefe für den Tempogegenstoß (hoher Bogen, in den Lauf des vordersten freien Mitspielers; geht auch beim Torwart).',
+    '<b>Wurf- und Passarten:</b> Wurf antippen = Schlagwurf, auf der Taste nach oben wischen = Sprungwurf (im Profil umstellbar, dort auch eine eigene Sprungwurf-Taste und Tasten links), zur Seite wischen = Knickwurf (geht am Block vorbei, flacher), nach unten wischen = Dreher. Pass antippen = gerader Pass, nach unten wischen = Bodenpass (unter den Armen der Abwehr durch, gut zum Kreis), nach oben wischen = langer Pass in die Tiefe für den Tempogegenstoß (hoher Bogen, in den Lauf des vordersten freien Mitspielers; geht auch beim Torwart).',
+    '<b>Dreher:</b> Ein flacher Aufsetzer mit Drall. Rechtshänder werfen eine Linkskurve, Linkshänder eine Rechtskurve. Der Ball setzt gut einen Meter vor dem Torwart auf, dreht dann ab und läuft unter Kniehöhe um den Torwart herum ins Tor. Ohne Drall wäre er am Torwart oder am Tor vorbeigegangen. Erlaubt nur von Außen, vom Kreis und beim 7-Meter (dort auf „Wurf“ nach unten wischen). Er zählt wie jedes Tor. Wer als Torwart stehen bleibt, statt früh zu springen, kommt oft noch an den Ball.',
     '<b>Schlagwurf:</b> Wurf aus dem Stand oder Lauf, schnell und flach. <b>Sprungwurf:</b> Absprung vor der 6-m-Linie, Wurf am höchsten Punkt über den Block. Zielen mit dem Joystick: links/rechts, hoch nach oben, flach nach unten. Jedes Tor zählt 1.',
     '<b>Prellen (automatisch):</b> Läufst du nach 3 Schritten weiter, prellt dein Spieler von selbst. Bleibst du stehen, fängt er den Ball und hat noch einmal 3 Schritte. Ein zweites Prellen gibt es nicht (Doppeldribbling), dann musst du passen oder werfen.',
     '<b>Torraum:</b> Der Halbkreis (6 m) gehört dem Torwart. Hineinspringen beim Sprungwurf ist erlaubt. Läufst du mit dem Ball hinein, gibt es Abwurf für den Gegner. Verteidigst du im eigenen Torraum, gibt es 7-Meter (Ballführer innerhalb von 9 m) oder Freiwurf.',
@@ -7053,17 +7054,17 @@ const H3 = { on:false };
         if (!H3.on) return; e.preventDefault();
         const a = b.dataset.a, mode = (st && st.btnMode) || '?';
         inp.hold[a] = true;
-        if ((a === 'a' || a === 'b') && (mode === 'att' || mode === 'drib' || (a === 'b' && mode === 'gkball'))){ g = { x:e.clientX, y:e.clientY, mode, id:e.pointerId }; b.classList.add('down'); try { b.setPointerCapture(e.pointerId); } catch (_) {} return; }
+        if ((a === 'a' || a === 'b') && (mode === 'att' || mode === 'drib' || (a === 'b' && mode === 'gkball') || (a === 'a' && mode === 'seven'))){ g = { x:e.clientX, y:e.clientY, mode, id:e.pointerId }; b.classList.add('down'); try { b.setPointerCapture(e.pointerId); } catch (_) {} return; }
         inp.act[a] = mode;
       });
       b.addEventListener('pointermove', e => {
         if (!g || e.pointerId !== g.id) return;
         const dx = e.clientX - g.x, dy = e.clientY - g.y;
         if (Math.hypot(dx, dy) < 22) return;
-        if (b.dataset.a === 'a'){ const up = dy < -Math.abs(dx)*.8; fire(up ? (CTL().tap === 'sprung' ? 'schlag' : 'jump') : Math.abs(dx) > Math.abs(dy) ? 'knick' : (CTL().tap === 'sprung' ? 'jump' : '')); }
+        if (b.dataset.a === 'a'){ const up = dy < -Math.abs(dx)*.8, down = dy > Math.abs(dx)*.8; if (g.mode === 'seven'){ fire(down ? 'dreher' : ''); return; } if (down){ fire('dreher'); return; } fire(up ? (CTL().tap === 'sprung' ? 'schlag' : 'jump') : Math.abs(dx) > Math.abs(dy) ? 'knick' : (CTL().tap === 'sprung' ? 'jump' : '')); }
         else fire(dy > Math.abs(dx)*.8 ? 'boden' : dy < -Math.abs(dx)*.8 ? 'lang' : '');
       });
-      const up = () => { if (g) fire(b.dataset.a === 'a' && CTL().tap === 'sprung' ? 'jump' : ''); inp.hold[b.dataset.a] = false; };
+      const up = () => { if (g) fire(b.dataset.a === 'a' && g.mode !== 'seven' && CTL().tap === 'sprung' ? 'jump' : ''); inp.hold[b.dataset.a] = false; };
       b.addEventListener('pointerup', up); b.addEventListener('pointercancel', up); b.addEventListener('pointerleave', () => { if (!g) inp.hold[b.dataset.a] = false; });
     });
     const map = { j:'b', k:'a', l:'c', i:'d', ' ':'a' };
@@ -7142,6 +7143,29 @@ const H3 = { on:false };
     from.yaw = Math.atan2(tgt.x - from.x, tgt.z - from.z);
     if (HUM(from.team)) st.ctrls[from.team] = to;
   }
+  /* Dreher: Aufsetzer mit Drall, der Ball springt nach dem Aufkommen seitlich weg.
+     Rechtshänder werfen eine Linkskurve, Linkshänder eine Rechtskurve (aus Sicht des Balls). Ohne Drall ginge der Ball
+     am Tor oder am Torwart vorbei, mit Drall dreht er beim Aufsetzen um gut 20° ab und flach ins Tor, um das Bein herum. */
+  function dreherOk(p){
+    const gz = atkZ(p.team), dz = Math.abs(gz - p.z), r = slotOf(p).r;
+    return (Math.abs(p.x) > 4.2 && dz < 9.5) || (r === 'aussen' && dz < 9) || (r === 'kreis' && dz < 8.5) || (dz < 8.3 && Math.abs(p.x) > 2.2) || dz < 7.6;
+  }
+  const dreherDir = p => p.lefty ? -1 : 1;   // +1 = Linkskurve
+  const DRE_TH = .38;
+  // um den Winkel a drehen; a > 0 = nach links aus Sicht der Flugrichtung
+  const rotL = (v, a) => { const c = Math.cos(a), n = Math.sin(a); return { x:v.x*c + v.z*n, z:v.z*c - v.x*n }; };
+  // Aufsetzpunkt B so, dass der Ball von s kommend nach der Drehung um th genau auf A zuläuft (|A - B| = r)
+  function dreherPoint(s, A, th, r){
+    const a0 = Math.atan2(A.x - s.x, A.z - s.z);
+    let best = null, be = 1e9;
+    for (let i = -90; i <= 90; i++){
+      const ph = a0 + i*Math.PI/180, w = { x:Math.sin(ph), z:Math.cos(ph) }, B = { x:A.x - w.x*r, z:A.z - w.z*r };
+      const u = { x:B.x - s.x, z:B.z - s.z }, l = Math.hypot(u.x, u.z) || 1, u2 = rotL({ x:u.x/l, z:u.z/l }, th);
+      const e = 1 - (u2.x*w.x + u2.z*w.z);
+      if (e < be){ be = e; best = { B, u:{ x:u.x/l, z:u.z/l }, w }; }
+    }
+    return best;
+  }
   /* Schlagwurf: kurzes Ausholen aus dem Stand oder Lauf. Sprungwurf: Absprung, Wurf am höchsten Punkt (über den Block). */
   function throwAt(p, tx, ty, flags){
     flags = flags || {};
@@ -7181,18 +7205,29 @@ const H3 = { on:false };
     const dist = Math.hypot(s.x - cl(tx, -GW, GW), gz - s.z);
     const ang = Math.abs(s.x)/Math.max(1, Math.abs(gz - s.z) + 1);   // spitzer Winkel von außen
     const cpu = !HUM(p.team);
-    const type = flags.type || 'wurf';
+    const type = flags.dreher ? 'aufsetzer' : (flags.type || 'wurf');
     const far = Math.max(0, dist - 7.5);
     const pen7 = !!(flags.seven || st.pen);
     // Wurfarm innen (Linkshänder rechts, Rechtshänder links) = besserer Winkel; Wurfarm außen = mehr Verdrehen
     const sideX = p.x*rightSign(p.team), armIn = !p.gk && (p.lefty ? sideX > 1.5 : sideX < -1.5), armOut = !p.gk && (p.lefty ? sideX < -1.5 : sideX > 1.5);
-    const sd = (type === 'heber' ? .06 : .07) + (pen7 ? .03 : 0) + (flags.knick ? .02 : 0) + Math.max(0, dist - 7)*.035 + far*.015 + (flags.jump ? .03 : 0) + Math.max(0, ang - .8)*.12*(armIn ? .45 : armOut ? 1.35 : 1) - (armIn ? .015 : 0) + (p.gk ? .25 : 0) + (cpu ? st.D.aim*.5 : 0);
+    const sd = (type === 'heber' ? .06 : .07) + (pen7 ? .03 : 0) + (flags.knick ? .02 : 0) + (flags.dreher ? .05 + (armOut ? .05 : 0) : 0) + Math.max(0, dist - 7)*.035 + far*.015 + (flags.jump ? .03 : 0) + Math.max(0, ang - .8)*.12*(armIn ? .45 : armOut ? 1.35 : 1) - (armIn ? .015 : 0) + (p.gk ? .25 : 0) + (cpu ? st.D.aim*.5 : 0);
     const ax = cl(tx, -1.4, 1.4) + gs()*sd, ay = cl(ty + gs()*sd*.6, .15, 2.1);
     const K = HUM(1 - p.team) ? HUMAN_K : st.D;
     let tgt, T;
     if (type === 'heber'){
       tgt = { x:ax, y:cl(1.82 + gs()*.06, 1.6, 2.05), z:gz + d*.2 };
       T = Math.hypot(tgt.x - s.x, tgt.z - s.z)/8.8;
+    } else if (flags.dreher){
+      // Dreher: flach, setzt knapp vor dem Torwart auf, dann Kurve um ihn herum auf A
+      const th = dreherDir(p)*DRE_TH, kk = gkOf(1 - p.team), A = { x:cl(ax, -GW + .12, GW - .12), z:gz };
+      const kd = kk ? Math.hypot(kk.x - A.x, kk.z - A.z) : 1, Dl = Math.hypot(A.x - s.x, A.z - s.z);
+      const r = cl(kd + 1.3, 1.4, Math.min(3.8, Dl - 1.2)), q = dreherPoint(s, A, th, r);
+      tgt = { x:q.B.x, y:.12, z:q.B.z };
+      T = Math.hypot(tgt.x - s.x, tgt.z - s.z)/16;
+      // Wo der Ball ohne Drall auf Höhe des Torwarts wäre (darauf fällt der Torwart herein) und wo er wirklich ist
+      const kz = kk ? kk.z : gz - d*.6, at = (P, v) => Math.abs(v.z) > .05 ? P.x + v.x*(kz - P.z)/v.z : P.x;
+      const before = (kz - q.B.z)*d < 0;
+      flags.fake = before ? at(s, q.u) : at(q.B, q.u); flags.real = before ? flags.fake : at(q.B, q.w); flags.A = A;
     } else if (type === 'aufsetzer'){
       // Aufsetzpunkt knapp vor dem Tor, der Ball springt hoch ins Tor
       const Dl = Math.abs(gz - s.z) || 1; tgt = { x:s.x + (ax - s.x)*(Dl - 1.5)/Dl, y:.12, z:gz - d*1.5 };   // Aufsetzpunkt so, dass der Ball auf ax ins Tor springt
@@ -7205,7 +7240,13 @@ const H3 = { on:false };
     const k = gkOf(1 - p.team);
     ball.fl = { kind:'shot', from:p, team:p.team, t:0, T, tgt, sx:ball.x, sz:ball.z, type, jump:!!flags.jump, seven:!!flags.seven, knick:!!flags.knick, dreher:!!flags.dreher, k,
                 kr:K.kr + (type === 'aufsetzer' ? .06 : 0) + (flags.jump ? .02 : 0) + (flags.knick ? .05 : 0) - Math.min(.06, far*.02) - (pen7 ? .04 : 0), kChecked:false, seven7:pen7,
-                kg: tgt.x + gs()*(K.ge + (type === 'aufsetzer' ? .15 : 0) + (flags.dreher ? .2 : 0))*(pen7 ? .75 : 1)/(1 + far*.25), ky: type === 'aufsetzer' ? .35 : tgt.y, far };
+                kg: tgt.x + gs()*(K.ge + (type === 'aufsetzer' ? .15 : 0))*(pen7 ? .75 : 1)/(1 + far*.25), ky: type === 'aufsetzer' ? .35 : tgt.y, far, dA:flags.dreher ? flags.A : null };
+    // Dreher: Der Torwart liest den Ball auf der falschen Linie. Ein guter Torwart durchschaut ihn manchmal.
+    if (flags.dreher){
+      const readP = HUM(1 - p.team) ? 0 : ({ leicht:.25, mittel:.4, schwer:.55 }[st.diff] || .4);
+      const rd = Math.random() < readP; ball.fl.fooled = !rd; ball.fl.kg = (rd ? flags.real : flags.fake) + gs()*.15;
+      ball.fl.ky = .45;
+    }
     // Computer-Torwart hat sich beim 7-Meter früh für eine Ecke entschieden
     if (st.seven && st.seven.commit && p === st.seven.sh){ ball.fl.kg = st.seven.commit*1.05; ball.fl.kr -= .08; }
     if (st.seven && st.seven.bit > 0 && p === st.seven.sh){ ball.fl.kr += .2; ball.fl.kg = k ? k.x : 0; }
@@ -7309,7 +7350,7 @@ const H3 = { on:false };
   function goalScored(f){
     const t = f.team;
     if (st.train){ banner('Tor!', f.type === 'heber' ? 'Heber' : f.type === 'aufsetzer' ? 'Aufsetzer' : f.jump ? 'Sprungwurf' : 'Schlagwurf'); if (trainEvent('goal', f)) return; return dead(1.4, () => trainSetup()); }
-    if (st.pen){ st.pen.score[t]++; banner('Tor!', f.type === 'heber' ? 'Heber' : f.type === 'aufsetzer' ? 'Aufsetzer' : ''); return penResult(true); }
+    if (st.pen){ st.pen.score[t]++; banner('Tor!', f.dreher ? 'Dreher' : f.type === 'heber' ? 'Heber' : f.type === 'aufsetzer' ? 'Aufsetzer' : ''); return penResult(true); }
     st.score[t]++; st.hs[st.half][t]++;
     if (st.mx){ st.mx.g[t]++; if (f.jump) st.mx.jump[t]++; if (f.seven) st.mx.seven[t]++; }
     // Computer stellt seine Abwehr nach dem Spielstand um: vorne 6:0, knapp hinten 5:1, deutlich hinten 3:2:1
@@ -7318,7 +7359,7 @@ const H3 = { on:false };
       const nf = dc >= 1 ? '60' : dc <= -3 ? '321' : dc <= -1 ? '51' : old;
       if (nf !== old){ st.form[1] = nf; flash('Computer stellt die Abwehr um: ' + { '60':'6:0', '51':'5:1', '321':'3:2:1' }[nf]); }
     }
-    const lab = f.seven ? '7-Meter' : f.from && f.from.gk ? 'Torwart-Tor' : f.dreher ? 'Dreher' : f.knick ? (f.from && slotOf(f.from).r === 'rueckraum' ? 'Hüftwurf' : 'Knickwurf') : f.jump ? 'Sprungwurf' : '';
+    const lab = f.seven ? (f.dreher ? '7-Meter · Dreher' : '7-Meter') : f.from && f.from.gk ? 'Torwart-Tor' : f.dreher ? 'Dreher' : f.knick ? (f.from && slotOf(f.from).r === 'rueckraum' ? 'Hüftwurf' : 'Knickwurf') : f.jump ? 'Sprungwurf' : '';
     banner('Tor!', nm(t) + (lab ? ' · ' + lab : ''));
     for (const p of field(t)){ p.st = 'cheer'; p.stT = 0; }
     st.seven = null;
@@ -7435,12 +7476,12 @@ const H3 = { on:false };
     if (sv.wait > .6){ sv.T -= rdt; }
     if (sv.T <= 0){ sv.shot = true; banner('Zu spät', '3 Sekunden vorbei'); if (st.train){ trainEvent('fail'); return; } if (st.pen) return penResult(false); st.seven = null; return dead(1, () => abwurf(1 - sv.t)); }
     sh.vx = sh.vz = 0;
-    const fire = (type, a) => { sv.shot = true; sh.st = ''; throwAt(sh, a.x, a.y, { type, seven:!st.pen }); };
+    const fire = (type, a, dr) => { sv.shot = true; sh.st = ''; throwAt(sh, a.x, a.y, { type, seven:!st.pen, dreher:!!dr }); };
     const feinting = sh.st === 'feint' && sh.stT < .42;
     if (HUM(sv.t) && !H3.auto){
       if (sv.wait > .6 && !feinting){
         const a = penAim(sh);
-        if (A.a) fire('wurf', a); else if (A.c) fire('heber', a); else if (A.d) fire('aufsetzer', a);
+        if (A.a && A.va === 'dreher') fire('aufsetzer', a, true); else if (A.a) fire('wurf', a); else if (A.c) fire('heber', a); else if (A.d) fire('aufsetzer', a);
         else if (A.b){
           if (sv.feints >= 2) flash('Nur zwei Täuschungen');
           else {
@@ -7464,7 +7505,7 @@ const H3 = { on:false };
         const hk = gkOf(1 - sv.t), out = hk ? Math.abs(hk.z - gz) : 0;
         const r = Math.random(), type = out > 2.8 ? (r < .55 ? 'heber' : 'wurf') : r < .74 ? 'wurf' : r < .86 ? 'heber' : 'aufsetzer';
         const side = hk && Math.abs(hk.x) > .2 ? -Math.sign(hk.x) : (Math.random() < .5 ? -1 : 1);
-        fire(type, { x:side*ra(.75, 1.25), y: type === 'heber' ? 1.8 : Math.random() < .5 ? ra(.3, .6) : ra(1.25, 1.75) });
+        fire(type, { x:side*ra(.75, 1.25), y: type === 'heber' ? 1.8 : Math.random() < .5 ? ra(.3, .6) : ra(1.25, 1.75) }, type === 'aufsetzer' && Math.random() < .5);
       }
     }
     // dein Torwart: Stellung wechseln
@@ -8102,6 +8143,11 @@ const H3 = { on:false };
       if (me.midThrow && (A.a || A.c || A.d)){ A.a = A.c = A.d = false; flashT(t, 'Anwurf: zuerst zu einem Mitspieler passen'); }
       if (me.ftStand && A.c){ A.c = false; A.a = true; flashT(t, 'Freiwurf aus dem Stand: kein Sprungwurf'); }
       if (A.d && !me.gk && !me.ftStand){ const j = joyVec(t), w = toWorld(j.x, 0, t); bodyFeint(me, Math.sign(w.x) || (Math.random() < .5 ? -1 : 1)); return; }
+      if (A.a && A.va === 'dreher' && !me.gk){
+        stopDrib(me); const a = humanAim(me);
+        if (!dreherOk(me)){ flashT(t, 'Dreher nur von Außen oder vom Kreis'); return throwAt(me, a.x, a.y, { jump:!me.ftStand }); }
+        return throwAt(me, a.x, a.y, { jump:!me.ftStand, dreher:true });
+      }
       if (A.a){ stopDrib(me); const a = humanAim(me); return throwAt(me, a.x, a.y, { jump:A.va === 'jump' && !me.gk, knick:A.va === 'knick' && !me.gk }); }
       if (A.c && !me.gk){ stopDrib(me); const a = humanAim(me); return throwAt(me, a.x, a.y, { jump:true }); }
       if (A.b){ stopDrib(me); const lg = A.vb === 'lang', t = (lg && pickLong(me)) || pickMate(me); if (t) pass(me, t, { bounce:A.vb === 'boden', long:lg }); return; }
@@ -8206,7 +8252,7 @@ const H3 = { on:false };
     const f0 = ball.fl;
     if (ball.y < .12){
       ball.y = .12;
-      if (f0 && f0.kind === 'shot' && f0.type === 'aufsetzer' && !f0.bounced){ f0.bounced = true; ball.vy = Math.abs(ball.vy)*.62 + 1.5; ball.vx *= .92; ball.vz *= .92; }
+      if (f0 && f0.kind === 'shot' && f0.type === 'aufsetzer' && !f0.bounced){ f0.bounced = true; ball.vy = Math.abs(ball.vy)*.62 + 1.5; ball.vx *= .92; ball.vz *= .92; if (f0.dreher && f0.dA){ const A = f0.dA, dx = A.x - ball.x, dz = A.z - ball.z, l = Math.hypot(dx, dz) || 1, sp = Math.hypot(ball.vx, ball.vz)/.92*.88, t = l/sp; ball.vx = dx/l*sp; ball.vz = dz/l*sp; ball.vy = (.42 - .12 + GRAV*t*t/2)/t; } }
       else if (f0 && f0.bounce && !f0.bounced){ f0.bounced = true; ball.vy = Math.abs(ball.vy)*.62 + 1.6; ball.vx *= .9; ball.vz *= .9; }
       else { ball.vy = Math.abs(ball.vy)*.45; ball.vx *= .8; ball.vz *= .8; if (f0 && f0.kind !== 'shot'){ ball.fl = null; ball.loose = true; } }
     }
@@ -8245,7 +8291,9 @@ const H3 = { on:false };
             const cx = px + vx*u, cz = pz + vz*u, by = py + (ball.y - py)*u;
             const outD = Math.abs(kz - gz);
             const lobCatch = f.type === 'heber' && f.seven7 ? (outD < 1.1 ? .55 : outD < 2.5 ? .3 : 0) : 0;   // Heber gegen Torwart auf der Linie: er greift zu
-            const reach = .38 + lobCatch + (k.dive ? .1 : 0) + Math.min(.1, Math.max(0, outD - .6)*.08) + Math.min(.12, (f.far || 0)*.035);   // Fernwürfe sieht der Torwart früher
+            const dreRead = f.dreher && HUM(k.team) && !k.dive ? .22 : 0;   // Dreher: Wer als Torwart stehen bleibt, kommt eher an den flachen Ball
+            const dreFool = f.dreher && (HUM(k.team) ? !!k.dive : f.fooled) ? -.26 : 0;   // auf dem falschen Fuß: der abspringende Ball geht durch
+            const reach = .38 + lobCatch + dreRead + dreFool + (k.dive ? .1 : 0) + Math.min(.1, Math.max(0, outD - .6)*.08) + Math.min(.12, (f.far || 0)*.035);   // Fernwürfe sieht der Torwart früher
             const top = k.dive ? (k.diveH > 1.4 ? 2.35 : 1.5) : (f.type === 'heber' && outD < 1.1 && f.t > f.kr ? 2.5 : 2.15);
             if (Math.hypot(cx - kx, cz - kz) < reach && by < top + k.y && by > -.1){ ball.fl = null; ball.vx = ball.vz = 0; ball.vy = 0; save(k); return; }
           }
@@ -8474,11 +8522,11 @@ const H3 = { on:false };
       const B = { a:$3('g3a'), b:$3('g3b'), c:$3('g3cc'), d:$3('g3d') };
       const set = (el, txt) => { el.hidden = !txt; if (txt) el.querySelector('b').textContent = txt; };
       const jb = CTL().jbtn ? 'Sprungwurf' : '';
-      const cfg = { att:['Wurf ↑','Pass ↕',jb,'Täuschen'], drib:['Wurf ↑','Pass ↕',jb,'Täuschen'], air:['','','',''], gkball:['Wurf','Pass ↑','',''],
-                    def:['Block','Wechsel','Verteidigen',''], gkshot:['Hechten','','',''], flight:['','Doppelpass','',''], wait:['','','',''], seven:['Wurf','Täuschen','Heber','Aufsetzer'], gk:['Hechten','Täuschen','Position',''], none:['','','',''] }[mode];
+      const cfg = { att:['Wurf ↕','Pass ↕',jb,'Täuschen'], drib:['Wurf ↕','Pass ↕',jb,'Täuschen'], air:['','','',''], gkball:['Wurf','Pass ↑','',''],
+                    def:['Block','Wechsel','Verteidigen',''], gkshot:['Hechten','','',''], flight:['','Doppelpass','',''], wait:['','','',''], seven:['Wurf ↓','Täuschen','Heber','Aufsetzer'], gk:['Hechten','Täuschen','Position',''], none:['','','',''] }[mode];
       set(B.a, cfg[0]); set(B.b, cfg[1]); set(B.c, cfg[2]); set(B.d, cfg[3]);
-      const hints = { att:(CTL().tap === 'sprung' ? 'Wurf: tippen = Sprungwurf, hoch wischen = Schlagwurf' : 'Wurf: tippen = Schlagwurf, hoch wischen = Sprungwurf') + ', zur Seite = Knickwurf · Pass: tippen = gerade, runter = Bodenpass, hoch = langer Pass in die Tiefe', drib:'Du prellst · stehen bleiben = fangen, dann noch 3 Schritte', air:'Sprungwurf …', gkball:'Dein Torwart hat den Ball: Pass, oder auf „Pass“ hoch wischen = langer Ball zum Gegenstoß',
-        def: st.diff === 'leicht' ? 'Abwehr: Du steuerst automatisch den Spieler am Ballführer · von vorne verteidigen, nie von hinten' : 'Abwehr: Joystick loslassen = Position halten · Wechsel = Spieler am Ball · von vorne verteidigen, nie von hinten (2 Min.)', wait:'', seven:'7-Meter: Joystick zielt · Täuschen lockt den Torwart · Heber, wenn er weit vorne steht (3 Sekunden)',
+      const hints = { att:(CTL().tap === 'sprung' ? 'Wurf: tippen = Sprungwurf, hoch wischen = Schlagwurf' : 'Wurf: tippen = Schlagwurf, hoch wischen = Sprungwurf') + ', zur Seite = Knickwurf, runter = Dreher (Außen/Kreis) · Pass: tippen = gerade, runter = Bodenpass, hoch = langer Pass in die Tiefe', drib:'Du prellst · stehen bleiben = fangen, dann noch 3 Schritte', air:'Sprungwurf …', gkball:'Dein Torwart hat den Ball: Pass, oder auf „Pass“ hoch wischen = langer Ball zum Gegenstoß',
+        def: st.diff === 'leicht' ? 'Abwehr: Du steuerst automatisch den Spieler am Ballführer · von vorne verteidigen, nie von hinten' : 'Abwehr: Joystick loslassen = Position halten · Wechsel = Spieler am Ball · von vorne verteidigen, nie von hinten (2 Min.)', wait:'', seven:'7-Meter: Joystick zielt · Wurf runter wischen = Dreher · Täuschen lockt den Torwart · Heber, wenn er weit vorne steht (3 Sekunden)',
         gk:'Dein Torwart: Joystick links/rechts · „Position“: Linie, davor, 4 m · Hechten im richtigen Moment (Joystick hoch/runter = Höhe)', gkshot:'Wurf aufs Tor! Jetzt steuerst du deinen Torwart: Hechten, Joystick = Seite und Höhe', flight:'Pass unterwegs · „Doppelpass“: Der Ball kommt sofort zu dir zurück', none:'' };
       st.hintBase = hints[mode];
     }
