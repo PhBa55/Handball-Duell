@@ -716,7 +716,7 @@ const cvs = $('#cv'), ctx = cvs.getContext('2d'), stage = $('#stage');
 
 /* ---------- Einstellungen ---------- */
 const GAME = 'hall';   // @@GAME@@
-const BUILD = '03.11.2026 22:22';   // @@BUILD@@ beach = Beach-Duell, hall = Hallen-Duell (beide Spiele aus derselben Quelle gebaut)
+const BUILD = '04.11.2026 18:22';   // @@BUILD@@ beach = Beach-Duell, hall = Hallen-Duell (beide Spiele aus derselben Quelle gebaut)
 const HALL_MODES = ['h3d','h7m','hfull','hlevels'];
 const S = { mode:'1p', half:45, diff:'mittel', game:'duell', zp:'1', fhalf:'180', fdiff:'leicht', opp:'cpu', cdiff:'mittel' };
 try { Object.assign(S, JSON.parse(localStorage.getItem('beachduell') || '{}')); } catch (e) {}
@@ -2127,10 +2127,10 @@ function openMode(key){
   if (key === 'levels' || key === 'hlevels'){ S.lastMode = key; saveS(); zbar.hidden = false; openLevels(); return; }
   $('#setupTitle').textContent = m.title;
   setupFields();
-  $('#startBtn').textContent = m.start;
+  $('#startBtn').textContent = m.start; $('#startBtn').dataset.lbl = m.start;
   fillRules($('#setupRules'), RULES[key]);
   $('#setupRules').closest('details').open = false;
-  syncMenu(); showOverlay('setupOv');
+  syncMenu(); showOverlay('setupOv'); if (typeof netUi === 'function') netUi();
 }
 function setupFields(){
   const m = MODES[curMode]; if (!m || !m.fields) return;
@@ -2187,6 +2187,7 @@ function syncMenu(){
   if (typeof syncTourBtn === 'function') syncTourBtn();
   $('#menu .eyebrow').textContent = hall ? 'Hallenhandball' : 'Beachhandball';
   $('#trainBadge').textContent = td ? td + '/' + TRL().filter(L => L.kind !== 'info').length + ' ✓' : 'Hier starten';
+  if (typeof netUi === 'function' && NET.host && NET.peer && !$('#setupOv').hidden) netUi();
 }
 document.querySelectorAll('.mode').forEach(b => b.addEventListener('click', () => b.dataset.mode === 'train' ? openTraining() : b.dataset.mode === 'rec' ? openRecords() : b.dataset.mode === 'prof' ? openProfile() : b.dataset.mode === 'board' ? openBoard() : b.dataset.mode === 'cup' ? openCup() : b.dataset.mode === 'tour' ? openTour() : openMode(b.dataset.mode)));
 $('#bugBtn').addEventListener('click', () => openBug());
@@ -2216,6 +2217,8 @@ document.querySelectorAll('.seg[data-key]').forEach(seg => seg.addEventListener(
 function startCur(){
   const onl = S.opp === 'online' && MODES[curMode] && (MODES[curMode].fields || []).includes('oppField');
   if (onl && !(NET.host && NET.peer)){ netStatus(NET.guest ? 'Der Raum-Ersteller startet das Spiel.' : 'Erst einen Raum erstellen und warten, bis der Mitspieler da ist.'); return; }
+  if (onl && !NET.tour && !NET.gReady){ netStatus(NET.names[1] + ' muss erst „Bereit“ tippen.'); return; }
+  if (onl){ NET.gReady = false; NET.selKey = ''; }
   if (!onl && NET.on) netLeave(false);
   S.lastMode = curMode; saveS();
   if (onl && !['h3d','h7m','g3d'].includes(curMode)) netHostStarted();
@@ -7342,8 +7345,11 @@ const H3 = { on:false };
     dead(1.0, () => {
       const sx = Math.sign(x || 1)*(HW - .15), sz = cl(z, -L + .5, L - .5);
       const p = nearestTo(field(t), { x:sx, z:sz });
-      p.x = sx; p.z = sz; p.vx = p.vz = 0; p.air = false; p.y = 0;
-      giveBall(p); p.yaw = Math.atan2(-Math.sign(sx), 0);
+      p.x = sx; p.z = sz; p.vx = p.vz = 0; p.air = false; p.y = 0; p.st = ''; p.drib = false; p.hold = 0; p.stepDist = 0;
+      // Abwehr 3 m Abstand, Einwurf aus dem Stand (wie Freiwurf): Wer dabei Richtung Linie drückt, tritt nicht ins Aus
+      for (const q of field(1 - t)){ const dd = h2(q, p); if (dd < 3){ const ux = (q.x - p.x)/(dd || 1), uz = (q.z - p.z)/(dd || 1); q.x = cl(p.x + ux*3.05, -HW + .3, HW - .3); q.z = p.z + uz*3.05; pushOut(q, 0, true); } }
+      giveBall(p); p.yaw = Math.atan2(-Math.sign(sx), 0); p.ftStand = true;
+      if (HUM(t)) flashT(t, 'Einwurf aus dem Stand: passen oder werfen');
       st.phase = 'play';
     });
   }
@@ -7531,7 +7537,9 @@ const H3 = { on:false };
       if (sv.bit > 0){ k.yaw = Math.atan2(0, d); return; }   // nach der Täuschung kurz aus dem Gleichgewicht
       sv.moveT -= dt;
       if (sv.moveT <= 0 && !HUM(1 - sv.t)){ sv.moveT = 9; if (Math.random() < .3) sv.kp = (sv.kp + (Math.random() < .5 ? 1 : 2)) % 3; }
-      if (!sv.kf && !sv.kfDone && (sv.kp || 0) === 0 && sv.wait > .8 && HUM(sv.t) && Math.random() < dt*.6){ sv.kf = { t:0 }; sv.kfDone = true; }
+      // Computer-Torwart täuscht das Herauskommen an: bei etwa 2 von 3 Würfen, zu einem zufälligen Zeitpunkt (nicht aus der 4-m-Stellung)
+      if (sv.kfAt == null) sv.kfAt = Math.random() < .65 ? ra(.8, 2.1) : -1;
+      if (!sv.kf && !sv.kfDone && sv.kfAt > 0 && (sv.kp || 0) < 2 && sv.wait > sv.kfAt && HUM(sv.t)){ sv.kf = { t:0 }; sv.kfDone = true; }
       if (sv.kf){ sv.kf.t += dt; if (sv.kf.t > .55) sv.kf = null; }
       const fo = sv.kf ? Math.sin(Math.min(1, sv.kf.t/.55)*Math.PI)*1.3 : 0;
       const tz = oz + d*(KPOS[sv.kp || 0] + fo), tx = sv.commit && sv.wait > .4 ? sv.commit*.35 : 0;
@@ -9088,7 +9096,7 @@ function netLeave(silent){
   clearInterval(NET.pingI); netWarn(0);
   if (NET.T){ if (!silent && NET.on) try { netSend('bye', {}); } catch (_) {} NET.T.close(); }
   const wasRoom = NET.room;
-  Object.assign(NET, { tour:false, lastRx:0, on:false, host:false, guest:false, room:'', peer:false, T:null, snap:null, curMsg:null, curMsg3:null, started:false, mode3:false });
+  Object.assign(NET, { gReady:false, selKey:'', tour:false, lastRx:0, on:false, host:false, guest:false, room:'', peer:false, T:null, snap:null, curMsg:null, curMsg3:null, started:false, mode3:false });
   const url = netUrl();
   if (!silent && wasRoom && url && url !== 'local') fetch(url + '/rooms/' + wasRoom + '.json', { method:'DELETE' }).catch(() => {});
   netUi();
@@ -9097,8 +9105,43 @@ function netUi(){
   const sb = document.getElementById('startBtn'); if (!sb) return;
   const online = S.opp === 'online' && MODES[curMode] && (MODES[curMode].fields || []).includes('oppField');
   sb.hidden = online && NET.guest;
-  sb.disabled = online && !(NET.host && NET.peer);
+  const wait = online && NET.host && NET.peer && !NET.tour && !NET.gReady;
+  sb.disabled = online && !(NET.host && NET.peer) || wait;
+  if (sb.dataset.lbl == null || !wait) sb.dataset.lbl = sb.textContent.startsWith('Warte auf') ? (sb.dataset.lbl || 'Anpfiff') : sb.textContent;
+  sb.textContent = wait ? 'Warte auf ' + NET.names[1] + ' …' : sb.dataset.lbl;
+  if (online && NET.host && NET.peer) netSel();
   const cr = document.getElementById('netCreate'); if (cr) cr.textContent = NET.host ? 'Neuer Raum' : 'Raum erstellen';
+}
+
+/* Online: Der Gast sieht, welches Spiel der Raum-Ersteller ausgewählt hat, und meldet sich mit „Bereit“.
+   Erst dann gibt es den Anpfiff. Ändert der Raum-Ersteller etwas, muss der Gast erneut bestätigen. */
+function netSelInfo(){
+  const ov = document.getElementById('setupOv'); if (!ov || ov.hidden) return null;
+  const rows = [];
+  ov.querySelectorAll('.field').forEach(f => {
+    if (f.hidden || f.id === 'oppField' || f.id === 'netField' || f.id === 'cdiffField' || f.id === 'hformField' || getComputedStyle(f).display === 'none') return;
+    const l = f.querySelector('.flabel'), on = f.querySelector('.seg button[aria-pressed="true"]');
+    if (l && on) rows.push(l.textContent.trim() + ': ' + on.textContent.trim());
+  });
+  return { mode:curMode, title:(document.getElementById('setupTitle') || {}).textContent || '', rows };
+}
+function netSel(){
+  if (!NET.host || !NET.peer || NET.started || NET.tour) return;
+  const i = netSelInfo(); if (!i) return;
+  const key = JSON.stringify(i); if (key === NET.selKey) return;
+  NET.selKey = key; NET.gReady = false;
+  netSend('sel', i);
+  const sb = document.getElementById('startBtn'); if (sb && !sb.hidden){ sb.disabled = true; sb.textContent = 'Warte auf ' + NET.names[1] + ' …'; }
+  netStatus(NET.names[1] + ' sieht deine Auswahl und muss noch „Bereit“ tippen.');
+}
+function netGuestSel(d){
+  const rows = (d.rows || []).join(' · ');
+  zMsg({ eyebrow:'Online · ' + NET.names[0] + ' hat gewählt', title:d.title || 'Spiel', text:(rows ? rows + '. ' : '') + 'Tippe „Bereit“, dann kann ' + NET.names[0] + ' anpfeifen.', net:true,
+         buttons:[{ label:'Bereit', primary:true, fn:() => {
+           netSend('rdy', { sel:d });
+           zMsg({ eyebrow:'Online · bereit', title:d.title || 'Spiel', text:'Du bist bereit. ' + NET.names[0] + ' pfeift gleich an.', net:true,
+                  buttons:[{ label:'Zurück zum Menü', fn:() => showOverlay('menu') }] });
+         } }] });
 }
 
 /* ---------- Nachrichten ---------- */
@@ -9128,6 +9171,11 @@ function netOnMsg(m){
       NET.peer = true; NET.names[0] = String(d.name || 'Spieler 1').slice(0, 14);
       netStatus('Verbunden mit ' + NET.names[0] + ' · ' + NET.names[0] + ' wählt das Spiel');
       netUi(); break;
+    case 'sel': if (NET.guest && !NET.started) netGuestSel(d); break;
+    case 'rdy':
+      if (!NET.host) return;
+      if (d.sel && JSON.stringify(d.sel) !== NET.selKey) break;   // bestätigt eine alte Auswahl
+      NET.gReady = true; netStatus(NET.names[1] + ' ist bereit. Du kannst anpfeifen.'); netUi(); break;
     case 'start':
       if (!NET.guest) return;
       netGuestStart(d); break;
