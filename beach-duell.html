@@ -716,7 +716,7 @@ const cvs = $('#cv'), ctx = cvs.getContext('2d'), stage = $('#stage');
 
 /* ---------- Einstellungen ---------- */
 const GAME = 'beach';   // @@GAME@@
-const BUILD = '06.11.2026 08:09';   // @@BUILD@@ beach = Beach-Duell, hall = Hallen-Duell (beide Spiele aus derselben Quelle gebaut)
+const BUILD = '13.11.2026 23:53';   // @@BUILD@@ beach = Beach-Duell, hall = Hallen-Duell (beide Spiele aus derselben Quelle gebaut)
 const HALL_MODES = ['h3d','h7m','hfull','hlevels'];
 const S = { mode:'1p', half:45, diff:'mittel', game:'duell', zp:'1', fhalf:'180', fdiff:'leicht', opp:'cpu', cdiff:'mittel' };
 try { Object.assign(S, JSON.parse(localStorage.getItem('beachduell') || '{}')); } catch (e) {}
@@ -2046,7 +2046,7 @@ const RULES = {
     '<b>Steuerung:</b> Links auf dem Bildschirm ist der Joystick zum Laufen. Rechts sind die Tasten. Am Computer: Pfeiltasten oder WASD, K = Wurf/Block, J = Pass/Wechsel, L = Pirouette, I = Kempa.',
     '<b>Angriff:</b> Du steuerst den Spieler mit Ball. Pass geht zum Mitspieler in Joystick-Richtung. Beim Wurf zielst du mit dem Joystick nach links oder rechts, nach oben für hoch, nach unten für flach.',
     '<b>Pirouette (wie im Wurfduell):</b> Taste gedrückt halten: Absprung und Drehung, die Gradzahl läuft mit. Loslassen im grünen Bereich ab 360° = Wurf mit 2 Punkten. Unter 360° nur 1 Punkt, darüber überdreht (Ballverlust). Für Profis: Doppel-Pirouette ab 720°.',
-    '<b>Kempa (wie im Wurfduell):</b> Hoher Pass in den Torraum vor einen Mitspieler. Tippe „Sprung“, wenn der Marker im grünen Bereich ist, sonst klappt der Fang nicht. In der Luft dann werfen, bevor der Luftbalken leer ist. 2 Punkte.',
+    '<b>Kempa (wie im Wurfduell):</b> Hoher Pass in den Torraum vor einen Mitspieler. Bei „leicht“ und „mittel“ (und zu zweit oder online) springt dein Mitspieler von selbst ab. Du tippst „Wurf“, der Joystick zielt. Je schneller nach dem Fangen, desto genauer, am besten tippst du schon, während der Ball fliegt. Bei „schwer“: „Sprung“ drücken und halten, wenn der Marker im grünen Bereich ist, nach dem Fangen loslassen = Wurf. Spätestens wenn der Luftbalken leer ist, muss der Ball weg. 2 Punkte.',
     '<b>Langer Ball:</b> Auf „Pass ↑“ nach oben wischen spielt einen langen Pass in den Lauf eines Mitspielers, der vorne frei ist (Tempogegenstoß, auch vom Torwart). Auf „Kempa ↑“ nach oben wischen spielt einen langen Kempa über das halbe Feld zu einem Mitspieler am Torraum. Der Ball fliegt höher und länger, das Timing für den Sprung ist dasselbe.',
     '<b>Abwehr:</b> Du steuerst den Abwehrspieler mit dem gelben Ring. Lauf in die Passwege, Block springt hoch, Wechsel nimmt den Spieler am nächsten zum Ball. Dein Torwart hält selbst.',
     '<b>Regeln:</b> Mit dem Ball höchstens 3 Schritte (Punkte über dem Kopf) und 5 Sekunden (Zeitring). Feldspieler dürfen nicht in den Torraum laufen, nur hineinspringen.',
@@ -4116,6 +4116,14 @@ $('#lvBack').addEventListener('click', () => toMenu());
    Wurfduell-Übungen laufen im Wurfduell auf „Leicht“, ohne Uhr und Punkte. Spielzug-Übungen sind kleine Szenen ohne Sterne.
    Eine Übung ist geschafft, sobald die Bewegung einmal klappt. */
 const LESSONS = [
+  { id:'b3pir', group:'3D-Arena', name:'Pirouette', kind:'b3d', t3:'pir', desc:'Drehung in der Luft, 2 Punkte.',
+    steps:['Lauf mit dem Ball Richtung Torraum. Abspringen musst du vor der Linie.', 'Halte die Taste „Pirouette“: Dein Spieler springt ab und dreht sich.', 'Nach einer vollen Drehung loslassen, dann fliegt der Ball. Der Joystick bestimmt die Ecke.', 'Zu früh losgelassen: nur 1 Punkt. Zu lange gehalten: überdreht, Ballverlust. Zwei Pirouetten-Tore und die Übung ist geschafft.'], done:'Zwei Pirouetten-Tore. Das gibt im Spiel jeweils 2 Punkte.' },
+  { id:'b3kempa', group:'3D-Arena', name:'Kempa', kind:'b3d', t3:'kempa', desc:'Pass in den Torraum, Fang und Wurf in der Luft.',
+    steps:['Tippe „Kempa ↑“: Der Ball fliegt in hohem Bogen vor deinen Mitspieler am Torraum. Du steuerst jetzt ihn.', 'Bei „leicht“ und „mittel“ springt er von selbst ab. Tipp „Wurf“, je schneller nach dem Fangen, desto genauer. Der Joystick bestimmt die Ecke.', 'Bei „schwer“ hältst du „Sprung“ im richtigen Moment und lässt nach dem Fangen los. Zwei Kempa-Tore und die Übung ist geschafft.'], done:'Zwei Kempa-Tore, jedes zählt 2 Punkte.' },
+  { id:'b3kempaL', group:'3D-Arena', name:'Langer Kempa', kind:'b3d', t3:'kempaL', desc:'Kempa über das halbe Feld.',
+    steps:['Du stehst weit vom Tor weg. Dein Mitspieler wartet am Torraum.', 'Auf „Kempa ↑“ nach oben wischen: langer Kempa. Der Ball fliegt höher und länger.', 'Dann wie beim Kempa: Wurf tippen (bei „schwer“ Sprung halten und loslassen).'], done:'Langer Kempa verwandelt.' },
+  { id:'b3tempo', group:'3D-Arena', name:'Tempogegenstoß', kind:'b3d', t3:'tempo', desc:'Torwart spielt den langen Pass.',
+    steps:['Dein Torwart hat den Ball, vorne läuft dein Mitspieler frei.', 'Auf „Pass ↑“ nach oben wischen: langer Pass in seinen Lauf.', 'Fang ihn, lauf weiter und schließ ab, bevor der Abwehrspieler da ist.'], done:'Tempogegenstoß mit langem Pass verwandelt.' },
   { id:'d1', group:'Wurfduell', name:'Normaler Wurf', short:'Wurf', kind:'duel', role:'att', type:'normal',
     desc:'Zielen und werfen.', check: r => r === 'tor',
     steps:['Leg den Finger unten auf den Bildschirm.', 'Zieh ihn nach oben. Das gelbe Fadenkreuz zeigt, wohin du zielst.', 'Lass los, und der Ball fliegt. Ecken sind schwer zu halten.'],
@@ -4284,6 +4292,13 @@ function startLesson(L){
     TR.active = true; TR.lesson = L; TR.tries = 0; TR.won = false; TR.prevDiff = S.diff; S.diff = 'leicht';
     Z.active = false; zbar.hidden = true;
     return newMatch();
+  }
+  if (L.kind === 'b3d'){
+    trainOff();
+    running = false; M = null; A = null; Z.active = false; zbar.hidden = true; showOverlay(null);
+    G3.onTrain = () => { G3.onTrain = null; syncMenu(); trainSuccess(L); };
+    if (!G3.start('train', L.t3)) openTraining();
+    return;
   }
   if (L.kind === '3d'){
     trainOff();
@@ -5408,7 +5423,7 @@ const G3 = { on:false };
     return g;
   }
   function subs(att, carrier){
-    if (st.so || G3.noSubs) return;
+    if (st.so || st.train || G3.noSubs) return;
     const def = 1 - att;
     const ag = PL.find(p => p.team === att && p.gk && !p.out && !p.leave);
     if (ag){
@@ -5462,6 +5477,7 @@ const G3 = { on:false };
     setNames();
     makeTeams();
     if (kind === 'so'){ st.so = { score:[0,0], shots:[0,0], sd:false, t:0, step:0, T:5 }; soSetup(); }
+    else if (kind === 'train'){ if (!TRAIN[lesson]) return false; st.train = { id:lesson, n:0, tries:0, ok:false }; trainSetup(); }
     else kickoff(0);
     lastT = performance.now();
     cancelAnimationFrame(raf); raf = requestAnimationFrame(loop);
@@ -5533,14 +5549,19 @@ const G3 = { on:false };
       b.addEventListener('pointerdown', e => {
         if (!G3.on) return; e.preventDefault();
         const a = b.dataset.a, mode = (st && st.btnMode) || '?';
-        inp.hold[a] = true; b.classList.add('down'); try { b.setPointerCapture(e.pointerId); } catch (_) {}
+        inp.hold[a] = true; b._pid = e.pointerId; b.classList.add('down'); try { b.setPointerCapture(e.pointerId); } catch (_) {}
         if ((a === 'b' && (mode === 'att' || mode === 'gkball')) || (a === 'd' && mode === 'att')){ g = { x:e.clientX, y:e.clientY, mode, id:e.pointerId }; return; }
         inp.act[a] = mode;
       });
       b.addEventListener('pointermove', e => { if (!g || e.pointerId !== g.id) return; const dx = e.clientX - g.x, dy = e.clientY - g.y; if (Math.hypot(dx, dy) < 22) return; fire(dy < -Math.abs(dx)*.8 ? 'lang' : ''); });
-      const up = () => { if (g) fire(''); b.classList.remove('down'); inp.hold[b.dataset.a] = false; };
+      const up = () => { if (g) fire(''); b.classList.remove('down'); inp.hold[b.dataset.a] = false; b._pid = null; };
+      b._up = up;
       b.addEventListener('pointerup', up); b.addEventListener('pointercancel', up); b.addEventListener('pointerleave', () => { if (!g){ b.classList.remove('down'); inp.hold[b.dataset.a] = false; } });
     });
+    // Sicherheitsnetz: Loslassen zählt auch, wenn der Finger beim Halten vom Knopf gerutscht ist (Pirouette, Kempa)
+    const anyUp = e => document.querySelectorAll('#g3btns button').forEach(b => { if (b._pid != null && b._pid === e.pointerId) b._up(); });
+    window.addEventListener('pointerup', anyUp, true); window.addEventListener('pointercancel', anyUp, true);
+    window.addEventListener('touchend', e => { if (!e.touches.length) document.querySelectorAll('#g3btns button').forEach(b => { if (b._pid != null) b._up(); }); }, true);
     window.addEventListener('keydown', e => {
       if (!G3.on) return;
       inp.keys[e.key.toLowerCase()] = true;
@@ -5608,6 +5629,7 @@ const G3 = { on:false };
     launch(from, tgt, T);
     ball.fl = { kind:kind === 'lob' ? 'lob' : 'pass', from, to, team:from.team, t:0, T, tgt, long };
     st.passN = (st.passN || 0) + 1;
+    if (st.train && long && from.team === 0){ if (kind === 'lob') st.train.longK = true; else st.train.longP = true; }
     const pv = st.pas;
     if (pv && pv.warn && pv.team === from.team && !from.gk && !st.so){
       pv.passes++;
@@ -5616,7 +5638,7 @@ const G3 = { on:false };
     }
     if (from.toSpez && !st.so){ from.toSpez = false; setRole(from, 'spez'); from.exitArea = true; }
     to.recv = { tgt, T, kind, t:0 };
-    if (kind === 'lob' && HUM(to.team) && !G3.auto){ const tc = TC(); Object.assign(to.recv, { human:true, ideal:T - .45, win:tc.kWin, ok:false, jumped:false }); }
+    if (kind === 'lob' && HUM(to.team) && !G3.auto){ const tc = TC(); Object.assign(to.recv, { human:true, ideal:T - .45, win:tc.kWin, ok:false, jumped:false, auto:softSteps() }); }   // auto: Fänger springt bei „leicht“/„mittel“ selbst
     from.yaw = Math.atan2(tgt.x - from.x, tgt.z - from.z);
     if (HUM(from.team)) st.ctrls[from.team] = to;
     if (st.so){ if (st.so.step === 0) st.so.step = 1; else if (st.so.step === 1) st.so.passed = true; }
@@ -5652,17 +5674,19 @@ const G3 = { on:false };
     const cpu = !HUM(p.team);
     const far = Math.max(0, dist - 7);
     const sideX = p.x*rightSign(p.team), armIn = !p.gk && (p.lefty ? sideX > 2.5 : sideX < -2.5), armOut = !p.gk && (p.lefty ? sideX < -2.5 : sideX > 2.5);   // Wurfarm innen = besserer Winkel
-    const sd = .07 + (armIn ? -.015 : armOut ? .03 : 0) + Math.max(0, dist - 6)*.04 + far*.015 + (flags.pirSd != null ? flags.pirSd*.6 : flags.pir ? .1 : 0) + (flags.kempa ? .08 + (p.kErr || 0)*.14 : 0) + (p.gk ? .25 : 0) + (cpu ? st.D.aim*.5 : 0);
+    // Automatischer Kempa-Sprung: Je schneller nach dem Fangen geworfen wird (höchster Punkt), desto genauer
+    if (flags.kempa && p.hang && p.hang.auto) p.kErr = Math.max(p.kErr || 0, cl((p.hang.t - .2)/.45, 0, 1.3));
+    const sd = .07 + (armIn ? -.015 : armOut ? .03 : 0) + Math.max(0, dist - 6)*.04 + far*.015 + (flags.pirSd != null ? flags.pirSd*.6 : flags.pir ? .1 : 0) + (flags.kempa ? .065 + (p.kErr || 0)*.13 : 0) + (p.gk ? .25 : 0) + (cpu ? st.D.aim*.5 : 0);
     p.kErr = 0; p.hang = null;
     const ax = cl(tx, -1.45, 1.45) + gs()*sd, ay = cl(ty + gs()*sd*.6, .12, 2.2);
-    const spd = p.gk ? 19 : flags.kempa ? 15 : 18.5;
+    const spd = p.gk ? 19 : flags.kempa ? 16 : 18.5;   // Kempa: aus der Luft, kurz vor dem Tor, der Torwart hat wenig Zeit
     const tgt = { x:ax, y:ay, z:gz + d*.2 };
     const T = Math.hypot(tgt.x - s.x, tgt.z - s.z)/spd;
     launch(p, tgt, T);
     const k = PL.find(q => q.team === 1 - p.team && q.gk && !q.out && !q.leave) || null, K = HUM(1 - p.team) ? HUMAN_K : st.D;
     ball.fl = { kind:'shot', from:p, team:p.team, t:0, T, tgt, pir:!!flags.pir, kempa:!!flags.kempa, gk:p.gk,
-                dbl:!!flags.dbl, spez:p.role === 'spez', pts:Math.max(flags.pts || 1, (flags.pir || flags.kempa || p.gk || p.role === 'spez') ? 2 : 1), kr:K.kr + (flags.pir ? .15 : 0) + (flags.dbl ? .1 : 0) - (flags.kempa ? .04 : 0) - Math.min(.06, far*.02), k, far,
-                kg: tgt.x + gs()*(K.ge + (flags.pir ? .15 : 0))/(1 + far*.25) };   // wohin der Torwart den Ball erwartet
+                dbl:!!flags.dbl, spez:p.role === 'spez', pts:Math.max(flags.pts || 1, (flags.pir || flags.kempa || p.gk || p.role === 'spez') ? 2 : 1), kr:K.kr + (flags.pir ? .15 : 0) + (flags.dbl ? .1 : 0) + (flags.kempa ? (Math.abs(p.x) < 2.5 ? .07 : -.02) : 0) - Math.min(.06, far*.02), k, far,
+                kg: tgt.x + gs()*(K.ge + (flags.pir ? .15 : 0) + (flags.kempa ? .08 : 0))/(1 + far*.25) };   // beim Kempa muss der Torwart mit dem fliegenden Spieler mitgehen   // wohin der Torwart den Ball erwartet
     p.yaw = Math.atan2(tgt.x - p.x, tgt.z - p.z);
   }
   function autoAim(p){
@@ -5710,7 +5734,8 @@ const G3 = { on:false };
     p.y = Math.sin(u*Math.PI)*.8; p.vy = 0;
     h.deg = h.t*h.rate; p.spin = h.deg*Math.PI/180;
     p.x = cl(p.x + p.vx*dt, -HW + .2, HW - .2); p.z += p.vz*dt;
-    if (!(IN[p.team] || inp).hold.c && h.t > .06 && ball.owner === p){
+    // Loslassen = Wurf. Wer bis zur Landung festhält, wirft automatisch (meist überdreht), statt mit dem Ball zu landen
+    if ((!(IN[p.team] || inp).hold.c && h.t > .06 || u >= 1) && ball.owner === p){
       const o = pirOutcome(h.deg, h.pw);
       p.st = 'pirEnd'; p.pirH = null;
       if (!o.ok){ p.air = false; p.y = 0; return faultFree(1 - p.team, 'Überdreht', Math.round(h.deg) + '°', p); }
@@ -5767,8 +5792,54 @@ const G3 = { on:false };
       st.phase = 'play';
     });
   }
+  /* ---------- Training in der 3D-Arena ----------
+     Kurze Szenen gegen den Torwart: Pirouette, Kempa, langer Kempa, Tempogegenstoß mit langem Pass.
+     Ziel erreicht = Übung geschafft. Parade, Fehlwurf, Ballverlust oder Regelverstoß = Szene neu. */
+  const TRAIN = {
+    pir:   { need:2, tip:'Pirouette-Taste halten, nach einer vollen Drehung loslassen. Der Joystick zielt.' },
+    kempa: { need:2, tip:'„Kempa ↑“ antippen. Dein Mitspieler springt selbst (bei „schwer“: „Sprung“ halten), dann schnell „Wurf“.' },
+    kempaL:{ need:1, tip:'Auf „Kempa ↑“ nach oben wischen: langer Kempa zum Mitspieler am Torraum.' },
+    tempo: { need:1, tip:'Dein Torwart hat den Ball: auf „Pass ↑“ nach oben wischen, dann vorne abschließen.' }
+  };
+  function trainSetup(){
+    const tr = st.train, id = tr.id;
+    tr.longP = false; tr.longK = false; tr.lostT = 0;
+    st.score = [[0,0],[0,0]]; st.pas = null; st.ts = 1;
+    for (const p of PL){ p.out = true; p.leave = null; p.waitFor = null; p.enter = false; p.toSpez = false; p.exitArea = false; p.recv = null; p.st = ''; p.air = false; p.y = 0; p.vy = 0; p.vx = p.vz = 0; p.hang = null; p.pirH = null; p.dive = 0; p.spin = 0; p.hold = 0; p.stepDist = 0; p.ftStand = false; p.wu = null; setRole(p, p.i === 3 ? 'gk' : p.i === 4 ? 'spez' : 'field'); }
+    const gz = atkZ(0), d = dirOf(0);
+    const P = (i, x, dep) => { const p = PL.find(q => q.team === 0 && q.i === i); p.out = false; p.x = x; p.z = gz - d*dep; p.yaw = Math.atan2(0, d); return p; };
+    const k1 = PL.find(q => q.team === 1 && q.i === 3); k1.out = false; k1.x = 0; k1.z = gz - d*.5; k1.yaw = Math.atan2(0, -d);
+    let car;
+    if (id === 'pir') car = P(0, 0, 9.2);
+    else if (id === 'kempa'){ car = P(0, 0, 10.5); P(1, -4.6, 7.4); }
+    else if (id === 'kempaL'){ car = P(0, 0, 17.5); P(1, -4.2, 7.6); }
+    else if (id === 'tempo'){ const k0 = PL.find(q => q.team === 0 && q.i === 3); k0.out = false; k0.x = 0; k0.z = ownZ(0) + d*.6; k0.yaw = Math.atan2(0, d); car = k0; P(1, 3.2, 11.5);
+      const df = PL.find(q => q.team === 1 && q.i === 0); df.out = false; df.x = 1.5; df.z = gz - d*19; df.yaw = Math.atan2(0, d); }
+    for (const p of PL) p.rig.root.visible = !p.out;
+    G3.noSubs = true; giveBall(car); G3.noSubs = false;
+    st.ctrls[0] = car; st.poss = 0; st.phase = 'play';
+    cam.yaw = d < 0 ? 0 : Math.PI;
+    banner(tr.tries ? 'Nochmal' : 'Training', TRAIN[id].tip, 2600);
+  }
+  function trainGoal(f){
+    const tr = st.train, id = tr.id;
+    const good = f.team === 0 && (id === 'pir' ? !!f.pir : id === 'kempa' ? !!f.kempa : id === 'kempaL' ? !!f.kempa && tr.longK : id === 'tempo' ? tr.longP : false);
+    banner(f.pts === 2 ? 'Tor! +2' : 'Tor!', good ? label(f) || 'Tor' : id === 'pir' ? 'Tor, aber ohne volle Pirouette' : id === 'tempo' ? 'Tor, aber ohne langen Pass' : 'Tor, aber das war kein Kempa');
+    if (good) tr.n++;
+    if (tr.n >= TRAIN[id].need){ tr.ok = true; return dead(1.6, () => { banner('Geschafft!', 'Übung gelungen', 1400); st.phase = 'menu'; stop(); if (typeof G3.onTrain === 'function') G3.onTrain(true); }); }
+    if (good && TRAIN[id].need > 1) flashT(0, 'Geschafft: ' + tr.n + ' von ' + TRAIN[id].need);
+    dead(1.5, () => trainSetup());
+  }
+  // Szene gescheitert (Parade, Fehlwurf, Ballverlust, Regelverstoß): neu aufbauen
+  function trainCheck(dt){
+    const tr = st.train; if (!tr || tr.ok || st.phase !== 'play') return;
+    const o = ball.owner;
+    if (o && o.team === 1){ tr.tries++; return dead(.6, () => trainSetup()); }
+    if (!o && !ball.fl){ tr.lostT += dt; if (tr.lostT > 2.5){ tr.tries++; banner('Ball weg', 'Neuer Versuch'); return dead(1, () => trainSetup()); } } else tr.lostT = 0;
+  }
   function goalScored(f){
     const t = f.team;
+    if (st.train) return trainGoal(f);
     if (st.so){ st.so.score[t] += f.pts; banner(f.pts === 2 ? 'Tor! +2' : 'Tor!', label(f)); return soResult(true); }
     st.score[st.half][t] += f.pts;
     if (st.mx){ st.mx.g[t]++; if (f.kempa) st.mx.kempa[t]++; if (f.pir) st.mx.pir[t]++; }
@@ -6063,6 +6134,11 @@ const G3 = { on:false };
   function physicsAir(p, dt){
     if (!p.air || p.st === 'pirH') return;
     // Kempa wie im Wurfduell: nach dem Fangen schwebt der Werfer, bis der Luftbalken leer ist
+    // Kempa: Sprung-Taste gehalten = in der Luft bleiben, loslassen = Wurf (Joystick zielt). Schon losgelassen = Wurf direkt nach dem Fangen.
+    if (p.hang && p.hang.q && ball.owner === p && p.hang.t > .1 && HUM(p.team) && !G3.auto){ p.hang.q = false; const a = humanAim(p); return throwAt(p, a.x, a.y, { kempa:true }); }
+    if (p.hang && p.hang.btn && ball.owner === p && p.hang.t > .12 && !(IN[p.team] || inp).hold[p.hang.btn] && HUM(p.team) && !G3.auto){
+      p.hang = null; const a = humanAim(p); return throwAt(p, a.x, a.y, { kempa:true });
+    }
     if (p.hang && ball.owner === p){ p.hang.t += st.rdt; if (p.hang.t < p.hang.max){ p.vy = 0; p.vx *= .96; p.vz *= .96; p.x += p.vx*dt; p.z += p.vz*dt; return; } p.hang = null; }
     p.y += p.vy*dt; p.vy -= GRAV*dt;
     if (p.y <= 0){ p.y = 0; p.vy = 0; p.air = false; p.landed = true; p.landT = .18; }
@@ -6076,13 +6152,16 @@ const G3 = { on:false };
     if (st.phase === 'menu' || st.paused) return;
     if (st.phase === 'dead'){
       st.deadT -= rdt;
+      // Während der Unterbrechung gedrückte Tasten verwerfen, sonst wird z. B. ein Wurf nach dem Freiwurfpfiff noch ausgeführt
+      for (const I of IN) if (I){ if (I.act) for (const k in I.act) I.act[k] = false; I.vr = {}; }
+      for (const p of PL) if (p.wu){ p.wu = null; if (p.st === 'windup') p.st = ''; }   // angefangene Würfe verfallen mit dem Pfiff
       for (const p of PL) if (!p.out){ p.vx *= .9; p.vz *= .9; animate(p, rdt); }
       ballStep(dt, true);
       if (st.deadT <= 0){ const f = st.after; st.after = null; st.phase = 'play'; if (f) f(); }
       return;
     }
     // Uhr
-    if (!st.so && !st.golden){
+    if (!st.so && !st.golden && !st.train){
       st.clock = Math.max(0, st.clock - rdt);
       if (st.clock === 0 && !st.timeUp){ st.timeUp = true; if (!(ball.fl && ball.fl.kind === 'shot')){ banner('Pfiff', 'Die Halbzeit ist vorbei'); dead(1.2, () => { checkTime(); if (st.phase !== 'menu') st.phase = 'play'; }); return; } }
     }
@@ -6195,6 +6274,7 @@ const G3 = { on:false };
     if (c && !so && !G3.auto && HUM(c.team) && !HUM(1 - c.team) && !c.gk) cpuTackle(dt, c);
     if (c && !so && !c.gk && (!HUM(c.team) || G3.auto || st.online)) for (const q of field(1 - c.team)) if (G3.auto || q !== st.ctrls[q.team]) aiTackle(dt, q, c);
     ballStep(dt, false);
+    if (st.train) trainCheck(dt);
     // Leichte Zeitlupe nur, wenn DEIN Spieler mit Ball in der Luft ist (Kempa, Pirouette). Beim Computer läuft das Spiel normal weiter.
     const bo = ball.owner, mine = bo && HUM(bo.team) && !G3.auto && bo === st.ctrls[bo.team];
     st.ts = (mine && (bo.st === 'pirH' || (bo.air && bo.st !== 'pir' && bo.st !== 'pirEnd'))) ? .65 : 1;
@@ -6295,12 +6375,14 @@ const G3 = { on:false };
     const left = f.T - f.t;
     const E = r.tgt, d = dirOf(p.team);
     const gz = atkZ(p.team), take = { x:lerpN(p.x, E.x, .6), z:gz - d*6.15 };   // Absprung knapp vor der Torraumlinie
+    { const AQ = st.AT ? st.AT[p.team] : st.A; if (r.human && r.auto && AQ && AQ.a){ AQ.a = false; r.q = true; } }   // „Wurf“ schon vor dem Fangen getippt: direkt nach dem Fangen werfen
     if (!p.air){
       const dx = take.x - p.x, dz = take.z - p.z, dd = Math.hypot(dx, dz);
       // Du: Sprung per Taste im richtigen Moment (wie im Wurfduell). Computer: automatisch.
       const AA = st.AT ? st.AT[p.team] : st.A;
-      let go = r.human ? !!(AA && (AA.a || AA.d)) : left <= .45;
-      if (r.human && go){ AA.a = AA.d = false; const err = f.t - r.ideal; r.ok = Math.abs(err) <= r.win; r.err = Math.abs(err)/r.win; r.jumped = true; if (!r.ok) flashT(p.team, err < 0 ? 'Zu früh gesprungen' : 'Zu spät gesprungen'); }
+      let go = r.human && !r.auto ? !!(AA && (AA.a || AA.d)) : left <= .45;
+      if (r.human && r.auto && go){ r.ok = true; r.err = 0; r.jumped = true; }
+      else if (r.human && go){ r.btn = AA.a ? 'a' : 'd'; AA.a = AA.d = false; const err = f.t - r.ideal; r.ok = Math.abs(err) <= r.win; r.err = Math.abs(err)/r.win; r.jumped = true; if (!r.ok) flashT(p.team, err < 0 ? 'Zu früh gesprungen' : 'Zu spät gesprungen'); }
       if (go){ p.air = true; p.vy = 4.4; p.st = 'jump'; const T = Math.max(.25, left); p.vx = (E.x - p.x)/T; p.vz = (E.z - p.z)/T; }
       else { const v = Math.min(6.2, dd/Math.max(.1, left - .45)); p.vx = dx/dd*v; p.vz = dz/dd*v; p.x += p.vx*dt; p.z += p.vz*dt; if (inArea(p)) p.z = Math.sign(p.z)*(AREA - .02); }
     } else { p.x += p.vx*dt; p.z += p.vz*dt; }
@@ -6406,9 +6488,9 @@ const G3 = { on:false };
         const hy = to.y + (f.kind === 'lob' ? 2.0 : 1.35);
         const hum = to.recv && to.recv.human;
         if (h2(to, ball) < .75 && Math.abs(ball.y - hy) < .75 && !(f.kind === 'lob' && (!to.air || (hum && !to.recv.ok)))){
-          if (hum){ to.kErr = to.recv.err || 0; to.hang = { t:0, max:TC().kHang }; }
+          if (hum){ to.kErr = to.recv.err || 0; const au = !!to.recv.auto; to.hang = { t:0, max:TC().kHang, btn:au ? null : (to.recv.btn || 'a'), auto:au, q:!!to.recv.q }; }
           ball.fl = null; giveBall(to); to.recv = null;
-          if (f.kind === 'lob' && to.air){ to.st = 'catch'; banner('Kempa!', HUM(to.team) ? 'Jetzt werfen' : '', 700); }
+          if (f.kind === 'lob' && to.air){ to.st = 'catch'; banner('Kempa!', HUM(to.team) && !G3.auto ? 'Loslassen = Wurf' : '', 700); }
           if (st.so && st.so.step === 1 && to === PL.find(q => q.team === st.so.t && q.i === 0)){ st.so.step = 2; st.so.T = 5; }
           return;
         }
@@ -6441,6 +6523,8 @@ const G3 = { on:false };
   function soStep(rdt, dt){
     const so = st.so, t = so.t, shooter = PL.find(p => p.team === t && p.i === 0), g0 = gkOf(t);
     const d = dirOf(t), gz = atkZ(t);
+    // Kempa unterwegs zu deinem Läufer: Sprung-Taste gehört dem Fänger (kempaRecv), hier nichts abgreifen
+    if (ball.fl && ball.fl.kind === 'lob' && ball.fl.to === shooter && shooter.recv && shooter.recv.human){ so.wait += rdt; return; }
     const AS = [0, 1].map(tt => ({ a:take('a', tt), b:take('b', tt), c:take('c', tt), d:take('d', tt) }));
     const A = AS[t], AK = AS[1 - t];
     if (so.step === 0){
@@ -6620,7 +6704,7 @@ const G3 = { on:false };
     let mode = 'none';
     const fl = ball.fl, kr = fl && fl.kind === 'lob' && fl.to && fl.to.team === MY() && fl.to.recv && fl.to.recv.human && !fl.to.air ? fl.to : null;
     if (c && c.st === 'pirH' && c.team === MY()) mode = 'pirH';
-    else if (kr) mode = 'kjump';
+    else if (kr) mode = kr.recv.auto ? 'kauto' : 'kjump';
     else if (so){
       if (so.t === MY()){
         if (so.step === 0) mode = 'so0'; else if (so.step === 1) mode = 'so1'; else mode = c && c.air ? 'air' : 'so2';
@@ -6633,7 +6717,7 @@ const G3 = { on:false };
       st.btnMode = mode;
       const B = { a:$3('g3a'), b:$3('g3b'), c:$3('g3cc'), d:$3('g3d') };
       const set = (el, txt) => { el.hidden = !txt; if (txt) el.querySelector('b').textContent = txt; };
-      const cfg = { pirH:['','','Loslassen!',''], kjump:['Sprung','','',''], att:['Wurf','Pass ↑','Pirouette','Kempa ↑'], air:['Wurf','','',''], gkball:['Wurf','Pass ↑','',''], def:['Block','Wechsel','Verteidigen',''], gkshot:['Hechten','','',''], wait:['','','',''],
+      const cfg = { pirH:['','','Loslassen!',''], kjump:['Sprung (halten)','','',''], kauto:['Wurf','','',''], att:['Wurf','Pass ↑','Pirouette','Kempa ↑'], air:['Wurf','','',''], gkball:['Wurf','Pass ↑','',''], def:['Block','Wechsel','Verteidigen',''], gkshot:['Hechten','','',''], wait:['','','',''],
                     so0:['','Pass zum TW','',''], so1:['','Rückpass','','Kempa'], so2:['Wurf','','Pirouette',''], gk:['Hechten','','',''], none:['','','',''] }[mode];
       set(B.a, cfg[0]); set(B.b, cfg[1]); set(B.c, cfg[2]); set(B.d, cfg[3]);
       const hints = { pirH:'Gedrückt halten = drehen · loslassen = werfen (Joystick zielt)', kjump:'Tippe „Sprung“, wenn der Marker im grünen Bereich ist', att:'Joystick: laufen und zielen (Kreuz im Tor) · Pass oder Kempa nach oben wischen = langer Ball zum Gegenstoß', air:'In der Luft! Jetzt werfen', gkball:'Dein Torwart hat den Ball: Pass, hoch wischen = langer Ball nach vorne, oder Wurf aufs leere Tor',
@@ -6650,12 +6734,14 @@ const G3 = { on:false };
       const h = c.pirH, o = pirOutcome(h.deg, h.pw);
       gauge(gg, 'DREHUNG · Ziel 360–' + (360 + h.pw) + '°', Math.round(h.deg) + '°', h.deg < 360 ? '#FFC63A' : o.ok ? '#55D9C9' : '#FF8F6B',
         h.deg < 360 ? 'Noch keine volle Drehung' : o.ok ? (o.dbl ? 'Doppel-Pirouette: jetzt loslassen!' : 'Jetzt loslassen!') : 'Überdreht', 720 + h.pw + 60, h.deg, [[360, 360 + h.pw], [720, 720 + dblW(h.pw)]]);
+    } else if (mode === 'kauto'){
+      gauge(gg, 'KEMPA · dein Spieler springt selbst', 'Wurf tippen', '#FFF7E8', '', fl.T, fl.t, []);
     } else if (mode === 'kjump'){
       const r = kr.recv, inWin = Math.abs(fl.t - r.ideal) <= r.win;
       gauge(gg, 'KEMPA · im grünen Bereich springen', inWin ? 'JETZT!' : '…', inWin ? '#55D9C9' : '#FFF7E8', '', fl.T + r.win*1.4, fl.t, [[r.ideal - r.win, r.ideal + r.win]]);
     } else if (c && c.team === MY() && c.hang){
       const left = Math.max(0, c.hang.max - c.hang.t);
-      gauge(gg, 'IN DER LUFT · jetzt werfen', left.toFixed(1).replace('.', ',') + ' s', left/c.hang.max > .35 ? '#55D9C9' : '#FF8F6B', '', c.hang.max, left, []);
+      gauge(gg, c.hang.auto ? 'IN DER LUFT · Wurf tippen, schnell = genau' : 'IN DER LUFT · loslassen = Wurf', left.toFixed(1).replace('.', ',') + ' s', left/c.hang.max > .35 ? '#55D9C9' : '#FF8F6B', '', c.hang.max, left, []);
     } else gg.hidden = true;
     // Haltezeit-Anzeige
     const ring = $3('g3hold');
@@ -6739,18 +6825,18 @@ const G3 = { on:false };
   let snapT = 0, inT = 0;
   function snap(){
     const so = st.so, b = ball, f = b.fl;
-    const kr = f && f.kind === 'lob' && f.to && f.to.recv && f.to.recv.human ? { to:PL.indexOf(f.to), t:r2(f.t), T:r2(f.T), ideal:r2(f.to.recv.ideal), win:r2(f.to.recv.win) } : 0;
+    const kr = f && f.kind === 'lob' && f.to && f.to.recv && f.to.recv.human ? { to:PL.indexOf(f.to), t:r2(f.t), T:r2(f.T), ideal:r2(f.to.recv.ideal), win:r2(f.to.recv.win), auto:f.to.recv.auto ? 1 : 0 } : 0;
     return { ph:st.phase, sc:st.score, sets:st.sets, half:st.half, clk:r2(st.clock), golden:st.golden ? 1 : 0, poss:st.poss, kind:st.kind,
       ctl:[PL.indexOf(st.ctrls[0]), PL.indexOf(st.ctrls[1])],
       so: so ? { score:so.score, shots:so.shots, sd:so.sd ? 1 : 0, t:so.t, step:so.step, T:r2(so.T) } : 0, kr, pw:st.pas && st.pas.warn ? st.pas.passes + 1 : 0,
       P:PL.map(p => [r2(p.x), r2(p.z), r2(p.y), r2(p.yaw), r2(p.vx), r2(p.vz), Math.max(0, ST_CODES.indexOf(p.st)), r2(p.stT), r2(p.dive), p.diveDir || 0, r2(p.diveH || 1),
                      p.air ? 1 : 0, r2(p.spin), p.out ? 1 : 0, p.faceBall ? 1 : 0, r2(p.hold), r2(p.stepDist), p.wu ? r2(p.wu.t/(p.wu.T || 1)) : -1,
-                     p.pirH ? [r2(p.pirH.deg), p.pirH.pw] : 0, p.hang ? [r2(p.hang.t), r2(p.hang.max)] : 0, p.gk ? 1 : 0, p.role === 'spez' ? 1 : 0]),
+                     p.pirH ? [r2(p.pirH.deg), p.pirH.pw] : 0, p.hang ? [r2(p.hang.t), r2(p.hang.max), p.hang.auto ? 1 : 0] : 0, p.gk ? 1 : 0, p.role === 'spez' ? 1 : 0]),
       b:[r2(b.x), r2(b.y), r2(b.z), r2(b.vx), r2(b.vy), r2(b.vz), b.owner ? PL.indexOf(b.owner) : -1, f ? f.team : -1, f ? (f.kind === 'shot' ? 1 : f.kind === 'lob' ? 2 : 0) : -1] };
   }
   function hostNet(){
     const now = performance.now();
-    if (now - snapT < 70 || !NET.T) return;
+    if (now - snapT < (NET.T && NET.T.direct ? 45 : 90) || !NET.T) return;   // Direktverbindung: gut 20 Stände pro Sekunde
     snapT = now; const sn = snap(); NET.T.state(0, sn);
     // Turnier: Zuschauer lesen etwa 5 Bilder pro Sekunde aus der Datenbank
     if (NET.tour && now - (st.wT || 0) > 200 && /^https?:/.test(netUrl())){ st.wT = now; fetch(netUrl() + '/rooms/' + NET.room + '/w.json', { method:'PUT', body:JSON.stringify(JSON.stringify(sn)) }).catch(() => {}); }
@@ -6796,13 +6882,13 @@ const G3 = { on:false };
         const stc = ST_CODES[a[6]] || ''; if (stc !== p.st){ p.st = stc; p.stT = a[7]; }
         p.dive = a[8]; p.diveDir = a[9]; p.diveH = a[10]; p.air = !!a[11]; p.spin = a[12]; p.out = !!a[13]; p.faceBall = !!a[14];
         p.hold = a[15]; p.stepDist = a[16]; p.wu = a[17] >= 0 ? { t:a[17], T:1 } : null;
-        p.pirH = a[18] ? { deg:a[18][0], pw:a[18][1] } : null; p.hang = a[19] ? { t:a[19][0], max:a[19][1] } : null;
+        p.pirH = a[18] ? { deg:a[18][0], pw:a[18][1] } : null; p.hang = a[19] ? { t:a[19][0], max:a[19][1], auto:!!a[19][2] } : null;
         if (!!a[20] !== p.gk) setRole(p, a[20] ? 'gk' : a[21] ? 'spez' : 'field');
         p.leave = null; p.enter = false; p.waitFor = null;
       });
       ball.owner = b[6] >= 0 ? PL[b[6]] : null;
       ball.fl = b[7] >= 0 ? { team:b[7], kind:b[8] === 1 ? 'shot' : b[8] === 2 ? 'lob' : 'pass', t:0, T:1 } : null;
-      if (ball.fl && s.kr){ const to = PL[s.kr.to]; ball.fl.to = to; ball.fl.t = s.kr.t; ball.fl.T = s.kr.T; if (to) to.recv = { human:true, ideal:s.kr.ideal, win:s.kr.win }; }
+      if (ball.fl && s.kr){ const to = PL[s.kr.to]; ball.fl.to = to; ball.fl.t = s.kr.t; ball.fl.T = s.kr.T; if (to) to.recv = { human:true, ideal:s.kr.ideal, win:s.kr.win, auto:!!s.kr.auto }; }
       else for (const p of PL) if (p.recv) p.recv = null;
     }
     for (const p of PL){ if (!p.out) animate(p, dt); }
@@ -6810,10 +6896,11 @@ const G3 = { on:false };
     if (st.watch){ for (const k in inp.act) inp.act[k] = false; return; }   // Zuschauer senden nichts
     for (const a of ['a', 'b', 'c', 'd']) if (inp.act[a]){ netSend('a3', { a, m:inp.act[a], v:(inp.vr || {})[a] || '' }); inp.act[a] = false; if (inp.vr) inp.vr[a] = ''; }
     const now = performance.now();
-    if (now - inT > 50 && NET.T){ inT = now; const j = joyVec(1); NET.T.state(1, { jx:r2(j.x), jy:r2(j.y), hc:inp.hold.c ? 1 : 0, cy:Math.round(cam.yaw*1000)/1000 }); }
+    if (now - inT > (NET.T && NET.T.direct ? 30 : 60) && NET.T){ inT = now; const j = joyVec(1); NET.T.state(1, { jx:r2(j.x), jy:r2(j.y), hc:inp.hold.c ? 1 : 0, ha:inp.hold.a ? 1 : 0, hd:inp.hold.d ? 1 : 0, cy:Math.round(cam.yaw*1000)/1000 }); }
   }
-  function remoteIn(d){ IN[1].jx = d.jx || 0; IN[1].jy = d.jy || 0; IN[1].hold = { c:!!d.hc }; IN[1].cy = d.cy; }
-  function remoteAct(d){ if (st && st.online && NET.host){ IN[1].act[d.a] = d.m || '?'; if (d.v){ IN[1].vr = IN[1].vr || {}; IN[1].vr[d.a] = d.v; } } }
+  function remoteIn(d){ IN[1].jx = d.jx || 0; IN[1].jy = d.jy || 0; { const hA = IN[1].holdAt || {}, nw = performance.now(), fresh = k => nw - (hA[k] || 0) < 160;   // ein älterer Stand ohne Tastendruck darf ein gerade gemeldetes Drücken nicht sofort aufheben
+        IN[1].hold = { c:!!d.hc || fresh('c'), a:!!d.ha || fresh('a'), d:!!d.hd || fresh('d') }; } IN[1].cy = d.cy; }
+  function remoteAct(d){ if (st && st.online && NET.host){ IN[1].act[d.a] = d.m || '?'; IN[1].hold = IN[1].hold || {}; IN[1].hold[d.a] = true; IN[1].holdAt = IN[1].holdAt || {}; IN[1].holdAt[d.a] = performance.now(); if (d.v){ IN[1].vr = IN[1].vr || {}; IN[1].vr[d.a] = d.v; } } }
   function showRemoteMsg(d){
     msg(d.eye, d.title, d.text, d.btns.map((b, i) => ({ label:b.label, primary:b.primary, fn:() => { netSend('b3', { id:d.id, i }); if (/Menü|verlassen/.test(b.label)){ netSend('end', {}); exit(); } } })), true);
   }
@@ -8038,6 +8125,9 @@ const H3 = { on:false };
     if (st.phase === 'menu' || st.paused) return;
     if (st.phase === 'dead'){
       st.deadT -= rdt;
+      // Während der Unterbrechung gedrückte Tasten verwerfen, sonst wird z. B. ein Wurf nach dem Freiwurfpfiff noch ausgeführt
+      for (const I of IN) if (I){ if (I.act) for (const k in I.act) I.act[k] = false; I.vr = {}; }
+      for (const p of PL) if (p.wu){ p.wu = null; if (p.st === 'windup') p.st = ''; }   // angefangene Würfe verfallen mit dem Pfiff
       for (const p of PL) if (!p.out){ p.vx *= .9; p.vz *= .9; animate(p, rdt); }
       ballStep(dt, true);
       if (st.deadT <= 0){ const f = st.after; st.after = null; st.phase = 'play'; if (f) f(); }
@@ -8682,7 +8772,7 @@ const H3 = { on:false };
   }
   function hostNet(){
     const now = performance.now();
-    if (now - snapT < 70 || !NET.T) return;
+    if (now - snapT < (NET.T && NET.T.direct ? 45 : 90) || !NET.T) return;   // Direktverbindung: gut 20 Stände pro Sekunde
     snapT = now; const sn = snap(); NET.T.state(0, sn);
     // Turnier: Zuschauer lesen etwa 5 Bilder pro Sekunde aus der Datenbank
     if (NET.tour && now - (st.wT || 0) > 200 && /^https?:/.test(netUrl())){ st.wT = now; fetch(netUrl() + '/rooms/' + NET.room + '/w.json', { method:'PUT', body:JSON.stringify(JSON.stringify(sn)) }).catch(() => {}); }
@@ -8739,7 +8829,7 @@ const H3 = { on:false };
     if (st.watch){ for (const k in inp.act) inp.act[k] = false; return; }   // Zuschauer senden nichts
     for (const a of ['a', 'b', 'c', 'd']) if (inp.act[a]){ netSend('a3', { a, m:inp.act[a], v:(inp.vr || {})[a] || '' }); inp.act[a] = false; if (inp.vr) inp.vr[a] = ''; }
     const now = performance.now();
-    if (now - inT > 60 && NET.T){ inT = now; const j = joyVec(1); NET.T.state(1, { jx:r2(j.x), jy:r2(j.y), hc:inp.hold.c ? 1 : 0, cy:Math.round(cam.yaw*1000)/1000 }); }
+    if (now - inT > (NET.T && NET.T.direct ? 30 : 60) && NET.T){ inT = now; const j = joyVec(1); NET.T.state(1, { jx:r2(j.x), jy:r2(j.y), hc:inp.hold.c ? 1 : 0, cy:Math.round(cam.yaw*1000)/1000 }); }
   }
   function remoteIn(d){ IN[1].jx = d.jx || 0; IN[1].jy = d.jy || 0; IN[1].hold = { c:!!d.hc }; IN[1].cy = d.cy; }
   function remoteAct(d){ if (st && st.online && NET.host){ IN[1].act[d.a] = d.m || '?'; if (d.v){ IN[1].vr = IN[1].vr || {}; IN[1].vr[d.a] = d.v; } } }
@@ -9138,7 +9228,7 @@ setInterval(() => {
 document.addEventListener('visibilitychange', () => { if (!document.hidden && NET.on) NET.lastRx = performance.now(); });
 window.addEventListener('pagehide', () => { if (NET.on && NET.T) try { netSend('bye', {}); } catch (e) {} });
 function netLeave(silent){
-  clearInterval(NET.pingI); netWarn(0);
+  clearInterval(NET.pingI); clearInterval(NET.rtcI); netWarn(0);
   if (NET.T){ if (!silent && NET.on) try { netSend('bye', {}); } catch (_) {} NET.T.close(); }
   const wasRoom = NET.room;
   Object.assign(NET, { gReady:false, selKey:'', tour:false, lastRx:0, on:false, host:false, guest:false, room:'', peer:false, T:null, snap:null, curMsg:null, curMsg3:null, started:false, mode3:false });
@@ -9207,6 +9297,9 @@ function netOnMsg(m){
       if (!NET.host) return;
       NET.peer = true; NET.names[1] = String(d.name || 'Spieler 2').slice(0, 14);
       if (NET.T.rtcStart && !NET.T.rtc) NET.T.rtcStart();
+      // Klappt die Direktverbindung nicht sofort (oder bricht sie ab), alle 8 s neu versuchen, höchstens 6-mal
+      clearInterval(NET.rtcI); NET.rtcTry = 0;
+      NET.rtcI = setInterval(() => { if (!NET.on || !NET.peer || !NET.T){ clearInterval(NET.rtcI); return; } if (NET.T.direct) return; if (++NET.rtcTry > 6){ clearInterval(NET.rtcI); return; } NET.T.rtcStart(); }, 8000);
       netSend('welcome', { name:NET.names[0], mode:curMode });
       netStatus('Raum ' + NET.room + ' · ' + NET.names[1] + ' ist da. Tippe jetzt ein Spiel an.');
       if (typeof TOUR !== 'undefined' && TOUR.match && !NET.started) setTimeout(tourStartMatch, 1500);
@@ -9379,9 +9472,12 @@ function netGuestTick0(dt){
    Den eigenen Spieler bewegt der Joystick sofort; die Antwort des Hosts korrigiert ihn nur sanft. */
 function net3Apply(PL, s, ball, dt, me, want, lerpAng){
   const now = performance.now();
-  const age = Math.min(.25, Math.max(0, (now - (s._t || now))/1000));
-  const lead = Math.min(.45, age + (NET.rtt || 0)/1000);
-  const kk = 1 - Math.exp(-dt*14);
+  // Der Schnappschuss ist beim Eintreffen schon um die halbe Ping-Zeit alt: Mitspieler, Gegner und Ball um Alter + Laufzeit vorausrechnen,
+  // damit Spieler 2 das Geschehen fast gleichzeitig mit Spieler 1 sieht
+  const oneWay = Math.min(.18, (NET.rtt || 0)/2000);
+  const age = Math.min(.4, Math.max(0, (now - (s._t || now))/1000) + oneWay);
+  const lead = Math.min(.45, age + oneWay);
+  const kk = 1 - Math.exp(-dt*18);
   s.P.forEach((a, i) => {
     const p = PL[i]; if (!p) return;
     let tx = a[0] + a[4]*age, tz = a[1] + a[5]*age;
